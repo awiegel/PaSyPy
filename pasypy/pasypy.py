@@ -1,6 +1,7 @@
 from z3 import *
 
 from variables import *
+from visualize import *
 
 
 def add_boundary(B):
