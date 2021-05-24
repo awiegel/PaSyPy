@@ -18,7 +18,7 @@ def init_graph():
 def create_logfile(name):
     if not os.path.exists('logs'):
         os.makedirs('logs')
-    logfile = open('logs/{}.txt'.format(name), 'w')
+    logfile = open('logs/{}.log'.format(name), 'w')
     for variable in variables:
         logfile.write('----- {} -----'.format(str(variable)))
     logfile.write('\n')
