@@ -8,10 +8,11 @@ y = Real('y')
 
 f = x + y <= 1
 
-variables = [x, y]
+parameters = [x, y]
 
 # starting box with intervalls [0,1] € R and depth 1
 Queue = [([0, 1], [0, 1], 1)]
+Sub_Queue = []
 
 G = []
 R = []

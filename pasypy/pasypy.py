@@ -1,33 +1,35 @@
 from z3 import *
+import timeit
 
-from variables import *
-from visualize import *
-from gui import *
+import variables
+import visualize
+import gui
+
 
 def add_boundary(s, B):
-    s.add(x >= B[0][0], x <= B[0][1], y >= B[1][0], y <= B[1][1])
+    s.add(variables.x >= B[0][0], variables.x <= B[0][1], variables.y >= B[1][0], variables.y <= B[1][1])
 
 
 def solveit(B):
-    Queue.pop(0)
+    variables.Queue.pop(0)
 
-    solver.push()
-    add_boundary(solver, B)
+    variables.solver.push()
+    add_boundary(variables.solver, B)
 
-    if solver.check() == sat:
-        solver.pop()
+    if variables.solver.check() == sat:
+        variables.solver.pop()
 
-        solver_neg.push()
-        add_boundary(solver_neg, B)
+        variables.solver_neg.push()
+        add_boundary(variables.solver_neg, B)
 
-        if solver_neg.check() == sat:
+        if variables.solver_neg.check() == sat:
             split_box(B)
         else:
-            G.append(B[:-1])
-        solver_neg.pop()
+            variables.G.append(B[:-1])
+        variables.solver_neg.pop()
     else:
-        solver.pop()
-        R.append(B[:-1])
+        variables.solver.pop()
+        variables.R.append(B[:-1])
 
 
 def split_box(area):
@@ -42,11 +44,16 @@ def split_box(area):
     Y2 = area[1][1]
     Y2M = Y2-d
 
-    if depth < 2**depth_limit:
-        Queue.append(([X1M, X2], [Y1M, Y2], depth))
-        Queue.append(([X1, X2M], [Y1, Y2M], depth))
-        Queue.append(([X1M, X2], [Y1, Y2M], depth))
-        Queue.append(([X1, X2M], [Y1M, Y2], depth))
+    if depth < 2**variables.depth_limit:
+        variables.Queue.append(([X1M, X2], [Y1M, Y2], depth))
+        variables.Queue.append(([X1, X2M], [Y1, Y2M], depth))
+        variables.Queue.append(([X1M, X2], [Y1, Y2M], depth))
+        variables.Queue.append(([X1, X2M], [Y1M, Y2], depth))
+    else:
+        variables.Sub_Queue.append(([X1M, X2], [Y1M, Y2], depth))
+        variables.Sub_Queue.append(([X1, X2M], [Y1, Y2M], depth))
+        variables.Sub_Queue.append(([X1M, X2], [Y1, Y2M], depth))
+        variables.Sub_Queue.append(([X1, X2M], [Y1M, Y2], depth))
 
 
 def calculate_area(boxes):
@@ -60,26 +67,29 @@ def main():
     try:
         timestamps = {'Start Time': timeit.default_timer()}
 
-        solver.add(f)
-        solver_neg.add(Not(f))
+        variables.solver.add(variables.f)
+        variables.solver_neg.add(Not(variables.f))
 
-        while Queue:
-            solveit(Queue[0])
-            show_progress()
+        while variables.Queue:
+            if variables.Queue[0][len(variables.parameters)] < (2**variables.depth_limit)/2:
+                solveit(variables.Queue[0])
+                visualize.show_progress()
+            else:
+                variables.Sub_Queue.append(variables.Queue[0])
+                variables.Queue.pop(0)
 
     except KeyboardInterrupt:
         None
 
     finally:
-        create_timestamp('Computation Time', timestamps)
+        visualize.create_timestamp('Computation Time', timestamps)
 
-        generate_graph()
+        visualize.generate_graph()
 
-        create_timestamp('Visualization Time', timestamps)
+        visualize.create_timestamp('Visualization Time', timestamps)
 
-        show_time(timestamps)
+        visualize.show_time(timestamps)
 
 
 if __name__ == "__main__":
-    main()
-    root.mainloop()
+    gui.root.mainloop()

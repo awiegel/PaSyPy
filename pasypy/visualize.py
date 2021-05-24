@@ -19,7 +19,7 @@ def create_logfile(name):
     if not os.path.exists('logs'):
         os.makedirs('logs')
     logfile = open('logs/{}.log'.format(name), 'w')
-    for variable in variables:
+    for variable in parameters:
         logfile.write('----- {} -----'.format(str(variable)))
     logfile.write('\n')
     return logfile
