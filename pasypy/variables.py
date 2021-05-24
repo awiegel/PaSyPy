@@ -1,6 +1,7 @@
 from z3 import Solver, Real
 
-s = Solver()
+solver = Solver()
+solver_neg = Solver()
 
 x = Real('x')
 y = Real('y')

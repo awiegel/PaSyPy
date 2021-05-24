@@ -4,33 +4,29 @@ from variables import *
 from visualize import *
 
 
-def add_boundary(B):
+def add_boundary(s, B):
     s.add(x >= B[0][0], x <= B[0][1], y >= B[1][0], y <= B[1][1])
 
 
 def solveit(B):
-    if Queue:
-        Queue.pop(0)
+    Queue.pop(0)
 
-    s.push()
-    s.add(f)
-    add_boundary(B)
+    solver.push()
+    add_boundary(solver, B)
 
-    if s.check() == sat:
-        s.pop()
+    if solver.check() == sat:
+        solver.pop()
 
-        s.push()
-        s.add(Not(f))
-        add_boundary(B)
+        solver_neg.push()
+        add_boundary(solver_neg, B)
 
-        if s.check() == sat:
+        if solver_neg.check() == sat:
             split_box(B)
-            s.pop()
         else:
-            s.pop()
             G.append(B[:-1])
+        solver_neg.pop()
     else:
-        s.pop()
+        solver.pop()
         R.append(B[:-1])
 
 
@@ -63,6 +59,9 @@ def calculate_area(boxes):
 def main():
     try:
         timestamps = {'Start Time': timeit.default_timer()}
+
+        solver.add(f)
+        solver_neg.add(Not(f))
 
         while Queue:
             solveit(Queue[0])
