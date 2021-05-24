@@ -2,7 +2,7 @@ from z3 import *
 
 from variables import *
 from visualize import *
-
+from gui import *
 
 def add_boundary(s, B):
     s.add(x >= B[0][0], x <= B[0][1], y >= B[1][0], y <= B[1][1])
@@ -79,8 +79,7 @@ def main():
 
         show_time(timestamps)
 
-        show_graph()
-
 
 if __name__ == "__main__":
     main()
+    root.mainloop()

@@ -6,6 +6,7 @@ import timeit
 import os
 
 from variables import *
+from gui import *
 from pasypy import calculate_area
 
 
@@ -93,10 +94,12 @@ def draw_hyperplane():
 
 # Complete visualization part
 def generate_graph():
+    figure = plt.figure()
     init_graph()
     draw_green_area()
     draw_red_area()
     draw_hyperplane()
+    app.add_plot(figure)
 
 
 def show_graph():
