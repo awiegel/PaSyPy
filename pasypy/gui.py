@@ -22,7 +22,12 @@ class MainApplication(tk.Frame):
     def add_plot(self, figure):
         figure_frame = tk.Frame(root, highlightbackground='black', highlightcolor='black', highlightthickness=5)
         figure_frame.grid(row=1, column=0, sticky=tk.NW, padx=5, pady=5)
-        self.line = FigureCanvasTkAgg(figure, master=figure_frame).get_tk_widget()
+        self.line = FigureCanvasTkAgg(figure, master=figure_frame)
+        
+        toolbar_frame = tk.Frame(root, highlightbackground='black', highlightcolor='black', highlightthickness=5)
+        toolbar_frame.grid(row=1, column=0, sticky=tk.NW, padx=5, pady=5)
+        NavigationToolbar2Tk(self.line, toolbar_frame)
+        self.line = self.line.get_tk_widget()
         self.line.grid(row=1, column=0, sticky=tk.NW, padx=5, pady=5)
 
 
