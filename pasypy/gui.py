@@ -24,6 +24,13 @@ class MainApplication(tk.Frame):
         self.show_unsafe_area_button = tk.Button(text="Show unsafe area", command=self.show_unsafe_area, width=15, height=2, bg='red')
         self.show_unsafe_area_button.grid(row=0, column=0, sticky=tk.NW, padx=200, pady=50)
 
+        self.increase_accuracy_button = tk.Button(root, text="Increase accuracy", command=self.increase_accuracy, width=15, height=1, bg='white', fg='black')
+        self.increase_accuracy_button.grid(row=1, column=2, sticky=tk.NW, padx=5, pady=245)
+
+        self.decrease_accuracy_button = tk.Button(root, text="Decrease accuracy", command=self.decrease_accuracy, width=15, height=1, bg='white', fg='black')
+        self.decrease_accuracy_button.grid(row=1, column=2, sticky=tk.NW, padx=5, pady=270)
+
+        self.accuracy = 0
 
     @classmethod
     def show_safe_area(self):
@@ -33,6 +40,23 @@ class MainApplication(tk.Frame):
     @classmethod
     def show_unsafe_area(self):
         os.startfile(os.getcwd() + '/logs/unsafe_area.log')
+
+
+    def increase_accuracy(self):
+        global depth_limit
+        depth_limit += 1
+        self.accuracy.destroy()
+        self.accuracy = tk.Label(text='Accuracy: 2^{} or {} or {}'.format(depth_limit, 2**depth_limit, 1/(2**depth_limit)), width=30, bg='black', fg='white', anchor=tk.W)
+        self.accuracy.grid(row=1, column=1, sticky=tk.NW, pady=260)
+
+
+    def decrease_accuracy(self):
+        global depth_limit
+        if depth_limit > 1:
+            depth_limit -= 1
+            self.accuracy.destroy()
+            self.accuracy = tk.Label(text='Accuracy: 2^{} or {} or {}'.format(depth_limit, 2**depth_limit, 1/(2**depth_limit)), width=30, bg='black', fg='white', anchor=tk.W)
+            self.accuracy.grid(row=1, column=1, sticky=tk.NW, pady=260)
 
 
     def add_plot(self, figure):
