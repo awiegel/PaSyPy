@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import svm
+from colorama import Fore, Style
 
 from variables import *
+from pasypy import calculate_area
 
 
 def init_graph():
@@ -12,18 +14,24 @@ def init_graph():
 
 def draw_green_area():
     for g in G:
-        plt.plot([g[0][0], g[0][1], g[0][1], g[0][0], g[0][0]], [
-                 g[1][0], g[1][0], g[1][1], g[1][1], g[1][0]], color='black')
-        plt.fill([g[0][0], g[0][1], g[0][1], g[0][0], g[0][0]], [
-                 g[1][0], g[1][0], g[1][1], g[1][1], g[1][0]], color='limegreen')
+        plt.plot([g[0][0], g[0][1], g[0][1], g[0][0], g[0][0]],
+                 [g[1][0], g[1][0], g[1][1], g[1][1], g[1][0]], color='black')
+        plt.fill([g[0][0], g[0][1], g[0][1], g[0][0], g[0][0]],
+                 [g[1][0], g[1][0], g[1][1], g[1][1], g[1][0]], color='limegreen')
+    print(Fore.GREEN + 'G: ', G)
+    print('Number of green boxes: ', len(G))
+    print(Style.RESET_ALL)
 
 
 def draw_red_area():
     for r in R:
-        plt.plot([r[0][0], r[0][1], r[0][1], r[0][0], r[0][0]], [
-                 r[1][0], r[1][0], r[1][1], r[1][1], r[1][0]], color='black')
-        plt.fill([r[0][0], r[0][1], r[0][1], r[0][0], r[0][0]], [
-                 r[1][0], r[1][0], r[1][1], r[1][1], r[1][0]], color='red')
+        plt.plot([r[0][0], r[0][1], r[0][1], r[0][0], r[0][0]],
+                 [r[1][0], r[1][0], r[1][1], r[1][1], r[1][0]], color='black')
+        plt.fill([r[0][0], r[0][1], r[0][1], r[0][0], r[0][0]],
+                 [r[1][0], r[1][0], r[1][1], r[1][1], r[1][0]], color='red')
+    print(Fore.RED + 'R: ', R)
+    print('Number of red boxes: ', len(R))
+    print(Style.RESET_ALL)
 
 
 def draw_hyperplane():
@@ -71,6 +79,13 @@ def generate_graph():
 
 def show_graph():
     plt.show()
+
+
+def show_progress():
+    green_area = calculate_area(G)
+    red_area = calculate_area(R)
+    print(Fore.GREEN + 'Green area:', '{:.2%}'.format(green_area), Fore.RED + '    Red area:', '{:.2%}'.format(red_area),
+          Fore.WHITE + '    White area left:', '{:.2%}'.format(1 - (green_area + red_area)))
 
 
 def main():

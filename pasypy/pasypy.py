@@ -53,10 +53,18 @@ def split_box(area):
         Queue.append(([X1, X2M], [Y1M, Y2], depth))
 
 
+def calculate_area(boxes):
+    area = 0
+    for i in boxes:
+        area += (i[0][1]-i[0][0]) * (i[1][1]-i[1][0])
+    return area
+
+
 def main():
     try:
         while Queue:
             solveit(Queue[0])
+            show_progress()
 
     except KeyboardInterrupt:
         None
