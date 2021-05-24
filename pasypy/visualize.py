@@ -3,6 +3,7 @@ import numpy as np
 from sklearn import svm
 from colorama import Fore, Style
 import timeit
+import os
 
 from variables import *
 from pasypy import calculate_area
@@ -13,23 +14,43 @@ def init_graph():
     plt.ylim([0, 1.0])
 
 
+def create_logfile(name):
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+    logfile = open('logs/{}.txt'.format(name), 'w')
+    for variable in variables:
+        logfile.write('----- {} -----'.format(str(variable)))
+    logfile.write('\n')
+    return logfile
+
+
 def draw_green_area():
+    logfile = create_logfile('safe_area')
+
     for g in G:
         plt.plot([g[0][0], g[0][1], g[0][1], g[0][0], g[0][0]],
                  [g[1][0], g[1][0], g[1][1], g[1][1], g[1][0]], color='black')
         plt.fill([g[0][0], g[0][1], g[0][1], g[0][0], g[0][0]],
                  [g[1][0], g[1][0], g[1][1], g[1][1], g[1][0]], color='limegreen')
+        logfile.write(str(g) + '\n')
+    logfile.close()
+
     print(Fore.GREEN + 'G: ', G)
     print('Number of green boxes: ', len(G))
     print(Style.RESET_ALL)
 
 
 def draw_red_area():
+    logfile = create_logfile('unsafe_area')
+
     for r in R:
         plt.plot([r[0][0], r[0][1], r[0][1], r[0][0], r[0][0]],
                  [r[1][0], r[1][0], r[1][1], r[1][1], r[1][0]], color='black')
         plt.fill([r[0][0], r[0][1], r[0][1], r[0][0], r[0][0]],
                  [r[1][0], r[1][0], r[1][1], r[1][1], r[1][0]], color='red')
+        logfile.write(str(r) + '\n')
+    logfile.close()
+
     print(Fore.RED + 'R: ', R)
     print('Number of red boxes: ', len(R))
     print(Style.RESET_ALL)
