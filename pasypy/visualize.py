@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import svm
 from colorama import Fore, Style
+import timeit
 
 from variables import *
 from pasypy import calculate_area
@@ -86,6 +87,23 @@ def show_progress():
     red_area = calculate_area(R)
     print(Fore.GREEN + 'Green area:', '{:.2%}'.format(green_area), Fore.RED + '    Red area:', '{:.2%}'.format(red_area),
           Fore.WHITE + '    White area left:', '{:.2%}'.format(1 - (green_area + red_area)))
+
+
+def create_timestamp(name, timestamps):
+    timestamp = timeit.default_timer()
+    for i in timestamps.values():
+        timestamp -= i
+    timestamps.update({name: timestamp})
+
+
+def show_time(timestamps):
+    total_time = 0
+    max_name_len = len(max(timestamps, key=len))
+    for i in timestamps:
+        if i != 'Start Time':
+            print('{}{} :'.format(i, (' ' * (max_name_len-len(i)))), round(timestamps[i], 3), 'sec.')
+            total_time += round(timestamps[i], 3)
+    print('Total Time{} :'.format(' ' * (max_name_len-len('Total Time'))), round(total_time, 3), 'sec.')
 
 
 def main():

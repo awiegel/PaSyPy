@@ -62,6 +62,8 @@ def calculate_area(boxes):
 
 def main():
     try:
+        timestamps = {'Start Time': timeit.default_timer()}
+
         while Queue:
             solveit(Queue[0])
             show_progress()
@@ -70,7 +72,13 @@ def main():
         None
 
     finally:
+        create_timestamp('Computation Time', timestamps)
+
         generate_graph()
+
+        create_timestamp('Visualization Time', timestamps)
+
+        show_time(timestamps)
 
         show_graph()
 
