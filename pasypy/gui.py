@@ -79,15 +79,24 @@ class MainApplication(tk.Frame):
         self.constraints = tk.Label(text='Constraints:', width=30, bg='black', fg='white')
         self.constraints.grid(row=1, column=1, sticky=tk.NW, pady=300)
         constraints_pady=320
-        # for constraint in Constraints:
-        tk.Label(text=variables.f, width=30, bg='black', fg='white').grid(row=1, column=1, sticky=tk.NW, pady=constraints_pady)
-        constraints_pady += 20
+        for constraint in variables.Constraints:
+            tk.Label(text=constraint, width=30, bg='black', fg='white').grid(row=1, column=1, sticky=tk.NW, pady=constraints_pady)
+            constraints_pady += 20
 
         self.ax = None
         self.line = 0
 
         figure = plt.figure()
         self.add_plot(figure)
+
+        self.text = tk.Text(root, width=15, height=1)
+        self.text.grid(row=1, column=2, sticky=tk.NW, padx=5, pady=310)
+
+        self.text_button = tk.Button(root, text="ADD", command=self.text_function, width=5, height=1, bg='green', fg='white')
+        self.text_button.grid(row=1, column=2, sticky=tk.NW, padx=130, pady=310)
+
+        self.remove_button = tk.Button(root, text="REMOVE ALL", command=self.remove_constraints, width=10, height=2, bg='brown', fg='white')
+        self.remove_button.grid(row=1, column=2, sticky=tk.NW, padx=5, pady=335)
 
 
     @classmethod
@@ -125,8 +134,6 @@ class MainApplication(tk.Frame):
 
     def update(self):
         self.line.destroy()
-        print(variables.Queue)
-        print(variables.Sub_Queue)
         if variables.Sub_Queue:
             variables.Queue = variables.Sub_Queue
             variables.Sub_Queue = []
@@ -155,6 +162,38 @@ class MainApplication(tk.Frame):
         self.red_area.config(text='Red area                           : {:.2%}'.format(red_area))
 
         self.white_area_left.config(text='White area left                 : {:.2%}'.format(1 - (green_area + red_area)))
+    
+
+    def text_function(self):
+        if self.text.compare('1.0', '!=', 'end-1c'):
+            f = self.text.get('1.0', 'end-1c')
+            self.text.delete('1.0', 'end-1c')
+
+            x = variables.x
+            y = variables.y
+            variables.Constraints.append(eval(f))
+            # try:
+            #     Constraints.append(eval(f))
+            # finally:
+            #     print(Constraints)
+            constraints_pady=320
+            # for index, constraint in zip(range(len(Constraints)), Constraints):
+            for constraint in variables.Constraints:
+                tk.Label(text=constraint, width=30, bg='black', fg='white').grid(row=1, column=1, sticky=tk.NW, pady=constraints_pady)
+                # self.constraints_list.append(label)
+                # tk.Button(root, text="X", command=lambda:self.text_remove(index), width=1, height=0, bg='black', fg='white').grid(row=1, column=1, sticky=tk.NW, pady=constraints_pady-5)
+                constraints_pady += 20
+
+
+    def remove_constraints(self):
+        constraints_pady=320
+        for constraint in variables.Constraints:
+            tk.Label(text=constraint, width=30, bg='WhiteSmoke', fg='WhiteSmoke').grid(row=1, column=1, sticky=tk.NW, pady=constraints_pady)
+
+            constraints_pady += 20
+
+        variables.Constraints = []
+        # self.constraints_list = []
 
 
 

@@ -6,7 +6,8 @@ solver_neg = Solver()
 x = Real('x')
 y = Real('y')
 
-f = x + y <= 1
+Constraints = []
+Constraints.append(x + y <= 1.5)
 
 parameters = [x, y]
 

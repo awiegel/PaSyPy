@@ -7,7 +7,9 @@ import gui
 
 
 def add_boundary(s, B):
-    s.add(variables.x >= B[0][0], variables.x <= B[0][1], variables.y >= B[1][0], variables.y <= B[1][1])
+    for index, value in zip(range(len(variables.parameters)), variables.parameters):
+        s.add(value >= B[index][0])
+        s.add(value <= B[index][1])
 
 
 def solveit(B):
@@ -67,8 +69,9 @@ def main():
     try:
         timestamps = {'Start Time': timeit.default_timer()}
 
-        variables.solver.add(variables.f)
-        variables.solver_neg.add(Not(variables.f))
+        for constraint in variables.Constraints:
+            variables.solver.add(constraint)
+            variables.solver_neg.add(Not(constraint))
 
         while variables.Queue:
             if variables.Queue[0][len(variables.parameters)] < (2**variables.depth_limit)/2:
