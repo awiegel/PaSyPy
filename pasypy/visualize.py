@@ -77,8 +77,12 @@ def draw_hyperplane():
         clf = svm.SVC(kernel='rbf', C=1000)
         clf.fit(X, Y)
         app.ax = plt.gca()
+        app.ax.callbacks.connect('xlim_changed', on_xlims_change)
+        app.ax.callbacks.connect('ylim_changed', on_ylims_change)
         xlim = app.ax.get_xlim()
         ylim = app.ax.get_ylim()
+        app.global_xlim = (0.0, 1.0)
+        app.global_ylim = (0.0, 1.0)
         xx = np.linspace(xlim[0], xlim[1], 30)
         yy = np.linspace(ylim[0], ylim[1], 30)
         YY, XX = np.meshgrid(yy, xx)
@@ -91,6 +95,15 @@ def draw_hyperplane():
         # plot support vectors
         # ax.scatter(clf.support_vectors_[:, 0], clf.support_vectors_[:, 1], s=100,
         # linewidth=1, facecolors='none', edgecolors='k')
+
+
+def on_xlims_change(event_ax):
+    print("updated xlims: ", event_ax.get_xlim())
+    app.global_xlim = event_ax.get_xlim()
+
+def on_ylims_change(event_ax):
+    print("updated ylims: ", event_ax.get_ylim())
+    app.lobal_ylim = event_ax.get_ylim()
 
 
 # Complete visualization part

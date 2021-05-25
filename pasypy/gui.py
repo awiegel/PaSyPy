@@ -98,6 +98,9 @@ class MainApplication(tk.Frame):
         self.remove_button = tk.Button(root, text="REMOVE ALL", command=self.remove_constraints, width=10, height=2, bg='brown', fg='white')
         self.remove_button.grid(row=1, column=2, sticky=tk.NW, padx=5, pady=335)
 
+        self.global_xlim = (0.0, 1.0)
+        self.global_ylim = (0.0, 1.0)
+
 
     @classmethod
     def show_safe_area(self):

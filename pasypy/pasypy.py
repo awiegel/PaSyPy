@@ -64,6 +64,12 @@ def calculate_area(boxes):
         area += (i[0][1]-i[0][0]) * (i[1][1]-i[1][0])
     return area
 
+def check_zoom():
+    return ((variables.Queue[0][0][0] >= gui.app.global_xlim[0]) and \
+            (variables.Queue[0][0][1] <= gui.app.global_xlim[1]) and \
+            (variables.Queue[0][1][0] >= gui.app.global_ylim[0]) and \
+            (variables.Queue[0][1][1] <= gui.app.global_ylim[1]))
+
 
 def main():
     try:
@@ -74,7 +80,8 @@ def main():
             variables.solver_neg.add(Not(constraint))
 
         while variables.Queue:
-            if variables.Queue[0][len(variables.parameters)] < (2**variables.depth_limit)/2:
+            if check_zoom() and (variables.Queue[0][len(variables.parameters)] < ((2**variables.depth_limit)/2)):
+
                 solveit(variables.Queue[0])
                 visualize.show_progress()
             else:
