@@ -15,6 +15,13 @@ def init_graph():
     plt.xlim([0, 1.0])
     plt.ylim([0, 1.0])
 
+    if not variables.change == (len(variables.parameters) - 1):
+        plt.xlabel(str(variables.parameters[variables.change]))
+        plt.ylabel(str(variables.parameters[(variables.change + 1)]))
+    else:
+        plt.xlabel(str(variables.parameters[variables.change]))
+        plt.ylabel(str(variables.parameters[0]))
+
 
 def create_logfile(name):
     if not os.path.exists('logs'):
@@ -29,12 +36,42 @@ def create_logfile(name):
 def draw_green_area():
     logfile = create_logfile('safe_area')
 
-    for g in variables.G:
-        plt.plot([g[0][0], g[0][1], g[0][1], g[0][0], g[0][0]],
-                 [g[1][0], g[1][0], g[1][1], g[1][1], g[1][0]], color='black')
-        plt.fill([g[0][0], g[0][1], g[0][1], g[0][0], g[0][0]],
-                 [g[1][0], g[1][0], g[1][1], g[1][1], g[1][0]], color='limegreen')
-        logfile.write(str(g) + '\n')
+    variables.GS = variables.G.copy()
+    if not variables.change == (len(variables.parameters) - 1):
+        for g in variables.G[:]:
+            for gg in variables.G[:]:
+                if (((gg[variables.change][0] >= g[variables.change][0]) and (gg[variables.change][1] <= g[variables.change][1])) and \
+                    ((gg[(variables.change + 1)][0] >= g[(variables.change + 1)][0]) and (gg[(variables.change + 1)][1] <= g[(variables.change + 1)][1]))) and \
+                   (((gg[variables.change][0] != g[variables.change][0]) or (gg[variables.change][1] != g[variables.change][1])) or \
+                    ((gg[(variables.change + 1)][0] != g[(variables.change + 1)][0]) or (gg[(variables.change + 1)][1] != g[(variables.change + 1)][1]))):
+                    try:
+                        variables.GS.remove(gg)
+                    except:
+                        pass
+        for g in variables.GS:
+            plt.plot([g[variables.change][0],g[variables.change][1],g[variables.change][1],g[variables.change][0],g[variables.change][0]],
+                     [g[(variables.change + 1)][0],g[(variables.change + 1)][0],g[(variables.change + 1)][1],g[(variables.change + 1)][1],g[(variables.change + 1)][0]], color='black')
+            plt.fill([g[variables.change][0],g[variables.change][1],g[variables.change][1],g[variables.change][0],g[variables.change][0]],
+                     [g[(variables.change + 1)][0],g[(variables.change + 1)][0],g[(variables.change + 1)][1],g[(variables.change + 1)][1],g[(variables.change + 1)][0]], color='limegreen')
+            logfile.write(str(g) + '\n')
+    else:
+        for g in variables.G[:]:
+            for gg in variables.G[:]:
+                if (((gg[variables.change][0] >= g[variables.change][0]) and (gg[variables.change][1] <= g[variables.change][1])) and \
+                    ((gg[0][0] >= g[0][0]) and (gg[0][1] <= g[0][1]))) and \
+                   (((gg[variables.change][0] != g[variables.change][0]) or (gg[variables.change][1] != g[variables.change][1])) or \
+                    ((gg[0][0] != g[0][0]) or (gg[0][1] != g[0][1]))):
+                    try:
+                        variables.GS.remove(gg)
+                    except:
+                        pass
+        for g in variables.GS:
+            plt.plot([g[variables.change][0],g[variables.change][1],g[variables.change][1],g[variables.change][0],g[variables.change][0]],
+                     [g[0][0],g[0][0],g[0][1],g[0][1],g[0][0]], color='black')
+            plt.fill([g[variables.change][0],g[variables.change][1],g[variables.change][1],g[variables.change][0],g[variables.change][0]],
+                     [g[0][0],g[0][0],g[0][1],g[0][1],g[0][0]], color='limegreen')
+            logfile.write(str(g) + '\n')
+
     logfile.close()
 
     print(Fore.GREEN + 'G: ', variables.G)
@@ -45,12 +82,40 @@ def draw_green_area():
 def draw_red_area():
     logfile = create_logfile('unsafe_area')
 
-    for r in variables.R:
-        plt.plot([r[0][0], r[0][1], r[0][1], r[0][0], r[0][0]],
-                 [r[1][0], r[1][0], r[1][1], r[1][1], r[1][0]], color='black')
-        plt.fill([r[0][0], r[0][1], r[0][1], r[0][0], r[0][0]],
-                 [r[1][0], r[1][0], r[1][1], r[1][1], r[1][0]], color='red')
-        logfile.write(str(r) + '\n')
+    variables.RS = variables.R.copy()
+    if not variables.change == (len(variables.parameters) - 1):
+        for r in variables.R[:]:
+            for w in variables.Sub_Queue:
+                if ((w[variables.change][0] >= r[variables.change][0]) and (w[variables.change][1] <= r[variables.change][1])) and \
+                    ((w[(variables.change + 1)][0] >= r[(variables.change + 1)][0]) and (w[(variables.change + 1)][1] <= r[(variables.change + 1)][1])):
+                    try:
+                        variables.RS.remove(r)
+                    except:
+                        pass
+
+        for r in variables.RS:
+            plt.plot([r[variables.change][0],r[variables.change][1],r[variables.change][1],r[variables.change][0],r[variables.change][0]],
+                     [r[(variables.change + 1)][0],r[(variables.change + 1)][0],r[(variables.change + 1)][1],r[(variables.change + 1)][1],r[(variables.change + 1)][0]], color='black')
+            plt.fill([r[variables.change][0],r[variables.change][1],r[variables.change][1],r[variables.change][0],r[variables.change][0]],
+                     [r[(variables.change + 1)][0],r[(variables.change + 1)][0],r[(variables.change + 1)][1],r[(variables.change + 1)][1],r[(variables.change + 1)][0]], color='red')
+            logfile.write(str(r) + '\n')
+    else:
+        for r in variables.R[:]:
+            for w in variables.Sub_Queue:
+                if ((w[variables.change][0] >= r[variables.change][0]) and (w[variables.change][1] <= r[variables.change][1])) and \
+                    ((w[0][0] >= r[0][0]) and (w[0][1] <= r[0][1])):
+                    try:
+                        variables.RS.remove(r)
+                    except:
+                        pass
+
+        for r in variables.RS:
+            plt.plot([r[variables.change][0],r[variables.change][1],r[variables.change][1],r[variables.change][0],r[variables.change][0]],
+                     [r[0][0],r[0][0],r[0][1],r[0][1],r[0][0]], color='black')
+            plt.fill([r[variables.change][0],r[variables.change][1],r[variables.change][1],r[variables.change][0],r[variables.change][0]],
+                     [r[0][0],r[0][0],r[0][1],r[0][1],r[0][0]], color='red')
+            logfile.write(str(r) + '\n')
+
     logfile.close()
 
     print(Fore.RED + 'R: ', variables.R)
@@ -61,15 +126,24 @@ def draw_red_area():
 def draw_hyperplane():
     X = []
     Y = []
-    for i in variables.G:
-        X.append([i[0][0], i[1][0]])
-        X.append([i[0][1], i[1][1]])
-        Y.append(0)
-        Y.append(0)
 
-    for i in variables.R:
-        X.append([i[0][0], i[1][0]])
-        X.append([i[0][1], i[1][1]])
+    for i in variables.GS:
+        if not variables.change == (len(variables.parameters) - 1):
+            X.append([i[variables.change][0],i[(variables.change + 1)][0]])
+            X.append([i[variables.change][1],i[(variables.change + 1)][1]])
+        else:
+            X.append([i[variables.change][0],i[(0)][0]])
+            X.append([i[variables.change][1],i[(0)][1]])
+        Y.append(0)
+        Y.append(0)
+    
+    for i in variables.RS:
+        if not variables.change == (len(variables.parameters) - 1):
+            X.append([i[variables.change][0],i[(variables.change + 1)][0]])
+            X.append([i[variables.change][1],i[(variables.change + 1)][1]])
+        else:
+            X.append([i[variables.change][0],i[(0)][0]])
+            X.append([i[variables.change][1],i[(0)][1]])
         Y.append(1)
         Y.append(1)
 

@@ -1,10 +1,10 @@
 from z3 import *
 import timeit
+import itertools
 
 import variables
 import visualize
 import gui
-
 
 def add_boundary(s, B):
     for index, value in zip(range(len(variables.parameters)), variables.parameters):
@@ -35,34 +35,29 @@ def solveit(B):
 
 
 def split_box(area):
-    depth = area[2]*2
+    depth = area[len(variables.parameters_borders)]*2
     d = 1 / depth
-    X1 = area[0][0]
-    X1M = X1+d
-    X2 = area[0][1]
-    X2M = X2-d
-    Y1 = area[1][0]
-    Y1M = Y1+d
-    Y2 = area[1][1]
-    Y2M = Y2-d
 
-    if depth < 2**variables.depth_limit:
-        variables.Queue.append(([X1M, X2], [Y1M, Y2], depth))
-        variables.Queue.append(([X1, X2M], [Y1, Y2M], depth))
-        variables.Queue.append(([X1M, X2], [Y1, Y2M], depth))
-        variables.Queue.append(([X1, X2M], [Y1M, Y2], depth))
-    else:
-        variables.Sub_Queue.append(([X1M, X2], [Y1M, Y2], depth))
-        variables.Sub_Queue.append(([X1, X2M], [Y1, Y2M], depth))
-        variables.Sub_Queue.append(([X1M, X2], [Y1, Y2M], depth))
-        variables.Sub_Queue.append(([X1, X2M], [Y1M, Y2], depth))
+    for i in range(len(variables.parameters_borders)):
+        variables.parameters_borders[i] = [[(area[i][0] + d), area[i][1]], [area[i][0], (area[i][1] - d)]]
+    cross = itertools.product(*variables.parameters_borders,repeat=1) # *Test
+    for i in cross:
+        i = i[:len(variables.parameters_borders)] + (depth,)
+        if depth < 2**variables.depth_limit:
+            variables.Queue.append(i)
+        else:
+            variables.Sub_Queue.append(i)
 
 
 def calculate_area(boxes):
     area = 0
     for i in boxes:
-        area += (i[0][1]-i[0][0]) * (i[1][1]-i[1][0])
+        mult = 1
+        for j in range(len(variables.parameters)):
+            mult *= (i[j][1]-i[j][0])
+        area += mult
     return area
+
 
 def check_zoom():
     return ((variables.Queue[0][0][0] >= gui.app.global_xlim[0]) and \
@@ -75,13 +70,11 @@ def main():
     try:
         timestamps = {'Start Time': timeit.default_timer()}
 
-
         variables.solver.reset()
         variables.solver_neg.reset()
         
         variables.solver.add(variables.Constraints)
         variables.solver_neg.add(Not(variables.Constraints))
-
 
         while variables.Queue:
             if check_zoom() and (variables.Queue[0][len(variables.parameters)] < ((2**variables.depth_limit)/2)):

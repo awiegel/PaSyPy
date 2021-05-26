@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from z3 import *
 
 import variables
+import visualize
 import pasypy
 
 
@@ -110,6 +111,20 @@ class MainApplication(tk.Frame):
 
         self.file_path = None
 
+        self.change_button = tk.Button(root, text="SWITCH", command=self.change_graph, width=10, height=2, bg='brown', fg='white')
+        self.change_button.grid(row=0, column=0, sticky=tk.NW, padx=415, pady=50)
+
+
+    def change_graph(self):
+        print(variables.parameters)
+        if variables.change == (len(variables.parameters) - 1):
+            variables.change = 0
+        else:
+            variables.change += 1
+
+        self.ax.clear()
+        visualize.generate_graph()
+
 
     def reload_file(self):
         self.constraints = parse_smt2_file(self.file_path)
@@ -127,6 +142,9 @@ class MainApplication(tk.Frame):
                 var = re.findall("name '(\w+)' is not defined",str(e))[0]
                 locals()['{}'.format(var)] = Real('{}'.format(var))
                 variables.parameters.append(locals()['{}'.format(var)])
+
+        for _ in variables.parameters:
+            variables.parameters_borders.append([])
 
         pasypy.main()
 
@@ -150,6 +168,7 @@ class MainApplication(tk.Frame):
             self.text.insert('1.0', self.constraints[0])
 
             variables.parameters = []
+            variables.parameters_borders = []
 
             while True:
                 try:
@@ -159,6 +178,13 @@ class MainApplication(tk.Frame):
                     var = re.findall("name '(\w+)' is not defined",str(e))[0]
                     locals()['{}'.format(var)] = Real('{}'.format(var))
                     variables.parameters.append(locals()['{}'.format(var)])
+
+            Bounds = ()
+            for _ in range(len(variables.parameters)):
+                variables.parameters_borders.append([])
+                Bounds += ([0,1],)
+            Bounds += (1,)
+            variables.Queue.append(Bounds)
 
             if reload:
                 self.reset()
