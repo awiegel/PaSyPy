@@ -3,13 +3,10 @@ from z3 import Solver, Real
 solver = Solver()
 solver_neg = Solver()
 
-x = Real('x')
-y = Real('y')
 
 Constraints = []
-Constraints.append(x + y <= 1.5)
 
-parameters = [x, y]
+parameters = []
 
 # starting box with intervalls [0,1] € R and depth 1
 Queue = [([0, 1], [0, 1], 1)]

@@ -1,8 +1,10 @@
 import os
+import re
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 import matplotlib.pyplot as plt
+from z3 import *
 
 import variables
 import pasypy
@@ -76,12 +78,11 @@ class MainApplication(tk.Frame):
         self.white_area_left = tk.Label(text='White area left                 : ', width=30, bg='white', fg='black', anchor=tk.W)
         self.white_area_left.grid(row=1, column=1, sticky=tk.NW, pady=140)
 
-        self.constraints = tk.Label(text='Constraints:', width=30, bg='black', fg='white')
-        self.constraints.grid(row=1, column=1, sticky=tk.NW, pady=300)
-        constraints_pady=320
-        for constraint in variables.Constraints:
-            tk.Label(text=constraint, width=30, bg='black', fg='white').grid(row=1, column=1, sticky=tk.NW, pady=constraints_pady)
-            constraints_pady += 20
+        self.constraints_title = tk.Label(text='Constraints:', width=30, bg='black', fg='white')
+        self.constraints_title.grid(row=1, column=1, sticky=tk.NW, pady=300)
+
+        self.constraints_label = tk.Label(text="", width=30, height=10, bg='black', fg='white')
+        self.constraints_label.grid(row=1, column=1, sticky=tk.NW, pady=320)
 
         self.ax = None
         self.line = 0
@@ -89,17 +90,95 @@ class MainApplication(tk.Frame):
         figure = plt.figure()
         self.add_plot(figure)
 
-        self.text = tk.Text(root, width=15, height=1)
-        self.text.grid(row=1, column=2, sticky=tk.NW, padx=5, pady=310)
+        self.text = tk.Text(root, width=22, height=10)
+        self.text.grid(row=1, column=2, sticky=tk.NW, padx=5, pady=350)
 
-        self.text_button = tk.Button(root, text="ADD", command=self.text_function, width=5, height=1, bg='green', fg='white')
-        self.text_button.grid(row=1, column=2, sticky=tk.NW, padx=130, pady=310)
+        self.text_button = tk.Button(root, text="EDIT", command=self.edit, width=5, height=1, bg='green', fg='white')
+        self.text_button.grid(row=1, column=2, sticky=tk.NW, padx=190, pady=490)
 
-        self.remove_button = tk.Button(root, text="REMOVE ALL", command=self.remove_constraints, width=10, height=2, bg='brown', fg='white')
-        self.remove_button.grid(row=1, column=2, sticky=tk.NW, padx=5, pady=335)
+        self.reload_file_button = tk.Button(root, text="RELOAD FILE", command=self.reload_file, width=10, height=1, bg='brown', fg='white')
+        self.reload_file_button.grid(row=1, column=2, sticky=tk.NW, padx=190, pady=335)
 
         self.global_xlim = (0.0, 1.0)
         self.global_ylim = (0.0, 1.0)
+
+        self.file_path_label = tk.Label(root, text="", width=25, height=2, bg='black', fg='white')
+        self.file_path_label.grid(row=1, column=2, sticky=tk.NW, padx=5, pady=310)
+
+        self.get_file_path_button = tk.Button(root, text="Open .smt2 file", command=self.browseFiles, width=15, height=1, bg='gray', fg='white')
+        self.get_file_path_button.grid(row=1, column=2, sticky=tk.NW, padx=190, pady=310)
+
+        self.file_path = None
+
+
+    def reload_file(self):
+        self.constraints = parse_smt2_file(self.file_path)
+        self.constraints_label.configure(text=self.constraints[0])
+        variables.Constraints = self.constraints[0]
+        self.text.delete('1.0', 'end-1c')
+        self.text.insert('1.0', self.constraints[0])
+        variables.parameters = []
+
+        while True:
+            try:
+                print(eval(str(self.constraints)))
+                break
+            except NameError as e:
+                var = re.findall("name '(\w+)' is not defined",str(e))[0]
+                locals()['{}'.format(var)] = Real('{}'.format(var))
+                variables.parameters.append(locals()['{}'.format(var)])
+
+        pasypy.main()
+
+
+    def browseFiles(self):
+        if self.file_path:
+            reload = True
+        else:
+            reload = False
+        
+        file_path = tk.filedialog.askopenfilename()
+        if file_path:
+            self.file_path = file_path
+            self.file_path_label.configure(text=os.path.basename(self.file_path))
+
+            self.constraints = parse_smt2_file(self.file_path)
+            self.constraints_label.configure(text=self.constraints[0])
+
+            variables.Constraints = self.constraints[0]
+            self.text.delete('1.0', 'end-1c')
+            self.text.insert('1.0', self.constraints[0])
+
+            variables.parameters = []
+
+            while True:
+                try:
+                    print(eval(str(self.constraints)))
+                    break
+                except NameError as e:
+                    var = re.findall("name '(\w+)' is not defined",str(e))[0]
+                    locals()['{}'.format(var)] = Real('{}'.format(var))
+                    variables.parameters.append(locals()['{}'.format(var)])
+
+            if reload:
+                self.reset()
+            else:
+                pasypy.main()
+                self.update_window()
+
+
+
+    def edit(self):
+        f = self.text.get('1.0', 'end-1c')
+        if self.text.compare('1.0', '!=', 'end-1c') and f != str(self.constraints[0]):
+
+            for i in variables.parameters:
+                locals()['{}'.format(i)] = i
+            
+            self.constraints_label.configure(text=f)
+            variables.Constraints = eval(f)
+
+            self.reset()
 
 
     @classmethod
@@ -154,7 +233,9 @@ class MainApplication(tk.Frame):
         self.ax.clear()
 
         pasypy.main()
-    
+        self.update_window()
+
+
     def update_window(self):
         green_area = pasypy.calculate_area(variables.G)
         self.number_of_green_boxes.config(text='Number of green boxes : {}'.format(len(variables.G)))
@@ -165,39 +246,6 @@ class MainApplication(tk.Frame):
         self.red_area.config(text='Red area                           : {:.2%}'.format(red_area))
 
         self.white_area_left.config(text='White area left                 : {:.2%}'.format(1 - (green_area + red_area)))
-    
-
-    def text_function(self):
-        if self.text.compare('1.0', '!=', 'end-1c'):
-            f = self.text.get('1.0', 'end-1c')
-            self.text.delete('1.0', 'end-1c')
-
-            x = variables.x
-            y = variables.y
-            variables.Constraints.append(eval(f))
-            # try:
-            #     Constraints.append(eval(f))
-            # finally:
-            #     print(Constraints)
-            constraints_pady=320
-            # for index, constraint in zip(range(len(Constraints)), Constraints):
-            for constraint in variables.Constraints:
-                tk.Label(text=constraint, width=30, bg='black', fg='white').grid(row=1, column=1, sticky=tk.NW, pady=constraints_pady)
-                # self.constraints_list.append(label)
-                # tk.Button(root, text="X", command=lambda:self.text_remove(index), width=1, height=0, bg='black', fg='white').grid(row=1, column=1, sticky=tk.NW, pady=constraints_pady-5)
-                constraints_pady += 20
-
-
-    def remove_constraints(self):
-        constraints_pady=320
-        for constraint in variables.Constraints:
-            tk.Label(text=constraint, width=30, bg='WhiteSmoke', fg='WhiteSmoke').grid(row=1, column=1, sticky=tk.NW, pady=constraints_pady)
-
-            constraints_pady += 20
-
-        variables.Constraints = []
-        # self.constraints_list = []
-
 
 
 def main():
