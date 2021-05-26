@@ -75,9 +75,13 @@ def main():
     try:
         timestamps = {'Start Time': timeit.default_timer()}
 
-        for constraint in variables.Constraints:
-            variables.solver.add(constraint)
-            variables.solver_neg.add(Not(constraint))
+
+        variables.solver.reset()
+        variables.solver_neg.reset()
+        
+        variables.solver.add(variables.Constraints)
+        variables.solver_neg.add(Not(variables.Constraints))
+
 
         while variables.Queue:
             if check_zoom() and (variables.Queue[0][len(variables.parameters)] < ((2**variables.depth_limit)/2)):
