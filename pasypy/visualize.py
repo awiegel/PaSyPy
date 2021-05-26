@@ -103,7 +103,7 @@ def on_xlims_change(event_ax):
 
 def on_ylims_change(event_ax):
     print("updated ylims: ", event_ax.get_ylim())
-    app.lobal_ylim = event_ax.get_ylim()
+    app.global_ylim = event_ax.get_ylim()
 
 
 # Complete visualization part
