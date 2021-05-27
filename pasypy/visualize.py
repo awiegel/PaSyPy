@@ -11,68 +11,50 @@ from gui import *
 from pasypy import calculate_area
 
 
+GS = []
+RS = []
+
+
 def init_graph():
     plt.xlim([0, 1.0])
     plt.ylim([0, 1.0])
 
-    if not variables.change == (len(variables.parameters) - 1):
-        plt.xlabel(str(variables.parameters[variables.change]))
-        plt.ylabel(str(variables.parameters[(variables.change + 1)]))
-    else:
-        plt.xlabel(str(variables.parameters[variables.change]))
-        plt.ylabel(str(variables.parameters[0]))
 
-
-def create_logfile(name):
+def create_logfile(name, B):
     if not os.path.exists('logs'):
         os.makedirs('logs')
     logfile = open('logs/{}.log'.format(name), 'w')
     for variable in variables.parameters:
         logfile.write('----- {} -----'.format(str(variable)))
     logfile.write('\n')
-    return logfile
+
+    for b in B:
+        logfile.write(str(b) + '\n')
+
+    logfile.close()
 
 
 def draw_green_area():
-    logfile = create_logfile('safe_area')
+    global GS
 
-    variables.GS = variables.G.copy()
-    if not variables.change == (len(variables.parameters) - 1):
-        for g in variables.G[:]:
-            for gg in variables.G[:]:
-                if (((gg[variables.change][0] >= g[variables.change][0]) and (gg[variables.change][1] <= g[variables.change][1])) and \
-                    ((gg[(variables.change + 1)][0] >= g[(variables.change + 1)][0]) and (gg[(variables.change + 1)][1] <= g[(variables.change + 1)][1]))) and \
-                   (((gg[variables.change][0] != g[variables.change][0]) or (gg[variables.change][1] != g[variables.change][1])) or \
-                    ((gg[(variables.change + 1)][0] != g[(variables.change + 1)][0]) or (gg[(variables.change + 1)][1] != g[(variables.change + 1)][1]))):
-                    try:
-                        variables.GS.remove(gg)
-                    except:
-                        pass
-        for g in variables.GS:
-            plt.plot([g[variables.change][0],g[variables.change][1],g[variables.change][1],g[variables.change][0],g[variables.change][0]],
-                     [g[(variables.change + 1)][0],g[(variables.change + 1)][0],g[(variables.change + 1)][1],g[(variables.change + 1)][1],g[(variables.change + 1)][0]], color='black')
-            plt.fill([g[variables.change][0],g[variables.change][1],g[variables.change][1],g[variables.change][0],g[variables.change][0]],
-                     [g[(variables.change + 1)][0],g[(variables.change + 1)][0],g[(variables.change + 1)][1],g[(variables.change + 1)][1],g[(variables.change + 1)][0]], color='limegreen')
-            logfile.write(str(g) + '\n')
-    else:
-        for g in variables.G[:]:
-            for gg in variables.G[:]:
-                if (((gg[variables.change][0] >= g[variables.change][0]) and (gg[variables.change][1] <= g[variables.change][1])) and \
-                    ((gg[0][0] >= g[0][0]) and (gg[0][1] <= g[0][1]))) and \
-                   (((gg[variables.change][0] != g[variables.change][0]) or (gg[variables.change][1] != g[variables.change][1])) or \
-                    ((gg[0][0] != g[0][0]) or (gg[0][1] != g[0][1]))):
-                    try:
-                        variables.GS.remove(gg)
-                    except:
-                        pass
-        for g in variables.GS:
-            plt.plot([g[variables.change][0],g[variables.change][1],g[variables.change][1],g[variables.change][0],g[variables.change][0]],
-                     [g[0][0],g[0][0],g[0][1],g[0][1],g[0][0]], color='black')
-            plt.fill([g[variables.change][0],g[variables.change][1],g[variables.change][1],g[variables.change][0],g[variables.change][0]],
-                     [g[0][0],g[0][0],g[0][1],g[0][1],g[0][0]], color='limegreen')
-            logfile.write(str(g) + '\n')
+    GS = variables.G.copy()
+    for g in variables.G[:]:
+        for gg in variables.G[:]:
+            if (((gg[variables.x_axe_position][0] >= g[variables.x_axe_position][0]) and (gg[variables.x_axe_position][1] <= g[variables.x_axe_position][1])) and \
+                ((gg[variables.y_axe_position][0] >= g[variables.y_axe_position][0]) and (gg[variables.y_axe_position][1] <= g[variables.y_axe_position][1]))) and \
+                (((gg[variables.x_axe_position][0] != g[variables.x_axe_position][0]) or (gg[variables.x_axe_position][1] != g[variables.x_axe_position][1])) or \
+                ((gg[variables.y_axe_position][0] != g[variables.y_axe_position][0]) or (gg[variables.y_axe_position][1] != g[variables.y_axe_position][1]))):
+                try:
+                    GS.remove(gg)
+                except:
+                    pass
+    for g in GS:
+        plt.plot([g[variables.x_axe_position][0],g[variables.x_axe_position][1],g[variables.x_axe_position][1],g[variables.x_axe_position][0],g[variables.x_axe_position][0]],
+                 [g[variables.y_axe_position][0],g[variables.y_axe_position][0],g[variables.y_axe_position][1],g[variables.y_axe_position][1],g[variables.y_axe_position][0]], color='black')
+        plt.fill([g[variables.x_axe_position][0],g[variables.x_axe_position][1],g[variables.x_axe_position][1],g[variables.x_axe_position][0],g[variables.x_axe_position][0]],
+                 [g[variables.y_axe_position][0],g[variables.y_axe_position][0],g[variables.y_axe_position][1],g[variables.y_axe_position][1],g[variables.y_axe_position][0]], color='forestgreen')
 
-    logfile.close()
+    create_logfile('safe_area', variables.G)
 
     print(Fore.GREEN + 'G: ', variables.G)
     print('Number of green boxes: ', len(variables.G))
@@ -80,43 +62,25 @@ def draw_green_area():
 
 
 def draw_red_area():
-    logfile = create_logfile('unsafe_area')
+    global RS
 
-    variables.RS = variables.R.copy()
-    if not variables.change == (len(variables.parameters) - 1):
-        for r in variables.R[:]:
-            for w in variables.Sub_Queue:
-                if ((w[variables.change][0] >= r[variables.change][0]) and (w[variables.change][1] <= r[variables.change][1])) and \
-                    ((w[(variables.change + 1)][0] >= r[(variables.change + 1)][0]) and (w[(variables.change + 1)][1] <= r[(variables.change + 1)][1])):
-                    try:
-                        variables.RS.remove(r)
-                    except:
-                        pass
+    RS = variables.R.copy()
+    for r in variables.R[:]:
+        for w in variables.Sub_Queue:
+            if ((w[variables.x_axe_position][0] >= r[variables.x_axe_position][0]) and (w[variables.x_axe_position][1] <= r[variables.x_axe_position][1])) and \
+                ((w[variables.y_axe_position][0] >= r[variables.y_axe_position][0]) and (w[variables.y_axe_position][1] <= r[variables.y_axe_position][1])):
+                try:
+                    RS.remove(r)
+                except:
+                    pass
 
-        for r in variables.RS:
-            plt.plot([r[variables.change][0],r[variables.change][1],r[variables.change][1],r[variables.change][0],r[variables.change][0]],
-                     [r[(variables.change + 1)][0],r[(variables.change + 1)][0],r[(variables.change + 1)][1],r[(variables.change + 1)][1],r[(variables.change + 1)][0]], color='black')
-            plt.fill([r[variables.change][0],r[variables.change][1],r[variables.change][1],r[variables.change][0],r[variables.change][0]],
-                     [r[(variables.change + 1)][0],r[(variables.change + 1)][0],r[(variables.change + 1)][1],r[(variables.change + 1)][1],r[(variables.change + 1)][0]], color='red')
-            logfile.write(str(r) + '\n')
-    else:
-        for r in variables.R[:]:
-            for w in variables.Sub_Queue:
-                if ((w[variables.change][0] >= r[variables.change][0]) and (w[variables.change][1] <= r[variables.change][1])) and \
-                    ((w[0][0] >= r[0][0]) and (w[0][1] <= r[0][1])):
-                    try:
-                        variables.RS.remove(r)
-                    except:
-                        pass
+    for r in RS:
+        plt.plot([r[variables.x_axe_position][0],r[variables.x_axe_position][1],r[variables.x_axe_position][1],r[variables.x_axe_position][0],r[variables.x_axe_position][0]],
+                 [r[variables.y_axe_position][0],r[variables.y_axe_position][0],r[variables.y_axe_position][1],r[variables.y_axe_position][1],r[variables.y_axe_position][0]], color='black')
+        plt.fill([r[variables.x_axe_position][0],r[variables.x_axe_position][1],r[variables.x_axe_position][1],r[variables.x_axe_position][0],r[variables.x_axe_position][0]],
+                 [r[variables.y_axe_position][0],r[variables.y_axe_position][0],r[variables.y_axe_position][1],r[variables.y_axe_position][1],r[variables.y_axe_position][0]], color='firebrick')
 
-        for r in variables.RS:
-            plt.plot([r[variables.change][0],r[variables.change][1],r[variables.change][1],r[variables.change][0],r[variables.change][0]],
-                     [r[0][0],r[0][0],r[0][1],r[0][1],r[0][0]], color='black')
-            plt.fill([r[variables.change][0],r[variables.change][1],r[variables.change][1],r[variables.change][0],r[variables.change][0]],
-                     [r[0][0],r[0][0],r[0][1],r[0][1],r[0][0]], color='red')
-            logfile.write(str(r) + '\n')
-
-    logfile.close()
+    create_logfile('unsafe_area', variables.R)
 
     print(Fore.RED + 'R: ', variables.R)
     print('Number of red boxes: ', len(variables.R))
@@ -127,23 +91,15 @@ def draw_hyperplane():
     X = []
     Y = []
 
-    for i in variables.GS:
-        if not variables.change == (len(variables.parameters) - 1):
-            X.append([i[variables.change][0],i[(variables.change + 1)][0]])
-            X.append([i[variables.change][1],i[(variables.change + 1)][1]])
-        else:
-            X.append([i[variables.change][0],i[(0)][0]])
-            X.append([i[variables.change][1],i[(0)][1]])
+    for i in GS:
+        X.append([i[variables.x_axe_position][0],i[variables.y_axe_position][0]])
+        X.append([i[variables.x_axe_position][1],i[variables.y_axe_position][1]])
         Y.append(0)
         Y.append(0)
     
-    for i in variables.RS:
-        if not variables.change == (len(variables.parameters) - 1):
-            X.append([i[variables.change][0],i[(variables.change + 1)][0]])
-            X.append([i[variables.change][1],i[(variables.change + 1)][1]])
-        else:
-            X.append([i[variables.change][0],i[(0)][0]])
-            X.append([i[variables.change][1],i[(0)][1]])
+    for i in RS:
+        X.append([i[variables.x_axe_position][0],i[variables.y_axe_position][0]])
+        X.append([i[variables.x_axe_position][1],i[variables.y_axe_position][1]])
         Y.append(1)
         Y.append(1)
 

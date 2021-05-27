@@ -35,14 +35,15 @@ def solveit(B):
 
 
 def split_box(area):
-    depth = area[len(variables.parameters_borders)]*2
+    depth = area[len(variables.parameters)]*2
     d = 1 / depth
 
-    for i in range(len(variables.parameters_borders)):
-        variables.parameters_borders[i] = [[(area[i][0] + d), area[i][1]], [area[i][0], (area[i][1] - d)]]
-    cross = itertools.product(*variables.parameters_borders,repeat=1) # *Test
+    borders = []
+    for i in range(len(variables.parameters)):
+        borders.append([[(area[i][0] + d), area[i][1]], [area[i][0], (area[i][1] - d)]])
+    cross = itertools.product(*borders, repeat=1)
     for i in cross:
-        i = i[:len(variables.parameters_borders)] + (depth,)
+        i = i[:len(variables.parameters)] + (depth,)
         if depth < 2**variables.depth_limit:
             variables.Queue.append(i)
         else:
