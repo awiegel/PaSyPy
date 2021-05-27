@@ -16,74 +16,97 @@ class MainApplication(tk.Frame):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
 
-        self.parent.title('Parameter Synthesis with Python')
-        self.parent.geometry('1280x1080')
-        self.greeting = tk.Label(text='Parameter Synthesis with Python')
+        self.parent.title('PaSyPy - Parameter Synthesis with Python')
+        self.parent.geometry('1020x740')
+        # self.greeting = tk.Label(text='Parameter Synthesis with Python')
+        self.parent.configure(background='white')
 
-        self.exit_button = tk.Button(root, text="Exit", command=root.quit, width=10, height=2, bg='black', fg='white')
-        self.exit_button.grid(row=0, column=1, sticky=tk.NE, padx=5, pady=5)
+        self.frame_color = 'black'
 
-        self.update_button = tk.Button(text="UPDATE", command=self.update, width=25, height=5, bg="blue", fg="yellow",)
-        self.update_button.grid(row=0, column=0, sticky=tk.NW, padx=5, pady=5)
+        self.frame5 = tk.Frame(width=100, height=140, background=self.frame_color)       
+        self.frame5.grid(row=0, column=0, sticky=tk.NW, padx=925, pady=5)
 
-        self.reset_button = tk.Button(text="RESET", command=self.reset, width=10, height=5, bg="gray", fg="white",)
-        self.reset_button.grid(row=0, column=0, sticky=tk.NW, padx=325, pady=5)
+        self.exit_button = tk.Button(self.frame5, text="Exit", command=root.quit, width=10, height=2, bg='black', fg='white')
+        self.exit_button.grid(row=0, column=0, sticky=tk.NW, padx=5, pady=5)
 
-        self.show_safe_area_button = tk.Button(text="Show safe area", command=self.show_safe_area, width=15, height=2, bg='limegreen')
-        self.show_safe_area_button.grid(row=0, column=0, sticky=tk.NW, padx=200, pady=5)
+        self.left_frame = tk.Frame(width=100, height=140, background=self.frame_color)       
+        self.left_frame.grid(row=0, column=0, sticky=tk.NW, padx=475, pady=62)
 
-        self.show_unsafe_area_button = tk.Button(text="Show unsafe area", command=self.show_unsafe_area, width=15, height=2, bg='red')
-        self.show_unsafe_area_button.grid(row=0, column=0, sticky=tk.NW, padx=200, pady=50)
+        self.update_graph_button = tk.Button(self.left_frame, text="Update\nGraph", command=self.update, width=11, height=3, bg="steel blue", fg="white")
+        self.update_graph_button.grid(row=0, column=0, sticky=tk.NW, padx=(5,3), pady=5)
 
-        self.increase_accuracy_button = tk.Button(root, text="Increase accuracy", command=self.increase_accuracy, width=15, height=1, bg='white', fg='black')
-        self.increase_accuracy_button.grid(row=1, column=2, sticky=tk.NW, padx=5, pady=245)
+        self.compute_button = tk.Button(self.left_frame, text="Compute", command=self.update, width=11, height=3, bg="steel blue", fg="white",)
+        self.compute_button.grid(row=0, column=1, sticky=tk.NW, padx=(3,5), pady=5)
 
-        self.decrease_accuracy_button = tk.Button(root, text="Decrease accuracy", command=self.decrease_accuracy, width=15, height=1, bg='white', fg='black')
-        self.decrease_accuracy_button.grid(row=1, column=2, sticky=tk.NW, padx=5, pady=270)
+        self.frame2 = tk.Frame(width=100, height=100, background=self.frame_color)       
+        self.frame2.grid(row=1, column=0, sticky=tk.NW, padx=890, pady=70)
 
-        self.summary = tk.Label(text='SUMMARY:', width=30, bg='black', fg='white')
-        self.summary.grid(row=1, column=1, sticky=tk.NW, pady=20)
-        self.summary1 = tk.Label(text='------------------------------', width=30, bg='black', fg='white') # relief='raised'
-        self.summary1.grid(row=1, column=1, sticky=tk.NW)
-        self.summary2 = tk.Label(text='------------------------------', width=30, bg='black', fg='white')
-        self.summary2.grid(row=1, column=1, sticky=tk.NW, pady=40)
-        self.summary3 = tk.Label(text='------------------------------', width=30, bg='black', fg='white')
-        self.summary3.grid(row=1, column=1, sticky=tk.NW, pady=160)
-        self.summary4 = tk.Label(text='------------------------------', width=30, bg='black', fg='white',)
-        self.summary4.grid(row=1, column=1, sticky=tk.NW, pady=240)
-        self.summary5 = tk.Label(text='------------------------------', width=30, bg='black', fg='white')
-        self.summary5.grid(row=1, column=1, sticky=tk.NW, pady=280)
+        self.show_safe_area_button = tk.Button(self.frame2, text="Show safe area", command=self.show_safe_area, width=15, height=2, bg='forest green')
+        self.show_safe_area_button.grid(row=0, column=0, sticky=tk.NW, padx=5, pady=(5,0))
 
-        self.time1 = tk.Label(text='Computation Time   :', width=30, bg='black', fg='white', anchor=tk.W)
-        self.time1.grid(row=1, column=1, sticky=tk.NW, pady=180)
-        self.time2 = tk.Label(text='Visualization Time    :', width=30, bg='black', fg='white', anchor=tk.W)
-        self.time2.grid(row=1, column=1, sticky=tk.NW, pady=200)
-        self.time3 = tk.Label(text='Total Time                 :', width=30, bg='black', fg='white', anchor=tk.W)
-        self.time3.grid(row=1, column=1, sticky=tk.NW, pady=220)
+        self.show_unsafe_area_button = tk.Button(self.frame2, text="Show unsafe area", command=self.show_unsafe_area, width=15, height=2, bg='firebrick')
+        self.show_unsafe_area_button.grid(row=1, column=0, sticky=tk.NW, padx=5, pady=(0,5))
+
+        self.frame1 = tk.Frame(width=1000, height=1400, background=self.frame_color)       
+        self.frame1.grid(row=1, column=0, sticky=tk.NW, padx=670, pady=5)
+
+
+
+        self.summary = tk.Label(self.frame1, text='SUMMARY:', width=30, bg='black', fg='white')
+        self.summary.grid(row=1, column=0, sticky=tk.NW, padx=5)
+        self.summary1 = tk.Label(self.frame1, text='---------------------------------------------', width=30, bg='black', fg='white') # relief='raised'
+        self.summary1.grid(row=0, column=0, sticky=tk.NW, padx=5, pady=(5,0))
+        self.summary2 = tk.Label(self.frame1,text='---------------------------------------------', width=30, bg='black', fg='white')
+        self.summary2.grid(row=2, column=0, sticky=tk.NW, padx=5)
+        self.summary3 = tk.Label(self.frame1, text='---------------------------------------------', width=30, bg='black', fg='white')
+        self.summary3.grid(row=8, column=0, sticky=tk.NW, padx=5)
+        self.summary4 = tk.Label(self.frame1, text='---------------------------------------------', width=30, bg='black', fg='white',)
+        self.summary4.grid(row=12, column=0, sticky=tk.NW, padx=5)
+        self.summary5 = tk.Label(self.frame1, text='---------------------------------------------', width=30, bg='black', fg='white')
+        self.summary5.grid(row=14, column=0, sticky=tk.NW, padx=5)
+        self.summary6 = tk.Label(self.frame1, text='---------------------------------------------', width=30, bg='black', fg='white')
+        self.summary6.grid(row=17, column=0, sticky=tk.NW, padx=5, pady=(0,5))
+
+        self.time1 = tk.Label(self.frame1, text='Computation Time   :', width=30, bg='black', fg='white', anchor=tk.W)
+        self.time1.grid(row=9, column=0, sticky=tk.NW, padx=5)
+        self.time2 = tk.Label(self.frame1, text='Visualization Time    :', width=30, bg='black', fg='white', anchor=tk.W)
+        self.time2.grid(row=10, column=0, sticky=tk.NW, padx=5)
+        self.time3 = tk.Label(self.frame1, text='Total Time                 :', width=30, bg='black', fg='white', anchor=tk.W)
+        self.time3.grid(row=11, column=0, sticky=tk.NW, padx=5)
         
         self.constraints = 0
-        self.accuracy = tk.Label(text='Accuracy: 2^{} or {} or {}'.format(variables.depth_limit, 2**variables.depth_limit, 1/(2**variables.depth_limit)), width=30, bg='black', fg='white', anchor=tk.W)
-        self.accuracy.grid(row=1, column=1, sticky=tk.NW, pady=260)
-        self.number_of_green_boxes = tk.Label(text='Number of green boxes : ', width=30, bg='limegreen', fg='black', anchor=tk.W)
-        self.number_of_green_boxes.grid(row=1, column=1, sticky=tk.NW, pady=60)
+        self.accuracy = tk.Label(self.frame1, text='Accuracy: 2^{}'.format(variables.depth_limit), width=30, bg='black', fg='white', anchor=tk.W)
+        self.accuracy.grid(row=13, column=0, sticky=tk.NW, padx=5)
+
+        self.increase_accuracy_button = tk.Button(self.frame1, text="+", command=self.increase_accuracy, width=2, height=1, bg='white', fg='black')
+        self.increase_accuracy_button.grid(row=13, column=0, sticky=tk.NE, padx=35)
+
+        self.decrease_accuracy_button = tk.Button(self.frame1, text="-", command=self.decrease_accuracy, width=2, height=1, bg='white', fg='black')
+        self.decrease_accuracy_button.grid(row=13, column=0, sticky=tk.NE, padx=5)
+
+        self.number_of_green_boxes = tk.Label(self.frame1, text='Number of green boxes : ', width=30, bg='forestgreen', fg='black', anchor=tk.W)
+        self.number_of_green_boxes.grid(row=3, column=0, sticky=tk.NW, padx=5)
         
-        self.green_area = tk.Label(text='Green area                        : ', width=30, bg='limegreen', fg='black', anchor=tk.W)
-        self.green_area.grid(row=1, column=1, sticky=tk.NW, pady=80)
+        self.green_area = tk.Label(self.frame1, text='Green area                        : ', width=30, bg='forestgreen', fg='black', anchor=tk.W)
+        self.green_area.grid(row=4, column=0, sticky=tk.NW, padx=5)
 
-        self.number_of_red_boxes = tk.Label(text='Number of red boxes     : ', width=30, bg='red', fg='black', anchor=tk.W)
-        self.number_of_red_boxes.grid(row=1, column=1, sticky=tk.NW, pady=100)
+        self.number_of_red_boxes = tk.Label(self.frame1, text='Number of red boxes     : ', width=30, bg='firebrick', fg='black', anchor=tk.W)
+        self.number_of_red_boxes.grid(row=5, column=0, sticky=tk.NW, padx=5)
 
-        self.red_area = tk.Label(text='Red area                           : ', width=30, bg='red', fg='black', anchor=tk.W)
-        self.red_area.grid(row=1, column=1, sticky=tk.NW, pady=120)
+        self.red_area = tk.Label(self.frame1, text='Red area                           : ', width=30, bg='firebrick', fg='black', anchor=tk.W)
+        self.red_area.grid(row=6, column=0, sticky=tk.NW, padx=5)
 
-        self.white_area_left = tk.Label(text='White area left                 : ', width=30, bg='white', fg='black', anchor=tk.W)
-        self.white_area_left.grid(row=1, column=1, sticky=tk.NW, pady=140)
+        self.white_area_left = tk.Label(self.frame1, text='White area left                 : ', width=30, bg='white', fg='black', anchor=tk.W)
+        self.white_area_left.grid(row=7, column=0, sticky=tk.NW, padx=5)
 
-        self.constraints_title = tk.Label(text='Constraints:', width=30, bg='black', fg='white')
-        self.constraints_title.grid(row=1, column=1, sticky=tk.NW, pady=300)
+        self.constraints_title = tk.Label(self.frame1, text='Constraints:', width=30, bg='black', fg='white')
+        self.constraints_title.grid(row=15, column=0, sticky=tk.NW, padx=5)
 
-        self.constraints_label = tk.Label(text="", width=30, height=10, bg='black', fg='white')
-        self.constraints_label.grid(row=1, column=1, sticky=tk.NW, pady=320)
+        self.constraints_label = tk.Label(self.frame1, text="", width=30, height=8, bg='black', fg='white')
+        self.constraints_label.grid(row=16, column=0, sticky=tk.NW, padx=5, pady=(0,5))
+
+                # self.frame3 = tk.Frame(width=100, height=100, background=self.frame_color)       
+        # self.frame3.grid(row=1, column=0, sticky=tk.NW, padx=890, pady=275)
 
         self.ax = None
         self.line = 0
@@ -91,84 +114,89 @@ class MainApplication(tk.Frame):
         figure = plt.figure()
         self.add_plot(figure)
 
-        self.text = tk.Text(root, width=22, height=10)
-        self.text.grid(row=1, column=2, sticky=tk.NW, padx=5, pady=350)
-
-        self.text_button = tk.Button(root, text="EDIT", command=self.edit, width=5, height=1, bg='green', fg='white')
-        self.text_button.grid(row=1, column=2, sticky=tk.NW, padx=190, pady=490)
-
-        self.reload_file_button = tk.Button(root, text="RELOAD FILE", command=self.reload_file, width=10, height=1, bg='brown', fg='white')
-        self.reload_file_button.grid(row=1, column=2, sticky=tk.NW, padx=190, pady=335)
-
         self.global_xlim = (0.0, 1.0)
         self.global_ylim = (0.0, 1.0)
 
-        self.file_path_label = tk.Label(root, text="", width=25, height=2, bg='black', fg='white')
-        self.file_path_label.grid(row=1, column=2, sticky=tk.NW, padx=5, pady=310)
+        self.frame4 = tk.Frame(width=100, height=140, background=self.frame_color)       
+        self.frame4.grid(row=0, column=0, sticky=tk.NW, padx=670, pady=(5,0))
 
-        self.get_file_path_button = tk.Button(root, text="Open .smt2 file", command=self.browseFiles, width=15, height=1, bg='gray', fg='white')
-        self.get_file_path_button.grid(row=1, column=2, sticky=tk.NW, padx=190, pady=310)
+        self.text = tk.Text(self.frame4, width=19, height=10)
+        self.text.grid(row=1, column=0, sticky=tk.NW, padx=5, pady=(0,5))
+
+        self.text_button = tk.Button(self.frame4, text="EDIT", command=self.edit, width=6, height=4, bg='gray', fg='white')
+        self.text_button.grid(row=1, column=0, sticky=tk.NW, padx=(170,5), pady=(95,5))
+
+        self.get_file_path_button = tk.Button(self.frame4, text="OPEN\nFILE", command=self.open_file, width=6, height=2, bg='gray', fg='white')
+        self.get_file_path_button.grid(row=1, column=0, sticky=tk.NW, padx=(170,5), pady=0)
+
+        self.reload_file_button = tk.Button(self.frame4, text="RELOAD\nFILE", command=self.reload_file, width=6, height=2, bg='gray', fg='white')
+        self.reload_file_button.grid(row=1, column=0, sticky=tk.NW, padx=(170,5), pady=45)
+
+
+        self.file_path_label = tk.Label(self.frame4, text="no file loaded", width=30, height=2, bg='black', fg='white')
+        self.file_path_label.grid(row=0, column=0, sticky=tk.NW, padx=5, pady=4)
+
 
         self.file_path = None
 
-        self.change_button = tk.Button(root, text="SWITCH", command=self.change_graph, width=10, height=2, bg='brown', fg='white')
-        self.change_button.grid(row=0, column=0, sticky=tk.NW, padx=415, pady=50)
+        self.frame5 = tk.Frame(width=100, height=140, background=self.frame_color)       
+        self.frame5.grid(row=0, column=0, sticky=tk.NW, padx=475, pady=5)
+
+        self.ready_label1 = tk.Label(self.frame5, text=">> STATUS <<", width=25, height=1, bg='black', fg='white')
+        self.ready_label1.grid(row=0, column=0, sticky=tk.NW, padx=5, pady=(5,0))
+
+        self.ready_label = tk.Label(self.frame5, text="WAITING", width=25, height=1, bg='black', fg='white')
+        self.ready_label.grid(row=1, column=0, sticky=tk.NW, padx=5, pady=(0,5))
 
 
-    def change_graph(self):
-        print(variables.parameters)
-        if variables.change == (len(variables.parameters) - 1):
-            variables.change = 0
-        else:
-            variables.change += 1
+        self.frame6 = tk.Frame(width=100, height=140, background=self.frame_color)       
+        self.frame6.grid(row=0, column=0, sticky=tk.NW, padx=5, pady=5)
 
-        self.ax.clear()
-        visualize.generate_graph()
+        self.background_image=tk.PhotoImage(file='PaSyPy/rwth_logo.png')
+        self.background_label = tk.Label(self.frame6, image=self.background_image)
+        self.background_label.grid(row=0, column=0, sticky=tk.NW, padx=5, pady=5)
+
+
+    def add_axes_field(self, x_axe, y_axe):
+        self.text_x_axe = tk.Entry(root, width=3, bg='black', fg='white', justify='center')
+        self.text_x_axe.insert(string=x_axe, index=0)
+        self.text_x_axe.grid(row=1, column=0, sticky=tk.NW, padx=325, pady=465)
+
+        self.text_y_axe = tk.Entry(root, width=3, bg='black', fg='white', justify='center')
+        self.text_y_axe.insert(string=y_axe, index=0)
+        self.text_y_axe.grid(row=1, column=0, sticky=tk.NW, padx=35, pady=250)
+
+    def add_empty_graph(self):
+        self.add_plot(plt.figure())
+        visualize.init_graph()
+
+        self.add_axes_field(variables.parameters[0], variables.parameters[1])
+
+
+    def get_graph_axes(self):
+        x_axe = Real('{}'.format(self.text_x_axe.get()))
+        variables.x_axe_position = 0
+        for index, value in zip(range(len(variables.parameters)), variables.parameters):
+            if x_axe == value:
+                variables.x_axe_position = index
+                break
+
+        y_axe = Real('{}'.format(self.text_y_axe.get()))
+        variables.y_axe_position = 0       
+        for index, value in zip(range(len(variables.parameters)), variables.parameters):
+            if y_axe == value:
+                variables.y_axe_position = index
+                break
 
 
     def reload_file(self):
-        self.constraints = parse_smt2_file(self.file_path)
-        self.constraints_label.configure(text=self.constraints[0])
-        variables.Constraints = self.constraints[0]
-        self.text.delete('1.0', 'end-1c')
-        self.text.insert('1.0', self.constraints[0])
-        variables.parameters = []
-
-        while True:
-            try:
-                print(eval(str(self.constraints)))
-                break
-            except NameError as e:
-                var = re.findall("name '(\w+)' is not defined",str(e))[0]
-                locals()['{}'.format(var)] = Real('{}'.format(var))
-                variables.parameters.append(locals()['{}'.format(var)])
-
-        for _ in variables.parameters:
-            variables.parameters_borders.append([])
-
-        pasypy.main()
-
-
-    def browseFiles(self):
         if self.file_path:
-            reload = True
-        else:
-            reload = False
-        
-        file_path = tk.filedialog.askopenfilename()
-        if file_path:
-            self.file_path = file_path
-            self.file_path_label.configure(text=os.path.basename(self.file_path))
-
             self.constraints = parse_smt2_file(self.file_path)
             self.constraints_label.configure(text=self.constraints[0])
-
             variables.Constraints = self.constraints[0]
             self.text.delete('1.0', 'end-1c')
             self.text.insert('1.0', self.constraints[0])
-
             variables.parameters = []
-            variables.parameters_borders = []
 
             while True:
                 try:
@@ -181,17 +209,57 @@ class MainApplication(tk.Frame):
 
             Bounds = ()
             for _ in range(len(variables.parameters)):
-                variables.parameters_borders.append([])
                 Bounds += ([0,1],)
             Bounds += (1,)
-            variables.Queue.append(Bounds)
+            variables.Queue = [Bounds]
+            variables.Sub_Queue = []
+            variables.G = []
+            variables.R = []
 
-            if reload:
-                self.reset()
-            else:
-                pasypy.main()
-                self.update_window()
+            pasypy.main()
 
+
+    def open_file(self):
+        if self.file_path:
+            reload = True
+        else:
+            reload = False
+        
+        file_path = tk.filedialog.askopenfilename()
+        if file_path:
+            
+            self.file_path = file_path
+            self.file_path_label.configure(text=os.path.basename(self.file_path))
+
+            self.constraints = parse_smt2_file(self.file_path)
+            self.constraints_label.configure(text=self.constraints[0])
+
+            variables.Constraints = self.constraints[0]
+            self.text.delete('1.0', 'end-1c')
+            self.text.insert('1.0', self.constraints[0])
+
+            variables.parameters = []
+
+            while True:
+                try:
+                    print(eval(str(self.constraints)))
+                    break
+                except NameError as e:
+                    var = re.findall("name '(\w+)' is not defined",str(e))[0]
+                    locals()['{}'.format(var)] = Real('{}'.format(var))
+                    variables.parameters.append(locals()['{}'.format(var)])
+
+            Bounds = ()
+            for _ in range(len(variables.parameters)):
+                Bounds += ([0,1],)
+            Bounds += (1,)
+            variables.Queue = [Bounds]
+            variables.Sub_Queue = []
+            variables.G = []
+            variables.R = []
+
+
+            self.add_empty_graph()
 
 
     def edit(self):
@@ -219,13 +287,13 @@ class MainApplication(tk.Frame):
 
     def increase_accuracy(self):
         variables.depth_limit += 1
-        self.accuracy.config(text='Accuracy: 2^{} or {} or {}'.format(variables.depth_limit, 2**variables.depth_limit, 1/(2**variables.depth_limit)))
+        self.accuracy.config(text='Accuracy: 2^{}'.format(variables.depth_limit))
 
 
     def decrease_accuracy(self):
         if variables.depth_limit > 1:
             variables.depth_limit -= 1
-            self.accuracy.config(text='Accuracy: 2^{} or {} or {}'.format(variables.depth_limit, 2**variables.depth_limit, 1/(2**variables.depth_limit)))
+            self.accuracy.config(text='Accuracy: 2^{}'.format(variables.depth_limit))
 
 
     def add_plot(self, figure):
@@ -241,16 +309,32 @@ class MainApplication(tk.Frame):
 
 
     def update(self):
-        self.line.destroy()
-        if variables.Sub_Queue:
-            variables.Queue = variables.Sub_Queue
-            variables.Sub_Queue = []
-        pasypy.main()
-        self.update_window()
+        if variables.Constraints is not None:
+            self.ready_label.configure(text='COMPUTING...')
+            if variables.depth_limit >= variables.previous_depth_limit:
+                self.get_graph_axes()
+
+                self.line.destroy()
+                if variables.Sub_Queue:
+                    variables.Queue = variables.Sub_Queue
+                    variables.Sub_Queue = []
+                pasypy.main()
+                self.update_window()
+            else:
+                self.reset()
+            
+            self.add_axes_field(variables.parameters[variables.x_axe_position], variables.parameters[variables.y_axe_position])
+
+            self.ready_label.configure(text='FINISHED')
+            variables.previous_depth_limit = variables.depth_limit
 
 
     def reset(self):
-        variables.Queue = [([0, 1], [0, 1], 1)]
+        Bounds = ()
+        for _ in range(len(variables.parameters)):
+            Bounds += ([0,1],)
+        Bounds += (1,)
+        variables.Queue = [Bounds]
         variables.Sub_Queue = []
         variables.G = []
         variables.R = []
