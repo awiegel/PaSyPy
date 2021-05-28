@@ -92,16 +92,16 @@ def draw_hyperplane():
     Y = []
 
     for i in GS:
-        X.append([i[variables.x_axe_position][0],i[variables.y_axe_position][0]])
-        X.append([i[variables.x_axe_position][1],i[variables.y_axe_position][1]])
-        Y.append(0)
-        Y.append(0)
+        for x_pos in range(2):
+            for y_pos in range(2):
+                X.append([i[variables.x_axe_position][x_pos],i[variables.y_axe_position][y_pos]])
+                Y.append(0)
     
     for i in RS:
-        X.append([i[variables.x_axe_position][0],i[variables.y_axe_position][0]])
-        X.append([i[variables.x_axe_position][1],i[variables.y_axe_position][1]])
-        Y.append(1)
-        Y.append(1)
+        for x_pos in range(2):
+            for y_pos in range(2):
+                X.append([i[variables.x_axe_position][x_pos],i[variables.y_axe_position][y_pos]])
+                Y.append(1)
 
     if 0 in Y and 1 in Y:
         clf = svm.SVC(kernel='rbf', C=1000)
