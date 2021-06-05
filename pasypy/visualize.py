@@ -15,9 +15,14 @@ GS = []
 RS = []
 
 
+
 def init_graph():
-    plt.xlim([0, 1.0])
-    plt.ylim([0, 1.0])
+    plt.xlim(variables.x_axe_limit)
+    if len(variables.parameters) > 1:
+        plt.ylim(variables.y_axe_limit)
+    else:
+        plt.ylim([0, 1])
+        plt.yticks([])
 
 
 def create_logfile(name, B):
@@ -38,21 +43,34 @@ def draw_green_area():
     global GS
 
     GS = variables.G.copy()
-    for g in variables.G[:]:
-        for gg in variables.G[:]:
-            if (((gg[variables.x_axe_position][0] >= g[variables.x_axe_position][0]) and (gg[variables.x_axe_position][1] <= g[variables.x_axe_position][1])) and \
-                ((gg[variables.y_axe_position][0] >= g[variables.y_axe_position][0]) and (gg[variables.y_axe_position][1] <= g[variables.y_axe_position][1]))) and \
-                (((gg[variables.x_axe_position][0] != g[variables.x_axe_position][0]) or (gg[variables.x_axe_position][1] != g[variables.x_axe_position][1])) or \
-                ((gg[variables.y_axe_position][0] != g[variables.y_axe_position][0]) or (gg[variables.y_axe_position][1] != g[variables.y_axe_position][1]))):
-                try:
-                    GS.remove(gg)
-                except:
-                    pass
-    for g in GS:
-        plt.plot([g[variables.x_axe_position][0],g[variables.x_axe_position][1],g[variables.x_axe_position][1],g[variables.x_axe_position][0],g[variables.x_axe_position][0]],
-                 [g[variables.y_axe_position][0],g[variables.y_axe_position][0],g[variables.y_axe_position][1],g[variables.y_axe_position][1],g[variables.y_axe_position][0]], color='black')
-        plt.fill([g[variables.x_axe_position][0],g[variables.x_axe_position][1],g[variables.x_axe_position][1],g[variables.x_axe_position][0],g[variables.x_axe_position][0]],
-                 [g[variables.y_axe_position][0],g[variables.y_axe_position][0],g[variables.y_axe_position][1],g[variables.y_axe_position][1],g[variables.y_axe_position][0]], color='forestgreen')
+    if len(variables.parameters) == 1:
+        for g in variables.G[:]:
+            for gg in variables.G[:]:
+                if ((gg[variables.x_axe_position][0] >= g[variables.x_axe_position][0]) and (gg[variables.x_axe_position][1] <= g[variables.x_axe_position][1])) and \
+                    ((gg[variables.x_axe_position][0] != g[variables.x_axe_position][0]) or (gg[variables.x_axe_position][1] != g[variables.x_axe_position][1])):
+                    try:
+                        GS.remove(gg)
+                    except:
+                        pass
+        for g in GS:
+            plt.plot([g[variables.x_axe_position][0],g[variables.x_axe_position][1],g[variables.x_axe_position][1],g[variables.x_axe_position][0],g[variables.x_axe_position][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color='black')
+            plt.fill([g[variables.x_axe_position][0],g[variables.x_axe_position][1],g[variables.x_axe_position][1],g[variables.x_axe_position][0],g[variables.x_axe_position][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color='forestgreen')
+    else:
+        for g in variables.G[:]:
+            for gg in variables.G[:]:
+                if (((gg[variables.x_axe_position][0] >= g[variables.x_axe_position][0]) and (gg[variables.x_axe_position][1] <= g[variables.x_axe_position][1])) and \
+                    ((gg[variables.y_axe_position][0] >= g[variables.y_axe_position][0]) and (gg[variables.y_axe_position][1] <= g[variables.y_axe_position][1]))) and \
+                    (((gg[variables.x_axe_position][0] != g[variables.x_axe_position][0]) or (gg[variables.x_axe_position][1] != g[variables.x_axe_position][1])) or \
+                    ((gg[variables.y_axe_position][0] != g[variables.y_axe_position][0]) or (gg[variables.y_axe_position][1] != g[variables.y_axe_position][1]))):
+                    try:
+                        GS.remove(gg)
+                    except:
+                        pass
+        for g in GS:
+            plt.plot([g[variables.x_axe_position][0],g[variables.x_axe_position][1],g[variables.x_axe_position][1],g[variables.x_axe_position][0],g[variables.x_axe_position][0]],
+                    [g[variables.y_axe_position][0],g[variables.y_axe_position][0],g[variables.y_axe_position][1],g[variables.y_axe_position][1],g[variables.y_axe_position][0]], color='black')
+            plt.fill([g[variables.x_axe_position][0],g[variables.x_axe_position][1],g[variables.x_axe_position][1],g[variables.x_axe_position][0],g[variables.x_axe_position][0]],
+                    [g[variables.y_axe_position][0],g[variables.y_axe_position][0],g[variables.y_axe_position][1],g[variables.y_axe_position][1],g[variables.y_axe_position][0]], color='forestgreen')
 
     create_logfile('safe_area', variables.G)
 
@@ -65,20 +83,33 @@ def draw_red_area():
     global RS
 
     RS = variables.R.copy()
-    for r in variables.R[:]:
-        for w in variables.Sub_Queue:
-            if ((w[variables.x_axe_position][0] >= r[variables.x_axe_position][0]) and (w[variables.x_axe_position][1] <= r[variables.x_axe_position][1])) and \
-                ((w[variables.y_axe_position][0] >= r[variables.y_axe_position][0]) and (w[variables.y_axe_position][1] <= r[variables.y_axe_position][1])):
-                try:
-                    RS.remove(r)
-                except:
-                    pass
+    if len(variables.parameters) == 1:
+        for r in variables.R[:]:
+            for w in variables.Sub_Queue:
+                if ((w[variables.x_axe_position][0] >= r[variables.x_axe_position][0]) and (w[variables.x_axe_position][1] <= r[variables.x_axe_position][1])):
+                    try:
+                        RS.remove(r)
+                    except:
+                        pass
 
-    for r in RS:
-        plt.plot([r[variables.x_axe_position][0],r[variables.x_axe_position][1],r[variables.x_axe_position][1],r[variables.x_axe_position][0],r[variables.x_axe_position][0]],
-                 [r[variables.y_axe_position][0],r[variables.y_axe_position][0],r[variables.y_axe_position][1],r[variables.y_axe_position][1],r[variables.y_axe_position][0]], color='black')
-        plt.fill([r[variables.x_axe_position][0],r[variables.x_axe_position][1],r[variables.x_axe_position][1],r[variables.x_axe_position][0],r[variables.x_axe_position][0]],
-                 [r[variables.y_axe_position][0],r[variables.y_axe_position][0],r[variables.y_axe_position][1],r[variables.y_axe_position][1],r[variables.y_axe_position][0]], color='firebrick')
+        for r in RS:
+            plt.plot([r[variables.x_axe_position][0],r[variables.x_axe_position][1],r[variables.x_axe_position][1],r[variables.x_axe_position][0],r[variables.x_axe_position][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color='black')
+            plt.fill([r[variables.x_axe_position][0],r[variables.x_axe_position][1],r[variables.x_axe_position][1],r[variables.x_axe_position][0],r[variables.x_axe_position][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color='firebrick')
+    else:
+        for r in variables.R[:]:
+            for w in variables.Sub_Queue:
+                if ((w[variables.x_axe_position][0] >= r[variables.x_axe_position][0]) and (w[variables.x_axe_position][1] <= r[variables.x_axe_position][1])) and \
+                    ((w[variables.y_axe_position][0] >= r[variables.y_axe_position][0]) and (w[variables.y_axe_position][1] <= r[variables.y_axe_position][1])):
+                    try:
+                        RS.remove(r)
+                    except:
+                        pass
+
+        for r in RS:
+            plt.plot([r[variables.x_axe_position][0],r[variables.x_axe_position][1],r[variables.x_axe_position][1],r[variables.x_axe_position][0],r[variables.x_axe_position][0]],
+                    [r[variables.y_axe_position][0],r[variables.y_axe_position][0],r[variables.y_axe_position][1],r[variables.y_axe_position][1],r[variables.y_axe_position][0]], color='black')
+            plt.fill([r[variables.x_axe_position][0],r[variables.x_axe_position][1],r[variables.x_axe_position][1],r[variables.x_axe_position][0],r[variables.x_axe_position][0]],
+                    [r[variables.y_axe_position][0],r[variables.y_axe_position][0],r[variables.y_axe_position][1],r[variables.y_axe_position][1],r[variables.y_axe_position][0]], color='firebrick')
 
     create_logfile('unsafe_area', variables.R)
 
@@ -111,8 +142,8 @@ def draw_hyperplane():
         app.ax.callbacks.connect('ylim_changed', on_ylims_change)
         xlim = app.ax.get_xlim()
         ylim = app.ax.get_ylim()
-        app.global_xlim = (0.0, 1.0)
-        app.global_ylim = (0.0, 1.0)
+        app.global_xlim = variables.x_axe_limit
+        app.global_ylim = variables.y_axe_limit
         xx = np.linspace(xlim[0], xlim[1], 30)
         yy = np.linspace(ylim[0], ylim[1], 30)
         YY, XX = np.meshgrid(yy, xx)
@@ -142,7 +173,8 @@ def generate_graph():
     init_graph()
     draw_green_area()
     draw_red_area()
-    draw_hyperplane()
+    if len(variables.parameters) > 1:
+        draw_hyperplane()
     app.add_plot(figure)
 
 

@@ -6,8 +6,9 @@ import variables
 import visualize
 import gui
 
+
 def add_boundary(s, B):
-    for index, value in zip(range(len(variables.parameters)), variables.parameters):
+    for index, value in enumerate(variables.parameters):
         s.add(value >= B[index][0])
         s.add(value <= B[index][1])
 
@@ -61,25 +62,31 @@ def calculate_area(boxes):
 
 
 def check_zoom():
-    return ((variables.Queue[0][0][0] >= gui.app.global_xlim[0]) and \
-            (variables.Queue[0][0][1] <= gui.app.global_xlim[1]) and \
-            (variables.Queue[0][1][0] >= gui.app.global_ylim[0]) and \
-            (variables.Queue[0][1][1] <= gui.app.global_ylim[1]))
+    if len(variables.parameters) > 1:
+        inside_zoom = ((variables.Queue[0][0][0] >= gui.app.global_xlim[0]) and \
+                       (variables.Queue[0][0][1] <= gui.app.global_xlim[1]) and \
+                       (variables.Queue[0][1][0] >= gui.app.global_ylim[0]) and \
+                       (variables.Queue[0][1][1] <= gui.app.global_ylim[1]))
+    else:
+        inside_zoom = ((variables.Queue[0][0][0] >= gui.app.global_xlim[0]) and \
+                       (variables.Queue[0][0][1] <= gui.app.global_xlim[1]))
+    return inside_zoom
+
+def init_solvers():
+    variables.solver.reset()
+    variables.solver_neg.reset()
+    variables.solver.add(variables.Constraints)
+    variables.solver_neg.add(variables.Constraints_neg)
 
 
 def main():
     try:
         timestamps = {'Start Time': timeit.default_timer()}
 
-        variables.solver.reset()
-        variables.solver_neg.reset()
-        
-        variables.solver.add(variables.Constraints)
-        variables.solver_neg.add(Not(variables.Constraints))
+        init_solvers()
 
         while variables.Queue:
             if check_zoom() and (variables.Queue[0][len(variables.parameters)] < ((2**variables.depth_limit)/2)):
-
                 solveit(variables.Queue[0])
                 visualize.show_progress()
             else:
