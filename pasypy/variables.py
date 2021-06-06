@@ -5,6 +5,7 @@ solver_neg = Solver()
 
 
 Constraints = []
+Constraints_neg = []
 
 parameters = []
 
@@ -23,6 +24,10 @@ previous_Constraints = []
 
 x_axe_position = 0
 y_axe_position = 0
+
+x_axe_limit = [0.0, 1.0]
+y_axe_limit = [0.0, 1.0]
+
 
 def main():
     None

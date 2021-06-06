@@ -37,7 +37,7 @@ def solveit(B):
 
 def split_box(area):
     depth = area[len(variables.parameters)]*2
-    d = 1 / depth
+    d = 1 / (depth / (variables.x_axe_limit[1] - variables.x_axe_limit[0]))
 
     borders = []
     for i in range(len(variables.parameters)):
@@ -56,7 +56,7 @@ def calculate_area(boxes):
     for i in boxes:
         mult = 1
         for j in range(len(variables.parameters)):
-            mult *= (i[j][1]-i[j][0])
+            mult *= (i[j][1]-i[j][0]) / (variables.x_axe_limit[1] - variables.x_axe_limit[0])
         area += mult
     return area
 
