@@ -239,6 +239,14 @@ class MainApplication(tk.Frame):
         self.file_path = None
         self.text_x_axe = None
         self.text_y_axe = None
+
+        self.parent.bind('+', lambda x: self.increase_accuracy())
+        self.parent.bind('-', lambda x: self.decrease_accuracy())
+        self.parent.bind('<Escape>', lambda x: self.parent.quit())
+        self.parent.bind('o', lambda x: self.open_file())
+        self.parent.bind('r', lambda x: self.reload_file())
+        self.parent.bind('<space>', lambda x: self.update())
+
         self.args_str = ''
 
 
