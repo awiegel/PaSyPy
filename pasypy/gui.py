@@ -211,6 +211,12 @@ class MainApplication(tk.Frame):
         self.text_button.grid(row=0, column=2, sticky=tk.NW, padx=5, pady=5)
         self.file_path_label = tk.Label(self.frame21, text="no file loaded", width=20, height=2, bg='black', fg='white')
         self.file_path_label.grid(row=0, column=3, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+        self.text1 = tk.Entry(self.frame21, width=5)
+        self.text1.grid(row=0, column=4, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+        self.text2 = tk.Entry(self.frame21, width=5)
+        self.text2.grid(row=0, column=5, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+        self.border_button = tk.Button(self.frame21, text="GET", command=self.border, width=6, height=2, bg='gray', fg='white')
+        self.border_button.grid(row=0, column=6, sticky=tk.NW, padx=5, pady=5)
         ## END - FRAME 2.1 #
 
         ## START - FRAME 2.2 #
@@ -259,6 +265,14 @@ class MainApplication(tk.Frame):
             self.text_y_axe = tk.Entry(self.frame12, width=3, bg='black', fg='white', justify='center')
             self.text_y_axe.insert(string=y_axe, index=0)
             self.text_y_axe.grid(row=0, column=0, sticky=tk.W, padx=25)
+
+
+    def border(self):
+        variables.x_axe_limit = [float(self.text1.get()), float(self.text2.get())]
+        self.global_xlim = variables.x_axe_limit
+        if len(variables.parameters) > 1:
+            variables.y_axe_limit = [float(self.text1.get()), float(self.text2.get())]
+        self.global_ylim = variables.y_axe_limit
 
 
     def add_empty_graph(self):
@@ -415,7 +429,8 @@ class MainApplication(tk.Frame):
                 self.args_str = self.args_str[:-2]
                 for index, value in enumerate(variables.quantifiers):
                     self.args_str = self.args_str.replace('Var({})'.format(index), str(value))
-                variables.Constraints_neg = Exists(variables.quantifiers, eval(self.args_str))        
+                variables.Constraints_neg = Exists(variables.quantifiers, eval(self.args_str))
+        
             else:
                 while True:
                     try:
