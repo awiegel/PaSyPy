@@ -314,7 +314,7 @@ class MainApplication(tk.Frame):
                     print(eval(str(self.constraints)))
                     break
                 except NameError as e:
-                    var = re.findall("name '(\w+)' is not defined",str(e))[0]
+                    var = re.findall(r"name '\w' is not defined",str(e))[0]
                     locals()['{}'.format(var)] = Real('{}'.format(var))
                     variables.parameters.append(locals()['{}'.format(var)])
 
@@ -414,12 +414,12 @@ class MainApplication(tk.Frame):
                         break
                     except NameError as e:
                         if counter < num_vars:
-                            var = re.findall("name '(\w+)' is not defined",str(e))[0]
+                            var = re.findall(r"name '\w' is not defined",str(e))[0]
                             locals()['{}'.format(var)] = Real('{}'.format(var))
                             variables.quantifiers.append(locals()['{}'.format(var)])
                             counter += 1
                         else:
-                            var = re.findall("name '(\w+)' is not defined",str(e))[0]
+                            var = re.findall(r"name '\w' is not defined",str(e))[0]
                             locals()['{}'.format(var)] = Real('{}'.format(var))
                             variables.parameters.append(locals()['{}'.format(var)])
 
@@ -437,7 +437,7 @@ class MainApplication(tk.Frame):
                         print(eval(str(self.constraints)))
                         break
                     except NameError as e:
-                        var = re.findall("name '(\w+)' is not defined",str(e))[0]
+                        var = re.findall(r"name '(\w+)' is not defined",str(e))[0]
                         locals()['{}'.format(var)] = Real('{}'.format(var))
                         variables.parameters.append(locals()['{}'.format(var)])
                 
