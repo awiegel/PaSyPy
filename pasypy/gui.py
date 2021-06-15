@@ -19,6 +19,7 @@ class MainApplication(tk.Frame):
 
         self.parent.title('PaSyPy - Parameter Synthesis with Python')
         self.parent.geometry('1200x750')
+        self.parent.minsize(1200, 750)
         # self.greeting = tk.Label(text='Parameter Synthesis with Python')
         self.parent.configure(background='white')
 
