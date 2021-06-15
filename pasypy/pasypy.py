@@ -1,4 +1,5 @@
-from z3 import *
+import z3
+
 import timeit
 import itertools
 
@@ -19,13 +20,13 @@ def solveit(B):
     variables.solver.push()
     add_boundary(variables.solver, B)
 
-    if variables.solver.check() == sat:
+    if variables.solver.check() == z3.sat:
         variables.solver.pop()
 
         variables.solver_neg.push()
         add_boundary(variables.solver_neg, B)
 
-        if variables.solver_neg.check() == sat:
+        if variables.solver_neg.check() == z3.sat:
             split_box(B)
         else:
             variables.G.append(B[:-1])

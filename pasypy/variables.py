@@ -1,7 +1,7 @@
-from z3 import Solver, Real
+import z3
 
-solver = Solver()
-solver_neg = Solver()
+solver = z3.Solver()
+solver_neg = z3.Solver()
 
 
 Constraints = None
