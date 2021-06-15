@@ -209,12 +209,3 @@ def show_time(timestamps):
             app.time2.config(text='{}{} : {} sec.'.format(i, (2 * ' ' * (max_name_len-len(i))), round(timestamps[i], 3)))
     print('Total Time{} :'.format(' ' * (max_name_len-len('Total Time'))), round(total_time, 3), 'sec.')
     app.time3.config(text='Total Time{} : {} sec.'.format((2 * ' ' * (max_name_len-len('Total Time'))), round(total_time, 3)))
-
-
-
-def main():
-    None
-
-
-if __name__ == "__main__":
-    main()

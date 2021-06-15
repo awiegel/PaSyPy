@@ -522,12 +522,6 @@ class MainApplication(tk.Frame):
         self.white_area_left.config(text='White area left                 : {:.2%}'.format(1 - (green_area + red_area)))
 
 
-def main():
-    None
-
-
-if __name__ == "__main__":
-    main()
-else:
+if __name__ != "__main__":
     root = tk.Tk()
     app = MainApplication(root)

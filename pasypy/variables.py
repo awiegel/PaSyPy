@@ -27,11 +27,3 @@ y_axe_position = 0
 
 x_axe_limit = [0.0, 1.0]
 y_axe_limit = [0.0, 1.0]
-
-
-def main():
-    None
-
-
-if __name__ == "__main__":
-    main()
