@@ -269,11 +269,23 @@ class MainApplication(tk.Frame):
 
 
     def border(self):
-        variables.x_axe_limit = [float(self.text1.get()), float(self.text2.get())]
+        lim_inf = self.text1.get()
+        if lim_inf:
+            lim_inf = float(lim_inf)
+        else:
+            lim_inf = variables.x_axe_limit[0]
+        lim_sup = self.text2.get()
+        if lim_sup:
+            lim_sup = float(lim_sup)
+        else:
+            lim_sup = variables.x_axe_limit[1]
+        variables.x_axe_limit = [lim_inf, lim_sup]
         self.global_xlim = variables.x_axe_limit
         if len(variables.parameters) > 1:
-            variables.y_axe_limit = [float(self.text1.get()), float(self.text2.get())]
+            variables.y_axe_limit = [lim_inf, lim_sup]
         self.global_ylim = variables.y_axe_limit
+        
+        self.restore_default()
 
 
     def add_empty_graph(self):
@@ -316,7 +328,6 @@ class MainApplication(tk.Frame):
             temp = []
             temp_sub = []
             for i in pp.children():
-                print(i)
                 if str(i).find('Var') != -1:
                     temp_sub.append(i)
                 else:
@@ -359,21 +370,20 @@ class MainApplication(tk.Frame):
     def read_file(self):
         if self.file_path:
             self.file_path_label.configure(text=os.path.basename(self.file_path))
-            self.constraints = parse_smt2_file(self.file_path)
+            variables.Constraints = parse_smt2_file(self.file_path)[0]
 
-            variables.Constraints = self.constraints[0]
             self.text.delete('1.0', 'end-1c')
-            self.text.insert('1.0', self.constraints[0])
+            self.text.insert('1.0', variables.Constraints)
 
             variables.parameters = []
             variables.quantifiers = []
 
-            if type(self.constraints[0]) == z3.z3.QuantifierRef:
-                num_vars = self.constraints[0].num_vars()
+            if type(variables.Constraints) == z3.z3.QuantifierRef:
+                num_vars = variables.Constraints.num_vars()
                 counter = 0
                 while True:
                     try:
-                        print(eval(str(self.constraints)))
+                        eval(str(variables.Constraints))
                         break
                     except NameError as e:
                         var = re.findall(r"name '(\w+)' is not defined",str(e))[0]
@@ -384,7 +394,7 @@ class MainApplication(tk.Frame):
                         else:
                             variables.parameters.append(locals()['{}'.format(var)])
 
-                boolref = self.constraints[0].body() 
+                boolref = variables.Constraints.body() 
                 self.args_str = ''
                 self.test(boolref, '', False)
                 self.args_str = self.args_str[:-2]
@@ -395,7 +405,7 @@ class MainApplication(tk.Frame):
             else:
                 while True:
                     try:
-                        print(eval(str(self.constraints)))
+                        eval(str(variables.Constraints))
                         break
                     except NameError as e:
                         var = re.findall(r"name '(\w+)' is not defined",str(e))[0]
@@ -404,20 +414,24 @@ class MainApplication(tk.Frame):
                 
                 variables.Constraints_neg = Not(variables.Constraints)
 
-            Bounds = ()
-            for _ in range(len(variables.parameters)):
-                Bounds += (variables.x_axe_limit,)
-            Bounds += (1,)
-            variables.Queue = [Bounds]
-            variables.Sub_Queue = []
-            variables.G = []
-            variables.R = []
+            self.restore_default()
 
-            self.add_empty_graph()
-            if len(variables.parameters) == 1:
-                self.add_axes_field(variables.parameters[0], None)
-            else:
-                self.add_axes_field(variables.parameters[0],variables.parameters[1])
+
+    def restore_default(self):
+        Bounds = ()
+        for _ in range(len(variables.parameters)):
+            Bounds += (variables.x_axe_limit,)
+        Bounds += (1,)
+        variables.Queue = [Bounds]
+        variables.Sub_Queue = []
+        variables.G = []
+        variables.R = []
+
+        self.add_empty_graph()
+        if len(variables.parameters) == 1:
+            self.add_axes_field(variables.parameters[0], None)
+        else:
+            self.add_axes_field(variables.parameters[0],variables.parameters[1])
 
 
     def open_file(self):        
@@ -430,13 +444,15 @@ class MainApplication(tk.Frame):
 
     def edit(self):
         f = self.text.get('1.0', 'end-1c')
-        if self.text.compare('1.0', '!=', 'end-1c') and f != str(self.constraints[0]):
+
+        if self.text.compare('1.0', '!=', 'end-1c') and f != str(variables.Constraints):
             for i in variables.parameters:
                 locals()['{}'.format(i)] = i
             
             variables.Constraints = eval(f)
 
-            self.reset()
+
+            self.restore_default()
 
 
     @classmethod
