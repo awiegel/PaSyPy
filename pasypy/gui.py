@@ -376,7 +376,7 @@ class MainApplication(tk.Frame):
                         print(eval(str(self.constraints)))
                         break
                     except NameError as e:
-                        var = re.findall(r"name '\w' is not defined",str(e))[0]
+                        var = re.findall(r"name '(\w+)' is not defined",str(e))[0]
                         locals()['{}'.format(var)] = Real('{}'.format(var))
                         if counter < num_vars:
                             variables.quantifiers.append(locals()['{}'.format(var)])
