@@ -301,35 +301,6 @@ class MainApplication(tk.Frame):
                     break
 
 
-    def reload_file(self):
-        if self.file_path:
-            self.constraints = parse_smt2_file(self.file_path)
-            variables.Constraints = self.constraints[0]
-            self.text.delete('1.0', 'end-1c')
-            self.text.insert('1.0', self.constraints[0])
-            variables.parameters = []
-
-            while True:
-                try:
-                    print(eval(str(self.constraints)))
-                    break
-                except NameError as e:
-                    var = re.findall(r"name '\w' is not defined",str(e))[0]
-                    locals()['{}'.format(var)] = Real('{}'.format(var))
-                    variables.parameters.append(locals()['{}'.format(var)])
-
-            Bounds = ()
-            for _ in range(len(variables.parameters)):
-                Bounds += (variables.x_axe_limit,)
-            Bounds += (1,)
-            variables.Queue = [Bounds]
-            variables.Sub_Queue = []
-            variables.G = []
-            variables.R = []
-
-            pasypy.main()
-
-
     def test(self, pp, pre_arg, flag):
         ret_val = False
         if (pp.decl().name() == 'and') or (pp.decl().name() == 'or'):
@@ -384,18 +355,9 @@ class MainApplication(tk.Frame):
         return ret_val
 
 
-    def open_file(self):
+    def read_file(self):
         if self.file_path:
-            reload = True
-        else:
-            reload = False
-        
-        file_path = tk.filedialog.askopenfilename()
-        if file_path:
-            
-            self.file_path = file_path
             self.file_path_label.configure(text=os.path.basename(self.file_path))
-
             self.constraints = parse_smt2_file(self.file_path)
 
             variables.Constraints = self.constraints[0]
@@ -413,14 +375,12 @@ class MainApplication(tk.Frame):
                         print(eval(str(self.constraints)))
                         break
                     except NameError as e:
+                        var = re.findall(r"name '\w' is not defined",str(e))[0]
+                        locals()['{}'.format(var)] = Real('{}'.format(var))
                         if counter < num_vars:
-                            var = re.findall(r"name '\w' is not defined",str(e))[0]
-                            locals()['{}'.format(var)] = Real('{}'.format(var))
                             variables.quantifiers.append(locals()['{}'.format(var)])
                             counter += 1
                         else:
-                            var = re.findall(r"name '\w' is not defined",str(e))[0]
-                            locals()['{}'.format(var)] = Real('{}'.format(var))
                             variables.parameters.append(locals()['{}'.format(var)])
 
                 boolref = self.constraints[0].body() 
@@ -459,10 +419,17 @@ class MainApplication(tk.Frame):
                 self.add_axes_field(variables.parameters[0],variables.parameters[1])
 
 
+    def open_file(self):        
+        self.file_path = tk.filedialog.askopenfilename()
+        self.read_file()
+
+    def reload_file(self):
+        self.read_file()
+
+
     def edit(self):
         f = self.text.get('1.0', 'end-1c')
         if self.text.compare('1.0', '!=', 'end-1c') and f != str(self.constraints[0]):
-
             for i in variables.parameters:
                 locals()['{}'.format(i)] = i
             

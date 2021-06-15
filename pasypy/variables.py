@@ -4,8 +4,8 @@ solver = Solver()
 solver_neg = Solver()
 
 
-Constraints = []
-Constraints_neg = []
+Constraints = None
+Constraints_neg = None
 
 parameters = []
 
