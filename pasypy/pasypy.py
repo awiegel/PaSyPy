@@ -89,7 +89,6 @@ def main():
         while variables.Queue:
             if check_zoom() and (variables.Queue[0][len(variables.parameters)] < ((2**variables.depth_limit)/2)):
                 solveit(variables.Queue[0])
-                visualize.show_progress()
             else:
                 variables.Sub_Queue.append(variables.Queue[0])
                 variables.Queue.pop(0)

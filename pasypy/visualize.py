@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import svm
-from colorama import Fore, Style
 import timeit
 import os
 
@@ -72,10 +71,6 @@ def draw_green_area():
 
     create_logfile('safe_area', variables.G)
 
-    print(Fore.GREEN + 'G: ', variables.G)
-    print('Number of green boxes: ', len(variables.G))
-    print(Style.RESET_ALL)
-
 
 def draw_red_area():
     global RS
@@ -110,10 +105,6 @@ def draw_red_area():
                     [r[variables.y_axe_position][0],r[variables.y_axe_position][0],r[variables.y_axe_position][1],r[variables.y_axe_position][1],r[variables.y_axe_position][0]], color='firebrick')
 
     create_logfile('unsafe_area', variables.R)
-
-    print(Fore.RED + 'R: ', variables.R)
-    print('Number of red boxes: ', len(variables.R))
-    print(Style.RESET_ALL)
 
 
 def draw_hyperplane():
@@ -181,13 +172,6 @@ def show_graph():
     plt.show()
 
 
-def show_progress():
-    green_area = calculate_area(variables.G)
-    red_area = calculate_area(variables.R)
-    print(Fore.GREEN + 'Green area:', '{:.2%}'.format(green_area), Fore.RED + '    Red area:', '{:.2%}'.format(red_area),
-          Fore.WHITE + '    White area left:', '{:.2%}'.format(1 - (green_area + red_area)))
-
-
 def create_timestamp(name, timestamps):
     timestamp = timeit.default_timer()
     for i in timestamps.values():
@@ -200,11 +184,9 @@ def show_time(timestamps):
     max_name_len = len(max(timestamps, key=len))
     for i in timestamps:
         if i != 'Start Time':
-            print('{}{} :'.format(i, (' ' * (max_name_len-len(i)))), round(timestamps[i], 3), 'sec.')
             total_time += round(timestamps[i], 3)
         if i == 'Computation Time':
             gui.app.time1.config(text='{}{} : {} sec.'.format(i, (' ' * (max_name_len-len(i))), round(timestamps[i], 3)))
         elif i == 'Visualization Time':
             gui.app.time2.config(text='{}{} : {} sec.'.format(i, (2 * ' ' * (max_name_len-len(i))), round(timestamps[i], 3)))
-    print('Total Time{} :'.format(' ' * (max_name_len-len('Total Time'))), round(total_time, 3), 'sec.')
     gui.app.time3.config(text='Total Time{} : {} sec.'.format((2 * ' ' * (max_name_len-len('Total Time'))), round(total_time, 3)))
