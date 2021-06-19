@@ -3,7 +3,6 @@ import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 import matplotlib.pyplot as plt
-from z3 import *
 import matplotlib
 matplotlib.use('Agg')
 
@@ -298,18 +297,16 @@ class MainApplication(tk.Frame):
 
 
     def get_graph_axes(self):
-        x_axe = Real('{}'.format(self.text_x_axe.get()))
         variables.x_axe_position = 0
         for index, value in enumerate(variables.parameters):
-            if x_axe == value:
+            if self.text_x_axe.get() == str(value):
                 variables.x_axe_position = index
                 break
 
         if self.text_y_axe:
-            y_axe = Real('{}'.format(self.text_y_axe.get()))
             variables.y_axe_position = 0       
             for index, value in enumerate(variables.parameters):
-                if y_axe == value:
+                if self.text_y_axe.get() == str(value):
                     variables.y_axe_position = index
                     break
 
@@ -318,8 +315,7 @@ class MainApplication(tk.Frame):
         if self.file_path:
             self.file_path_label.configure(text=os.path.basename(self.file_path))
 
-            variables.Constraints = parse_smt2_file(self.file_path)[0]
-            constraints_parser.set_new_constraints()
+            constraints_parser.parse_from_file(self.file_path)
 
             self.text.delete('1.0', 'end-1c')
             self.text.insert('1.0', variables.Constraints)
@@ -353,11 +349,10 @@ class MainApplication(tk.Frame):
 
 
     def edit(self):
-        constraints = self.text.get('1.0', 'end-1c')
-        if self.text.compare('1.0', '!=', 'end-1c') and constraints != str(variables.Constraints):
+        text = self.text.get('1.0', 'end-1c')
+        if self.text.compare('1.0', '!=', 'end-1c') and text != str(variables.Constraints):
             
-            constraints_parser.parse_constraints(constraints)
-            constraints_parser.set_new_constraints()            
+            constraints_parser.parse_from_textfield(text)
             
             self.restore_default()
 
