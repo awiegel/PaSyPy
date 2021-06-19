@@ -1,5 +1,4 @@
 import os
-import re
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
@@ -10,6 +9,7 @@ matplotlib.use('Agg')
 
 import variables
 import pasypy
+import constraints_parser
 
 
 class MainApplication(tk.Frame):
@@ -41,7 +41,7 @@ class MainApplication(tk.Frame):
         ### START - FRAME 1.1.1 #
         self.frame111 = tk.Frame(master=self.frame11, background='black')       
         self.frame111.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W))
-        self.background_image = tk.PhotoImage(file='PaSyPy/rwth_logo.png')
+        self.background_image = tk.PhotoImage(file='rwth_logo.png')
         self.background_label = tk.Label(self.frame111, image=self.background_image)
         self.background_label.grid(row=0, column=0, sticky=tk.NW, padx=1, pady=1)
         self.exit_button = tk.Button(self.frame111, text="Exit", command=self.parent.quit, width=10, height=2, bg='black', fg='white')
@@ -256,8 +256,6 @@ class MainApplication(tk.Frame):
 
         self.args_str = ''
         
-        self.num_vars = 0
-
 
     def add_axes_field(self, x_axe, y_axe):
         self.text_x_axe = tk.Entry(self.frame12, width=3, bg='black', fg='white', justify='center')
@@ -316,36 +314,12 @@ class MainApplication(tk.Frame):
                     break
 
 
-    def get_number_of_vars(self, formula):
-        if type(formula) == z3.z3.QuantifierRef:
-            self.num_vars += formula.num_vars()
-            for i in range(formula.num_vars()):
-                variables.quantifiers.append(formula.var_name(i))
-            self.get_number_of_vars(formula.body())
-        elif type(formula) == z3.z3.BoolRef:
-            # if len(formula.children()) > 0:
-            for subFormula in formula.children():
-                self.get_number_of_vars(subFormula)
-            # else:
-            #     variables.parameters.append(formula)
-        elif type(formula) == z3.z3.ArithRef:
-            if 'var' not in formula.sexpr() and formula not in variables.parameters:
-                variables.parameters.append(formula)
-        else:
-            pass
-
-
     def read_file(self):
         if self.file_path:
             self.file_path_label.configure(text=os.path.basename(self.file_path))
 
             variables.Constraints = parse_smt2_file(self.file_path)[0]
-            
-            variables.parameters = []
-            variables.quantifiers = []
-
-            self.get_number_of_vars(variables.Constraints)
-            variables.Constraints_neg = Not(variables.Constraints)
+            constraints_parser.set_new_constraints()
 
             self.text.delete('1.0', 'end-1c')
             self.text.insert('1.0', variables.Constraints)
@@ -378,31 +352,12 @@ class MainApplication(tk.Frame):
         self.read_file()
 
 
-    def parse_constraints(self, constraints):
-        temp_locals = []
-        while True:
-            try:
-                variables.Constraints = eval(constraints)
-                break
-            except NameError as e:
-                var = re.findall(r"name '(\w+)' is not defined",str(e))[0]
-                locals()['{}'.format(var)] = Real('{}'.format(var))
-                temp_locals.append(var)
-        for temp_local in temp_locals:
-            locals().pop(temp_local)
-
-
     def edit(self):
         constraints = self.text.get('1.0', 'end-1c')
         if self.text.compare('1.0', '!=', 'end-1c') and constraints != str(variables.Constraints):
             
-            self.parse_constraints(constraints)
-            
-            variables.parameters = []
-            variables.quantifiers = []
-            
-            self.get_number_of_vars(variables.Constraints)
-            variables.Constraints_neg = Not(variables.Constraints)            
+            constraints_parser.parse_constraints(constraints)
+            constraints_parser.set_new_constraints()            
             
             self.restore_default()
 
