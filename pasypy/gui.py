@@ -255,6 +255,8 @@ class MainApplication(tk.Frame):
         self.parent.bind('<space>', lambda _: self.update())
 
         self.args_str = ''
+        
+        self.num_vars = 0
 
 
     def add_axes_field(self, x_axe, y_axe):
@@ -314,105 +316,39 @@ class MainApplication(tk.Frame):
                     break
 
 
-    def test(self, pp, pre_arg, flag):
-        ret_val = False
-        if (pp.decl().name() == 'and') or (pp.decl().name() == 'or'):
-            if pp.decl().name() == 'and':
-                # self.args_str += 'And'
-                self.args_str += 'Or'
-            else:
-                # self.args_str += 'Or'
-                self.args_str += 'And'
-            self.args_str += '('
-
-            temp = []
-            temp_sub = []
-            for i in pp.children():
-                if str(i).find('Var') != -1:
-                    temp_sub.append(i)
-                else:
-                    temp.append(i)
-            temp.extend(temp_sub)
-            # for i in pp.children():
-            for i in temp:
-                ret_val = self.test(i, pp.decl().name(), flag)
-                flag = ret_val
-            self.args_str = self.args_str[:-2]
-            self.args_str += ')'
-            if not flag:
-                self.args_str += ')'
-        elif type(pp) == z3.z3.BoolRef:
-            abc = False
-            for arg in range(pp.num_args()):
-                if str(pp.arg(arg)) == 'Var(0)' or str(pp.arg(arg)) == 'Var(1)' or str(pp.arg(arg)) == 'Var(2)':
-                    abc = True
-            if abc:
-                if not flag:
-                    ret_val = True
-                    if pre_arg == 'and':
-                        # self.args_str += 'Or'
-                        self.args_str += 'And'
-                    else:
-                        # self.args_str += 'And'
-                        self.args_str += 'Or'
-                    self.args_str += '('
-            self.args_str += 'Not('
-            self.args_str += str(pp)
-            self.args_str += ')'
+    def get_number_of_vars(self, formula):
+        if type(formula) == z3.z3.QuantifierRef:
+            self.num_vars += formula.num_vars()
+            for i in range(formula.num_vars()):
+                variables.quantifiers.append(formula.var_name(i))
+            self.get_number_of_vars(formula.body())
+        elif type(formula) == z3.z3.BoolRef:
+            # if len(formula.children()) > 0:
+            for subFormula in formula.children():
+                self.get_number_of_vars(subFormula)
+            # else:
+            #     variables.parameters.append(formula)
+        elif type(formula) == z3.z3.ArithRef:
+            if 'var' not in formula.sexpr() and formula not in variables.parameters:
+                variables.parameters.append(formula)
         else:
-            print('ERROR PLEASE CHECK')
-        
-        self.args_str += ', '
-
-        return ret_val
+            pass
 
 
     def read_file(self):
         if self.file_path:
             self.file_path_label.configure(text=os.path.basename(self.file_path))
+
             variables.Constraints = parse_smt2_file(self.file_path)[0]
-
-            self.text.delete('1.0', 'end-1c')
-            self.text.insert('1.0', variables.Constraints)
-
+            
             variables.parameters = []
             variables.quantifiers = []
 
-            if type(variables.Constraints) == z3.z3.QuantifierRef:
-                num_vars = variables.Constraints.num_vars()
-                counter = 0
-                while True:
-                    try:
-                        eval(str(variables.Constraints))
-                        break
-                    except NameError as e:
-                        var = re.findall(r"name '(\w+)' is not defined",str(e))[0]
-                        locals()['{}'.format(var)] = Real('{}'.format(var))
-                        if counter < num_vars:
-                            variables.quantifiers.append(locals()['{}'.format(var)])
-                            counter += 1
-                        else:
-                            variables.parameters.append(locals()['{}'.format(var)])
+            self.get_number_of_vars(variables.Constraints)
+            variables.Constraints_neg = Not(variables.Constraints)
 
-                boolref = variables.Constraints.body() 
-                self.args_str = ''
-                self.test(boolref, '', False)
-                self.args_str = self.args_str[:-2]
-                for index, value in enumerate(variables.quantifiers):
-                    self.args_str = self.args_str.replace('Var({})'.format(index), str(value))
-                variables.Constraints_neg = Exists(variables.quantifiers, eval(self.args_str))
-        
-            else:
-                while True:
-                    try:
-                        eval(str(variables.Constraints))
-                        break
-                    except NameError as e:
-                        var = re.findall(r"name '(\w+)' is not defined",str(e))[0]
-                        locals()['{}'.format(var)] = Real('{}'.format(var))
-                        variables.parameters.append(locals()['{}'.format(var)])
-                
-                variables.Constraints_neg = Not(variables.Constraints)
+            self.text.delete('1.0', 'end-1c')
+            self.text.insert('1.0', variables.Constraints)
 
             self.restore_default()
 
@@ -442,16 +378,32 @@ class MainApplication(tk.Frame):
         self.read_file()
 
 
+    def parse_constraints(self, constraints):
+        temp_locals = []
+        while True:
+            try:
+                variables.Constraints = eval(constraints)
+                break
+            except NameError as e:
+                var = re.findall(r"name '(\w+)' is not defined",str(e))[0]
+                locals()['{}'.format(var)] = Real('{}'.format(var))
+                temp_locals.append(var)
+        for temp_local in temp_locals:
+            locals().pop(temp_local)
+
+
     def edit(self):
-        f = self.text.get('1.0', 'end-1c')
-
-        if self.text.compare('1.0', '!=', 'end-1c') and f != str(variables.Constraints):
-            for i in variables.parameters:
-                locals()['{}'.format(i)] = i
+        constraints = self.text.get('1.0', 'end-1c')
+        if self.text.compare('1.0', '!=', 'end-1c') and constraints != str(variables.Constraints):
             
-            variables.Constraints = eval(f)
-
-
+            self.parse_constraints(constraints)
+            
+            variables.parameters = []
+            variables.quantifiers = []
+            
+            self.get_number_of_vars(variables.Constraints)
+            variables.Constraints_neg = Not(variables.Constraints)            
+            
             self.restore_default()
 
 
