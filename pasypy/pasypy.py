@@ -20,20 +20,27 @@ def solveit(B):
     variables.solver.push()
     add_boundary(variables.solver, B)
 
-    if variables.solver.check() == z3.sat:
+    status = variables.solver.check()
+    if status == z3.sat:
         variables.solver.pop()
 
         variables.solver_neg.push()
         add_boundary(variables.solver_neg, B)
 
-        if variables.solver_neg.check() == z3.sat:
+        status = variables.solver_neg.check()
+        if status == z3.sat:
             split_box(B)
-        else:
+        elif status == z3.unsat:
             variables.G.append(B[:-1])
+        else:
+            print('TIMEOUT NEG', variables.solver_neg.reason_unknown())
+
         variables.solver_neg.pop()
-    else:
+    elif status == z3.unsat:
         variables.solver.pop()
         variables.R.append(B[:-1])
+    else:
+        print('TIMEOUT', variables.solver.reason_unknown())
 
 
 def split_box(area):
@@ -73,6 +80,7 @@ def check_zoom():
                        (variables.Queue[0][0][1] <= gui.app.global_xlim[1]))
     return inside_zoom
 
+
 def init_solvers():
     variables.solver.reset()
     variables.solver_neg.reset()
@@ -93,6 +101,7 @@ def main():
                 variables.Sub_Queue.append(variables.Queue[0])
                 variables.Queue.pop(0)
 
+        
     except KeyboardInterrupt:
         None
 
