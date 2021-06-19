@@ -1,13 +1,14 @@
 import z3
 
-solver = z3.Solver()
-solver_neg = z3.Solver()
 
+solver = z3.ParOr('smt', 'default').solver(logFile='logs/logfile.log')
+solver_neg = z3.ParOr('smt', 'default').solver(logFile='logs/logfile.log')
 
 Constraints = None
 Constraints_neg = None
 
 parameters = []
+quantifiers = []
 
 # starting box with intervalls [0,1] € R and depth 1
 Queue = []
