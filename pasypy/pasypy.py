@@ -1,11 +1,8 @@
-import z3
-
-import timeit
 import itertools
 
-import variables
-import visualize
-import gui
+import z3
+
+from pasypy import variables
 
 
 def add_boundary(s, B):
@@ -71,13 +68,13 @@ def calculate_area(boxes):
 
 def check_zoom():
     if len(variables.parameters) > 1:
-        inside_zoom = ((variables.Queue[0][0][0] >= gui.app.global_xlim[0]) and \
-                       (variables.Queue[0][0][1] <= gui.app.global_xlim[1]) and \
-                       (variables.Queue[0][1][0] >= gui.app.global_ylim[0]) and \
-                       (variables.Queue[0][1][1] <= gui.app.global_ylim[1]))
+        inside_zoom = ((variables.Queue[0][0][0] >= variables.x_axe_limit_temp[0]) and \
+                       (variables.Queue[0][0][1] <= variables.x_axe_limit_temp[1]) and \
+                       (variables.Queue[0][1][0] >= variables.y_axe_limit_temp[0]) and \
+                       (variables.Queue[0][1][1] <= variables.y_axe_limit_temp[1]))
     else:
-        inside_zoom = ((variables.Queue[0][0][0] >= gui.app.global_xlim[0]) and \
-                       (variables.Queue[0][0][1] <= gui.app.global_xlim[1]))
+        inside_zoom = ((variables.Queue[0][0][0] >= variables.x_axe_limit_temp[0]) and \
+                       (variables.Queue[0][0][1] <= variables.x_axe_limit_temp[1]))
     return inside_zoom
 
 
@@ -89,31 +86,11 @@ def init_solvers():
 
 
 def main():
-    try:
-        timestamps = {'Start Time': timeit.default_timer()}
+    init_solvers()
 
-        init_solvers()
-
-        while variables.Queue:
-            if check_zoom() and (variables.Queue[0][len(variables.parameters)] < ((2**variables.depth_limit)/2)):
-                solveit(variables.Queue[0])
-            else:
-                variables.Sub_Queue.append(variables.Queue[0])
-                variables.Queue.pop(0)
-
-        
-    except KeyboardInterrupt:
-        None
-
-    finally:
-        visualize.create_timestamp('Computation Time', timestamps)
-
-        visualize.generate_graph()
-
-        visualize.create_timestamp('Visualization Time', timestamps)
-
-        visualize.show_time(timestamps)
-
-
-if __name__ == "__main__":
-    gui.root.mainloop()
+    while variables.Queue:
+        if check_zoom() and (variables.Queue[0][len(variables.parameters)] < ((2**variables.depth_limit)/2)):
+            solveit(variables.Queue[0])
+        else:
+            variables.Sub_Queue.append(variables.Queue[0])
+            variables.Queue.pop(0)

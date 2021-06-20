@@ -1,16 +1,14 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import svm
-import timeit
-import os
 
-import variables
-import gui
+from pasypy import variables
 
 
 GS = []
 RS = []
-
 
 
 def init_graph():
@@ -126,13 +124,13 @@ def draw_hyperplane():
     if 0 in Y and 1 in Y:
         clf = svm.SVC(kernel='rbf', C=1000)
         clf.fit(X, Y)
-        gui.app.ax = plt.gca()
-        gui.app.ax.callbacks.connect('xlim_changed', on_xlims_change)
-        gui.app.ax.callbacks.connect('ylim_changed', on_ylims_change)
-        xlim = gui.app.ax.get_xlim()
-        ylim = gui.app.ax.get_ylim()
-        gui.app.global_xlim = variables.x_axe_limit
-        gui.app.global_ylim = variables.y_axe_limit
+        variables.ax = plt.gca()
+        variables.ax.callbacks.connect('xlim_changed', on_xlims_change)
+        variables.ax.callbacks.connect('ylim_changed', on_ylims_change)
+        xlim = variables.ax.get_xlim()
+        ylim = variables.ax.get_ylim()
+        variables.x_axe_limit_temp = variables.x_axe_limit
+        variables.y_axe_limit_temp = variables.y_axe_limit
         xx = np.linspace(xlim[0], xlim[1], 30)
         yy = np.linspace(ylim[0], ylim[1], 30)
         YY, XX = np.meshgrid(yy, xx)
@@ -140,7 +138,7 @@ def draw_hyperplane():
         Z = clf.decision_function(xy).reshape(XX.shape)
         # plot decision boundary and margins
         # plt instead of ax
-        gui.app.ax.contour(XX, YY, Z, colors='b', levels=[-1, 0, 1], alpha=0.5,
+        variables.ax.contour(XX, YY, Z, colors='b', levels=[-1, 0, 1], alpha=0.5,
                    linestyles=['--', '-', '--'])
         # plot support vectors
         # ax.scatter(clf.support_vectors_[:, 0], clf.support_vectors_[:, 1], s=100,
@@ -149,44 +147,23 @@ def draw_hyperplane():
 
 def on_xlims_change(event_ax):
     print("updated xlims: ", event_ax.get_xlim())
-    gui.app.global_xlim = event_ax.get_xlim()
+    variables.x_axe_limit_temp = event_ax.get_xlim()
 
 def on_ylims_change(event_ax):
     print("updated ylims: ", event_ax.get_ylim())
-    gui.app.global_ylim = event_ax.get_ylim()
+    variables.y_axe_limit_temp = event_ax.get_ylim()
 
 
 # Complete visualization part
 def generate_graph():
     plt.close('all')
-    figure = plt.figure()
+    variables.figure = plt.figure()
     init_graph()
     draw_green_area()
     draw_red_area()
     if len(variables.parameters) > 1:
         draw_hyperplane()
-    gui.app.add_plot(figure)
 
 
 def show_graph():
     plt.show()
-
-
-def create_timestamp(name, timestamps):
-    timestamp = timeit.default_timer()
-    for i in timestamps.values():
-        timestamp -= i
-    timestamps.update({name: timestamp})
-
-
-def show_time(timestamps):
-    total_time = 0
-    max_name_len = len(max(timestamps, key=len))
-    for i in timestamps:
-        if i != 'Start Time':
-            total_time += round(timestamps[i], 3)
-        if i == 'Computation Time':
-            gui.app.time1.config(text='{}{} : {} sec.'.format(i, (' ' * (max_name_len-len(i))), round(timestamps[i], 3)))
-        elif i == 'Visualization Time':
-            gui.app.time2.config(text='{}{} : {} sec.'.format(i, (2 * ' ' * (max_name_len-len(i))), round(timestamps[i], 3)))
-    gui.app.time3.config(text='Total Time{} : {} sec.'.format((2 * ' ' * (max_name_len-len('Total Time'))), round(total_time, 3)))

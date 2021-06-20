@@ -8,7 +8,6 @@ Constraints = None
 Constraints_neg = None
 
 parameters = []
-quantifiers = []
 
 # starting box with intervalls [0,1] € R and depth 1
 Queue = []
@@ -28,3 +27,9 @@ y_axe_position = 0
 
 x_axe_limit = [0.0, 1.0]
 y_axe_limit = [0.0, 1.0]
+
+x_axe_limit_temp = x_axe_limit
+y_axe_limit_temp = y_axe_limit
+
+ax = None
+figure = None

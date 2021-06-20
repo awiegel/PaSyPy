@@ -6,9 +6,8 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
 
-import variables
-import pasypy
-import constraints_parser
+from pasypy import variables, pasypy, constraints_parser, visualize, time
+
 
 
 class MainApplication(tk.Frame):
@@ -140,12 +139,12 @@ class MainApplication(tk.Frame):
         ### START - FRAME 1.3.2 #
         self.frame132 = tk.Frame(master=self.frame13, background='white')
         self.frame132.grid(row=0, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), pady=1)
-        self.time1 = tk.Label(self.frame132, text='Computation Time   :', bg='black', fg='white', anchor=tk.W)
-        self.time1.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W))
-        self.time2 = tk.Label(self.frame132, text='Visualization Time    :', bg='black', fg='white', anchor=tk.W)
-        self.time2.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W))
-        self.time3 = tk.Label(self.frame132, text='Total Time                 :', bg='black', fg='white', anchor=tk.W)
-        self.time3.grid(row=2, column=0, sticky=(tk.N+tk.E+tk.S+tk.W))
+        self.time = tk.Label(self.frame132, text='Computation Time :', bg='black', fg='white', anchor=tk.W)
+        self.time.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W))
+        # self.time2 = tk.Label(self.frame132, text='Visualization Time    :', bg='black', fg='white', anchor=tk.W)
+        # self.time2.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W))
+        # self.time3 = tk.Label(self.frame132, text='Total Time                 :', bg='black', fg='white', anchor=tk.W)
+        # self.time3.grid(row=2, column=0, sticky=(tk.N+tk.E+tk.S+tk.W))
         
         tk.Grid.rowconfigure(self.frame132, index=0, weight=1)
         tk.Grid.rowconfigure(self.frame132, index=1, weight=1)
@@ -234,14 +233,10 @@ class MainApplication(tk.Frame):
         tk.Grid.columnconfigure(self.frame2, index=0, weight=1)
         # END - FRAME 2 #
 
-
-        self.ax = None
         self.line = 0
 
         self.add_empty_graph()
 
-        self.global_xlim = variables.x_axe_limit
-        self.global_ylim = variables.y_axe_limit
         self.file_path = None
         self.text_x_axe = None
         self.text_y_axe = None
@@ -279,10 +274,10 @@ class MainApplication(tk.Frame):
         else:
             lim_sup = variables.x_axe_limit[1]
         variables.x_axe_limit = [lim_inf, lim_sup]
-        self.global_xlim = variables.x_axe_limit
+        variables.x_axe_limit_temp = variables.x_axe_limit
         if len(variables.parameters) > 1:
             variables.y_axe_limit = [lim_inf, lim_sup]
-        self.global_ylim = variables.y_axe_limit
+        variables.y_axe_limit_temp = variables.y_axe_limit
         
         self.restore_default()
 
@@ -390,6 +385,18 @@ class MainApplication(tk.Frame):
         self.line.grid(row=0, column=0, sticky=tk.NW, padx=1,pady=1)
 
 
+    def start_computation_with_visualize_and_time(self):
+        time.create_timestamp()
+        pasypy.main()
+        time.create_timestamp()
+        time.calculate_time()
+        self.time.config(text='Computation Time : {} sec.'.format(round(time.total_time, 3)))
+
+        visualize.generate_graph()
+        self.add_plot(variables.figure)
+        self.update_window()
+
+
     def update(self):
         if variables.Constraints is not None:
             self.ready_label.configure(text='COMPUTING...')
@@ -401,8 +408,8 @@ class MainApplication(tk.Frame):
                 if variables.Sub_Queue:
                     variables.Queue.extend(variables.Sub_Queue)
                     variables.Sub_Queue = []
-                pasypy.main()
-                self.update_window()
+
+                self.start_computation_with_visualize_and_time()
             else:
                 self.reset()
             
@@ -424,8 +431,7 @@ class MainApplication(tk.Frame):
 
         self.line.destroy()
 
-        pasypy.main()
-        self.update_window()
+        self.start_computation_with_visualize_and_time()
 
 
     def update_window(self):
