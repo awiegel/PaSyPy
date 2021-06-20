@@ -1,0 +1,17 @@
+[run]
+# branch = True
+
+source =
+    .
+
+omit =
+    pasypy/gui.py
+    pasypy/visualize.py
+
+
+[report]
+exclude_lines =
+    if __name__ == "__main__":
+    from
+    import
+
