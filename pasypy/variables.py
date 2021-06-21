@@ -20,7 +20,6 @@ R = []
 depth_limit = 5
 
 previous_depth_limit = 0
-previous_Constraints = []
 
 x_axe_position = 0
 y_axe_position = 0
@@ -30,6 +29,3 @@ y_axe_limit = [0.0, 1.0]
 
 x_axe_limit_temp = x_axe_limit
 y_axe_limit_temp = y_axe_limit
-
-ax = None
-figure = None

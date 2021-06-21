@@ -124,11 +124,11 @@ def draw_hyperplane():
     if 0 in Y and 1 in Y:
         clf = svm.SVC(kernel='rbf', C=1000)
         clf.fit(X, Y)
-        variables.ax = plt.gca()
-        variables.ax.callbacks.connect('xlim_changed', on_xlims_change)
-        variables.ax.callbacks.connect('ylim_changed', on_ylims_change)
-        xlim = variables.ax.get_xlim()
-        ylim = variables.ax.get_ylim()
+        ax = plt.gca()
+        ax.callbacks.connect('xlim_changed', on_xlims_change)
+        ax.callbacks.connect('ylim_changed', on_ylims_change)
+        xlim = ax.get_xlim()
+        ylim = ax.get_ylim()
         variables.x_axe_limit_temp = variables.x_axe_limit
         variables.y_axe_limit_temp = variables.y_axe_limit
         xx = np.linspace(xlim[0], xlim[1], 30)
@@ -138,11 +138,9 @@ def draw_hyperplane():
         Z = clf.decision_function(xy).reshape(XX.shape)
         # plot decision boundary and margins
         # plt instead of ax
-        variables.ax.contour(XX, YY, Z, colors='b', levels=[-1, 0, 1], alpha=0.5,
-                   linestyles=['--', '-', '--'])
+        ax.contour(XX, YY, Z, colors='b', levels=[-1, 0, 1], alpha=0.5, linestyles=['--', '-', '--'])
         # plot support vectors
-        # ax.scatter(clf.support_vectors_[:, 0], clf.support_vectors_[:, 1], s=100,
-        # linewidth=1, facecolors='none', edgecolors='k')
+        # ax.scatter(clf.support_vectors_[:, 0], clf.support_vectors_[:, 1], s=100, linewidth=1, facecolors='none', edgecolors='k')
 
 
 def on_xlims_change(event_ax):
@@ -157,12 +155,13 @@ def on_ylims_change(event_ax):
 # Complete visualization part
 def generate_graph():
     plt.close('all')
-    variables.figure = plt.figure()
+    figure = plt.figure()
     init_graph()
     draw_green_area()
     draw_red_area()
     if len(variables.parameters) > 1:
         draw_hyperplane()
+    return figure
 
 
 def show_graph():

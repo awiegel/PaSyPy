@@ -392,8 +392,8 @@ class MainApplication(tk.Frame):
         time.calculate_time()
         self.time.config(text='Computation Time : {} sec.'.format(round(time.total_time, 3)))
 
-        visualize.generate_graph()
-        self.add_plot(variables.figure)
+        figure = visualize.generate_graph()
+        self.add_plot(figure)
         self.update_window()
 
 
