@@ -236,10 +236,9 @@ class MainApplication(tk.Frame):
         self.line = 0
 
         self.add_empty_graph()
+        self.add_empty_axes()
 
         self.file_path = None
-        self.text_x_axe = None
-        self.text_y_axe = None
 
         self.parent.bind('+', lambda _: self.increase_accuracy())
         self.parent.bind('-', lambda _: self.decrease_accuracy())
@@ -248,18 +247,34 @@ class MainApplication(tk.Frame):
         self.parent.bind('r', lambda _: self.reload_file())
         self.parent.bind('<space>', lambda _: self.update())
 
-        self.args_str = ''
         
 
-    def add_axes_field(self, x_axe, y_axe):
-        self.text_x_axe = tk.Entry(self.frame12, width=3, bg='black', fg='white', justify='center')
-        self.text_x_axe.insert(string=x_axe, index=0)
-        self.text_x_axe.grid(row=0, column=0, sticky=tk.S, pady=15)
+    def add_axes_field(self, update=False):       
+        self.opt_x_axe.children['menu'].delete(0, 'end')
+        self.opt_y_axe.children['menu'].delete(0, 'end')
+        
+        if len(variables.parameters) == 1:
+            self.opt_x_axe.children['menu'].add_command(label=variables.parameters[0], command=self.variable_x_axe.set(variables.parameters[0]))
+        else:
+            for parameter in variables.parameters:
+                self.opt_x_axe.children['menu'].add_command(label=parameter, command=lambda x=parameter: self.variable_x_axe.set(x))
+                self.opt_y_axe.children['menu'].add_command(label=parameter, command=lambda x=parameter: self.variable_y_axe.set(x))
+            if update:
+                self.variable_x_axe.set(self.variable_x_axe.get())
+                if self.variable_y_axe.get() != self.variable_x_axe.get():
+                    self.variable_y_axe.set(self.variable_y_axe.get())
+                else:
+                    for parameter in variables.parameters:
+                        if self.variable_x_axe.get() != str(parameter):
+                            self.variable_y_axe.set(str(parameter))
+            else:
+                self.variable_x_axe.set(variables.parameters[0])
+                self.variable_y_axe.set(variables.parameters[1])
+            self.opt_x_axe.configure(state='normal')
+            self.opt_y_axe.configure(state='normal')
 
-        if y_axe is not None:
-            self.text_y_axe = tk.Entry(self.frame12, width=3, bg='black', fg='white', justify='center')
-            self.text_y_axe.insert(string=y_axe, index=0)
-            self.text_y_axe.grid(row=0, column=0, sticky=tk.W, padx=25)
+        self.opt_x_axe.lift()
+        self.opt_y_axe.lift()
 
 
     def border(self):
@@ -288,22 +303,37 @@ class MainApplication(tk.Frame):
         plt.xlim(variables.x_axe_limit)
         plt.ylim(variables.y_axe_limit)
 
-        self.add_axes_field('','')
+    
+    def add_empty_axes(self):
+        self.variable_x_axe = tk.StringVar(self)
+        self.opt_x_axe = tk.OptionMenu(self.frame12, self.variable_x_axe, *[''])
+        self.opt_x_axe.configure(state='disabled')
+        self.opt_x_axe.grid(row=0, column=0, sticky=tk.S, pady=5)
+        
+        self.variable_y_axe = tk.StringVar(self)
+        self.opt_y_axe = tk.OptionMenu(self.frame12, self.variable_y_axe, *[''])
+        self.opt_y_axe.configure(state='disabled')
+        self.opt_y_axe.grid(row=0, column=0, sticky=tk.W, padx=5)
 
 
     def get_graph_axes(self):
-        variables.x_axe_position = 0
-        for index, value in enumerate(variables.parameters):
-            if self.text_x_axe.get() == str(value):
-                variables.x_axe_position = index
-                break
-
-        if self.text_y_axe:
-            variables.y_axe_position = 0       
+        if len(variables.parameters) == 1:
+            variables.x_axe_position = 0
+        else:
             for index, value in enumerate(variables.parameters):
-                if self.text_y_axe.get() == str(value):
-                    variables.y_axe_position = index
+                if self.variable_x_axe.get() == str(value):
+                    variables.x_axe_position = index
                     break
+            
+            if self.variable_y_axe.get() != self.variable_x_axe.get():
+                for index, value in enumerate(variables.parameters):
+                    if self.variable_y_axe.get() == str(value):
+                        variables.y_axe_position = index
+                        break
+            else:
+                for index, value in enumerate(variables.parameters):
+                    if self.variable_x_axe.get() != str(value):
+                        variables.y_axe_position = index
 
 
     def read_file(self):
@@ -329,10 +359,8 @@ class MainApplication(tk.Frame):
         variables.R = []
 
         self.add_empty_graph()
-        if len(variables.parameters) == 1:
-            self.add_axes_field(variables.parameters[0], None)
-        else:
-            self.add_axes_field(variables.parameters[0],variables.parameters[1])
+
+        self.add_axes_field()
 
 
     def open_file(self):        
@@ -401,22 +429,17 @@ class MainApplication(tk.Frame):
         if variables.Constraints is not None:
             self.ready_label.configure(text='COMPUTING...')
             self.ready_label.update()
-            if variables.depth_limit >= variables.previous_depth_limit:
-                self.get_graph_axes()
+            self.get_graph_axes()
 
-                self.line.destroy()
-                if variables.Sub_Queue:
-                    variables.Queue.extend(variables.Sub_Queue)
-                    variables.Sub_Queue = []
+            if variables.Sub_Queue:
+                variables.Queue.extend(variables.Sub_Queue)
+                variables.Sub_Queue = []
 
-                self.start_computation_with_visualize_and_time()
-            else:
-                self.reset()
-            
-            self.add_axes_field(variables.parameters[variables.x_axe_position], variables.parameters[variables.y_axe_position])
+            self.start_computation_with_visualize_and_time()
+
+            self.add_axes_field(update=True)
 
             self.ready_label.configure(text='FINISHED')
-            variables.previous_depth_limit = variables.depth_limit
 
 
     def reset(self):

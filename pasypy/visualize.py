@@ -34,38 +34,74 @@ def create_logfile(name, B):
     logfile.close()
 
 
+def filter_depth(unfiltered, filtered):
+    for i in unfiltered:
+        if (i[len(variables.parameters)] < ((2**variables.depth_limit)/2)):
+            filtered.append(i) 
+
+
+def filter_multiple_axes(temp_boxes, color):
+    new_boxes = color
+
+    unique_boxes = []
+    unique_boxes_indices = []
+    for index, value in enumerate(temp_boxes):
+        box = (value[variables.x_axe_position], value[variables.y_axe_position])
+        if box not in unique_boxes:
+            unique_boxes.append(box)
+            unique_boxes_indices.append(index)
+
+    for unique_boxes_index in unique_boxes_indices:
+        for index, value in enumerate(temp_boxes):
+            if unique_boxes_index == index:
+                new_boxes.append(value)
+                break
+
+
+def plot_one_dimensional(area, area_color):
+    for i in area:
+        plt.plot([i[0][0],i[0][1],i[0][1],i[0][0],i[0][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color='black')
+        plt.fill([i[0][0],i[0][1],i[0][1],i[0][0],i[0][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color=area_color)
+
+def plot_multi_dimensional(area, area_color):
+    for i in area:
+        plt.plot([i[variables.x_axe_position][0],i[variables.x_axe_position][1],i[variables.x_axe_position][1],i[variables.x_axe_position][0],i[variables.x_axe_position][0]],
+                 [i[variables.y_axe_position][0],i[variables.y_axe_position][0],i[variables.y_axe_position][1],i[variables.y_axe_position][1],i[variables.y_axe_position][0]],
+                 color='black')
+        plt.fill([i[variables.x_axe_position][0],i[variables.x_axe_position][1],i[variables.x_axe_position][1],i[variables.x_axe_position][0],i[variables.x_axe_position][0]],
+                 [i[variables.y_axe_position][0],i[variables.y_axe_position][0],i[variables.y_axe_position][1],i[variables.y_axe_position][1],i[variables.y_axe_position][0]],
+                 color=area_color)
+
 def draw_green_area():
     global GS
 
-    GS = variables.G.copy()
+    G_depth_filtered = []
+    filter_depth(variables.G, G_depth_filtered)
+
     if len(variables.parameters) == 1:
-        for g in variables.G[:]:
-            for gg in variables.G[:]:
-                if ((gg[variables.x_axe_position][0] >= g[variables.x_axe_position][0]) and (gg[variables.x_axe_position][1] <= g[variables.x_axe_position][1])) and \
-                    ((gg[variables.x_axe_position][0] != g[variables.x_axe_position][0]) or (gg[variables.x_axe_position][1] != g[variables.x_axe_position][1])):
-                    try:
-                        GS.remove(gg)
-                    except:
-                        pass
-        for g in GS:
-            plt.plot([g[variables.x_axe_position][0],g[variables.x_axe_position][1],g[variables.x_axe_position][1],g[variables.x_axe_position][0],g[variables.x_axe_position][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color='black')
-            plt.fill([g[variables.x_axe_position][0],g[variables.x_axe_position][1],g[variables.x_axe_position][1],g[variables.x_axe_position][0],g[variables.x_axe_position][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color='forestgreen')
+        GS = G_depth_filtered.copy()
+        plot_one_dimensional(G_depth_filtered, 'forestgreen')
     else:
-        for g in variables.G[:]:
-            for gg in variables.G[:]:
-                if (((gg[variables.x_axe_position][0] >= g[variables.x_axe_position][0]) and (gg[variables.x_axe_position][1] <= g[variables.x_axe_position][1])) and \
-                    ((gg[variables.y_axe_position][0] >= g[variables.y_axe_position][0]) and (gg[variables.y_axe_position][1] <= g[variables.y_axe_position][1]))) and \
-                    (((gg[variables.x_axe_position][0] != g[variables.x_axe_position][0]) or (gg[variables.x_axe_position][1] != g[variables.x_axe_position][1])) or \
-                    ((gg[variables.y_axe_position][0] != g[variables.y_axe_position][0]) or (gg[variables.y_axe_position][1] != g[variables.y_axe_position][1]))):
-                    try:
-                        GS.remove(gg)
-                    except:
-                        pass
-        for g in GS:
-            plt.plot([g[variables.x_axe_position][0],g[variables.x_axe_position][1],g[variables.x_axe_position][1],g[variables.x_axe_position][0],g[variables.x_axe_position][0]],
-                    [g[variables.y_axe_position][0],g[variables.y_axe_position][0],g[variables.y_axe_position][1],g[variables.y_axe_position][1],g[variables.y_axe_position][0]], color='black')
-            plt.fill([g[variables.x_axe_position][0],g[variables.x_axe_position][1],g[variables.x_axe_position][1],g[variables.x_axe_position][0],g[variables.x_axe_position][0]],
-                    [g[variables.y_axe_position][0],g[variables.y_axe_position][0],g[variables.y_axe_position][1],g[variables.y_axe_position][1],g[variables.y_axe_position][0]], color='forestgreen')
+        if len(variables.parameters) == 2:
+            GS = G_depth_filtered.copy()
+            plot_multi_dimensional(GS, 'forestgreen')
+        else:
+            GS = []
+            temp = G_depth_filtered.copy()
+            for g in G_depth_filtered[:]:
+                for gg in G_depth_filtered[:]:
+                    if (((gg[variables.x_axe_position][0] >= g[variables.x_axe_position][0]) and (gg[variables.x_axe_position][1] <= g[variables.x_axe_position][1])) and \
+                        ((gg[variables.y_axe_position][0] >= g[variables.y_axe_position][0]) and (gg[variables.y_axe_position][1] <= g[variables.y_axe_position][1]))) and \
+                        (((gg[variables.x_axe_position][0] != g[variables.x_axe_position][0]) or (gg[variables.x_axe_position][1] != g[variables.x_axe_position][1])) or \
+                        ((gg[variables.y_axe_position][0] != g[variables.y_axe_position][0]) or (gg[variables.y_axe_position][1] != g[variables.y_axe_position][1]))):
+                        try:
+                            temp.remove(gg)
+                        except:
+                            pass
+            
+            filter_multiple_axes(temp, GS)
+            plot_multi_dimensional(GS, 'forestgreen')
+
 
     create_logfile('safe_area', variables.G)
 
@@ -73,34 +109,32 @@ def draw_green_area():
 def draw_red_area():
     global RS
 
-    RS = variables.R.copy()
+    R_depth_filtered = []
+    filter_depth(variables.R, R_depth_filtered)
+
     if len(variables.parameters) == 1:
-        for r in variables.R[:]:
-            for w in variables.Sub_Queue:
-                if ((w[variables.x_axe_position][0] >= r[variables.x_axe_position][0]) and (w[variables.x_axe_position][1] <= r[variables.x_axe_position][1])):
-                    try:
-                        RS.remove(r)
-                    except:
-                        pass
-
-        for r in RS:
-            plt.plot([r[variables.x_axe_position][0],r[variables.x_axe_position][1],r[variables.x_axe_position][1],r[variables.x_axe_position][0],r[variables.x_axe_position][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color='black')
-            plt.fill([r[variables.x_axe_position][0],r[variables.x_axe_position][1],r[variables.x_axe_position][1],r[variables.x_axe_position][0],r[variables.x_axe_position][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color='firebrick')
+        RS = R_depth_filtered.copy()
+        plot_one_dimensional(R_depth_filtered, 'firebrick')
     else:
-        for r in variables.R[:]:
-            for w in variables.Sub_Queue:
-                if ((w[variables.x_axe_position][0] >= r[variables.x_axe_position][0]) and (w[variables.x_axe_position][1] <= r[variables.x_axe_position][1])) and \
-                    ((w[variables.y_axe_position][0] >= r[variables.y_axe_position][0]) and (w[variables.y_axe_position][1] <= r[variables.y_axe_position][1])):
-                    try:
-                        RS.remove(r)
-                    except:
-                        pass
+        if len(variables.parameters) == 2:
+            RS = R_depth_filtered.copy()
+            plot_multi_dimensional(RS, 'firebrick')
 
-        for r in RS:
-            plt.plot([r[variables.x_axe_position][0],r[variables.x_axe_position][1],r[variables.x_axe_position][1],r[variables.x_axe_position][0],r[variables.x_axe_position][0]],
-                    [r[variables.y_axe_position][0],r[variables.y_axe_position][0],r[variables.y_axe_position][1],r[variables.y_axe_position][1],r[variables.y_axe_position][0]], color='black')
-            plt.fill([r[variables.x_axe_position][0],r[variables.x_axe_position][1],r[variables.x_axe_position][1],r[variables.x_axe_position][0],r[variables.x_axe_position][0]],
-                    [r[variables.y_axe_position][0],r[variables.y_axe_position][0],r[variables.y_axe_position][1],r[variables.y_axe_position][1],r[variables.y_axe_position][0]], color='firebrick')
+        else:
+            RS = []
+            temp = R_depth_filtered.copy()
+            for r in R_depth_filtered[:]:
+                for w in variables.Sub_Queue:
+                    if ((w[variables.x_axe_position][0] >= r[variables.x_axe_position][0]) and (w[variables.x_axe_position][1] <= r[variables.x_axe_position][1])) and \
+                        ((w[variables.y_axe_position][0] >= r[variables.y_axe_position][0]) and (w[variables.y_axe_position][1] <= r[variables.y_axe_position][1])):
+                        try:
+                            temp.remove(r)
+                        except:
+                            pass
+
+            filter_multiple_axes(temp, RS)
+            plot_multi_dimensional(RS, 'firebrick')
+
 
     create_logfile('unsafe_area', variables.R)
 
