@@ -208,14 +208,16 @@ class MainApplication(tk.Frame):
         self.reload_file_button.grid(row=0, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
         self.text_button = tk.Button(self.frame21, text="EDIT", command=self.edit, width=6, height=2, bg='gray', fg='white')
         self.text_button.grid(row=0, column=2, sticky=tk.NW, padx=5, pady=5)
+        self.save_button = tk.Button(self.frame21, text="SAVE", command=self.save, width=6, height=2, bg='gray', fg='white')
+        self.save_button.grid(row=0, column=3, sticky=tk.NW, padx=5, pady=5)
         self.file_path_label = tk.Label(self.frame21, text="no file loaded", width=20, height=2, bg='black', fg='white')
-        self.file_path_label.grid(row=0, column=3, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+        self.file_path_label.grid(row=0, column=4, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
         self.text1 = tk.Entry(self.frame21, width=5)
-        self.text1.grid(row=0, column=4, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+        self.text1.grid(row=0, column=5, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
         self.text2 = tk.Entry(self.frame21, width=5)
-        self.text2.grid(row=0, column=5, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+        self.text2.grid(row=0, column=6, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
         self.border_button = tk.Button(self.frame21, text="GET", command=self.border, width=6, height=2, bg='gray', fg='white')
-        self.border_button.grid(row=0, column=6, sticky=tk.NW, padx=5, pady=5)
+        self.border_button.grid(row=0, column=7, sticky=tk.NW, padx=5, pady=5)
         ## END - FRAME 2.1 #
 
         ## START - FRAME 2.2 #
@@ -378,6 +380,16 @@ class MainApplication(tk.Frame):
             constraints_parser.parse_from_textfield(text)
             
             self.restore_default()
+
+
+    def save(self):
+        if variables.Constraints is not None:
+            path = tk.filedialog.asksaveasfilename(defaultextension='.smt2')
+            if path is not None:
+                variables.solver.add(variables.Constraints)
+                smt2_file = open(path, 'w')
+                smt2_file.write(variables.solver.to_smt2())
+                smt2_file.close()
 
 
     @classmethod
