@@ -28,9 +28,7 @@ def _get_number_of_vars(formula):
 
 def set_new_constraints():
     variables.parameters = []
-
     _get_number_of_vars(variables.Constraints)
-    variables.Constraints_neg = Not(variables.Constraints)
 
 
 def parse_from_file(file_path):

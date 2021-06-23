@@ -12,7 +12,6 @@ class TestPasypy(unittest.TestCase):
         y = z3.Real('y')
         z = z3.Real('z')
         variables.Constraints = z3.Exists(z, z3.And(x >= 1/2, y >= 1/2, z > x, z < y))
-        variables.Constraints_neg = z3.Not(variables.Constraints)
         variables.parameters = [x,y]
 
         pasypy.main()
@@ -27,7 +26,6 @@ class TestPasypy(unittest.TestCase):
         y = z3.Real('y')
         z = z3.Real('z')
         variables.Constraints = z3.Exists(z, z3.And(x >= 1/2, y >= 1/2, y < z, z < x))
-        variables.Constraints_neg = z3.Not(variables.Constraints)
         variables.parameters = [x,y]
 
         variables.Queue = [([0.0, 1.0], [0.0, 1.0], 1)]
