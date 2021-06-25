@@ -2,7 +2,7 @@ import z3
 
 
 solver = z3.ParOr('smt', 'default').solver(logFile='logs/logfile.log')
-solver_neg = z3.ParOr('smt', 'default').solver(logFile='logs/logfile.log')
+solver_neg = z3.ParOr('smt', 'default').solver(logFile='logs/logfile_neg.log')
 
 Constraints = None
 
