@@ -21,8 +21,6 @@ def init_graph():
 
 
 def create_logfile(name, B):
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
     logfile = open('logs/{}.log'.format(name), 'w')
     for variable in variables.parameters:
         logfile.write('----- {} -----'.format(str(variable)))
