@@ -137,7 +137,7 @@ def draw_red_area():
     create_logfile('unsafe_area', variables.R)
 
 
-def draw_hyperplane():
+def draw_hyperplane(ax):
     X = []
     Y = []
 
@@ -156,13 +156,8 @@ def draw_hyperplane():
     if 0 in Y and 1 in Y:
         clf = svm.SVC(kernel='rbf', C=1000)
         clf.fit(X, Y)
-        ax = plt.gca()
-        ax.callbacks.connect('xlim_changed', on_xlims_change)
-        ax.callbacks.connect('ylim_changed', on_ylims_change)
         xlim = ax.get_xlim()
         ylim = ax.get_ylim()
-        variables.x_axe_limit_temp = variables.x_axe_limit
-        variables.y_axe_limit_temp = variables.y_axe_limit
         xx = np.linspace(xlim[0], xlim[1], 30)
         yy = np.linspace(ylim[0], ylim[1], 30)
         YY, XX = np.meshgrid(yy, xx)
@@ -191,8 +186,14 @@ def generate_graph():
     init_graph()
     draw_green_area()
     draw_red_area()
+    
+    ax = plt.gca()
+    ax.callbacks.connect('xlim_changed', on_xlims_change)
+    ax.callbacks.connect('ylim_changed', on_ylims_change)
+    variables.x_axe_limit_temp = variables.x_axe_limit
+    variables.y_axe_limit_temp = variables.y_axe_limit
     if len(variables.parameters) > 1:
-        draw_hyperplane()
+        draw_hyperplane(ax)
     return figure
 
 
