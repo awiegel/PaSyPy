@@ -175,7 +175,7 @@ class MainApplication(tk.Frame):
         self.frame13 = tk.Frame(master=self.frame1, background='black')
         self.frame13.grid(row=2, column=0, sticky=tk.SW, padx=5, pady=5)
         
-        self.background_image = tk.PhotoImage(file='logo_ths_final2.png')
+        self.background_image = tk.PhotoImage(file='logo_ths.png')
         self.background_label = tk.Label(self.frame13, image=self.background_image)
         self.background_label.grid(row=0, column=0, sticky=tk.SW, padx=1, pady=1)
         ## END - FRAME 1.3 #
