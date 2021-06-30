@@ -380,6 +380,7 @@ class MainApplication(tk.Frame):
         if variables.Constraints is not None:
             path = tk.filedialog.asksaveasfilename(defaultextension='.smt2')
             if path is not None:
+                variables.solver.reset()
                 variables.solver.add(variables.Constraints)
                 smt2_file = open(path, 'w')
                 smt2_file.write(variables.solver.to_smt2())
