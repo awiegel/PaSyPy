@@ -46,6 +46,9 @@ def parse_from_textfield(text):
             var = re.findall(r"name '(\w+)' is not defined",str(e))[0]
             locals()['{}'.format(var)] = Real('{}'.format(var))
             temp_locals.append(var)
+        except AttributeError as e:
+            bool_var = temp_locals[-1]
+            locals()['{}'.format(bool_var)] = Bool('{}'.format(bool_var))
     for temp_local in temp_locals:
         locals().pop(temp_local)
 
