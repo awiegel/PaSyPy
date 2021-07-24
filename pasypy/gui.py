@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
 
-from pasypy import variables, pasypy, constraints_parser, visualize, time
+from pasypy import variables, pasypy, constraints_parser, visualize, time, splitting_heuristics
 
 
 class MainApplication(tk.Frame):
@@ -15,8 +15,8 @@ class MainApplication(tk.Frame):
         self.parent = parent
 
         self.parent.title('PaSyPy - Parameter Synthesis with Python')
-        self.parent.geometry('1200x750')
-        self.parent.minsize(1200, 750)
+        self.parent.geometry('1250x750')
+        self.parent.minsize(1250, 750)
         self.parent.configure(background='white')
         # self.parent.wm_attributes('-fullscreen','true')
 
@@ -206,6 +206,12 @@ class MainApplication(tk.Frame):
         self.file_path_label.grid(row=0, column=4, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
         # self.exit_button = tk.Button(self.frame21, text='Exit', command=self.parent.quit, width=10, height=2, bg='black', fg='white')
         # self.exit_button.grid(row=0, column=5, sticky=tk.E, padx=5, pady=5)
+
+        self.current_splitting_heuristic = tk.StringVar(self)
+        self.current_splitting_heuristic.set(splitting_heuristics.current_splitting_heuristic)
+        self.splitting_option = tk.OptionMenu(self.frame21, self.current_splitting_heuristic, *splitting_heuristics.splitting_heuristics, command=self.set_splitting_heuristic)
+        self.splitting_option.configure(state='normal', font=('',10), width=8, relief='solid')
+        self.splitting_option.grid(row=0, column=6, sticky=tk.NW, padx=5, pady=5)
         ## END - FRAME 2.1 #
 
         ## START - FRAME 2.2 #
@@ -240,6 +246,13 @@ class MainApplication(tk.Frame):
         self.changed = True
         self.current_depth_limit = 0
         
+
+
+
+    def set_splitting_heuristic(self, args):
+        splitting_heuristics.current_splitting_heuristic = self.current_splitting_heuristic.get()
+        self.restore_default()
+
 
     def add_axes_field(self, update=False):       
         self.opt_x_axe.children['menu'].delete(0, 'end')
