@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
 
-from pasypy import variables, pasypy, constraints_parser, visualize, time, splitting_heuristics
+from pasypy import variables, pasypy, constraints_parser, visualize, time, settings, splitting_heuristics
 
 
 class MainApplication(tk.Frame):
@@ -206,6 +206,9 @@ class MainApplication(tk.Frame):
         self.file_path_label.grid(row=0, column=4, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
         # self.exit_button = tk.Button(self.frame21, text='Exit', command=self.parent.quit, width=10, height=2, bg='black', fg='white')
         # self.exit_button.grid(row=0, column=5, sticky=tk.E, padx=5, pady=5)
+        self.show_hyperplane = tk.BooleanVar()
+        self.hyperplane_option = tk.Checkbutton(self.frame21, text='Hyperplane',variable=self.show_hyperplane, onvalue=True, offvalue=False, command=self.set_hyperplane_option)
+        self.hyperplane_option.grid(row=0, column=5, sticky=tk.NW, padx=5, pady=5)
 
         self.current_splitting_heuristic = tk.StringVar(self)
         self.current_splitting_heuristic.set(splitting_heuristics.current_splitting_heuristic)
@@ -248,6 +251,10 @@ class MainApplication(tk.Frame):
         
 
 
+
+    def set_hyperplane_option(self):
+        settings.show_hyperplane = self.show_hyperplane.get()
+        self.update()
 
     def set_splitting_heuristic(self, args):
         splitting_heuristics.current_splitting_heuristic = self.current_splitting_heuristic.get()

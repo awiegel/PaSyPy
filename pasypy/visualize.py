@@ -5,6 +5,7 @@ import numpy as np
 from sklearn import svm
 
 from pasypy import variables
+from pasypy import settings
 
 
 GS = []
@@ -171,11 +172,9 @@ def draw_hyperplane(ax):
 
 
 def on_xlims_change(event_ax):
-    print("updated xlims: ", event_ax.get_xlim())
     variables.x_axe_limit_temp = event_ax.get_xlim()
 
 def on_ylims_change(event_ax):
-    print("updated ylims: ", event_ax.get_ylim())
     variables.y_axe_limit_temp = event_ax.get_ylim()
 
 
@@ -192,7 +191,7 @@ def generate_graph():
     ax.callbacks.connect('ylim_changed', on_ylims_change)
     variables.x_axe_limit_temp = variables.x_axe_limit
     variables.y_axe_limit_temp = variables.y_axe_limit
-    if len(variables.parameters) > 1:
+    if (len(variables.parameters) > 1) and settings.show_hyperplane:
         draw_hyperplane(ax)
     return figure
 
