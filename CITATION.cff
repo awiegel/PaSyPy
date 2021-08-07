@@ -1,0 +1,16 @@
+cff-version: 1.1.0
+message: "If you use this software in your work, please cite it using the following metadata."
+abstract: A python-based tool using parameter synthesis to find safe and unsafe regions of the parameter space.
+authors:
+  - family-names: Wiegel
+    given-names: Alexander
+title: PaSyPy
+date-released: 2021-09-20
+url: https://github.com/awiegel/PaSyPy
+version: 1.0.0
+keywords:
+  - PaSyPy
+  - Parameter Synthesis
+  - SMT solving
+  - Python
+license: "MIT"
