@@ -10,6 +10,8 @@ from pasypy import settings
 
 GS = []
 RS = []
+safe_color = 'forestgreen'
+unsafe_color = 'firebrick'
 
 
 def init_graph():
@@ -79,11 +81,11 @@ def draw_green_area():
 
     if len(variables.parameters) == 1:
         GS = G_depth_filtered.copy()
-        plot_one_dimensional(G_depth_filtered, 'forestgreen')
+        plot_one_dimensional(G_depth_filtered, safe_color)
     else:
         if len(variables.parameters) == 2:
             GS = G_depth_filtered.copy()
-            plot_multi_dimensional(GS, 'forestgreen')
+            plot_multi_dimensional(GS, safe_color)
         else:
             GS = []
             temp = G_depth_filtered.copy()
@@ -99,7 +101,7 @@ def draw_green_area():
                             pass
             
             filter_multiple_axes(temp, GS)
-            plot_multi_dimensional(GS, 'forestgreen')
+            plot_multi_dimensional(GS, safe_color)
 
 
     create_logfile('safe_area', variables.G)
@@ -113,11 +115,11 @@ def draw_red_area():
 
     if len(variables.parameters) == 1:
         RS = R_depth_filtered.copy()
-        plot_one_dimensional(R_depth_filtered, 'firebrick')
+        plot_one_dimensional(R_depth_filtered, unsafe_color)
     else:
         if len(variables.parameters) == 2:
             RS = R_depth_filtered.copy()
-            plot_multi_dimensional(RS, 'firebrick')
+            plot_multi_dimensional(RS, unsafe_color)
 
         else:
             RS = []

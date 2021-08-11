@@ -123,17 +123,17 @@ class MainApplication(tk.Frame):
         ### START - FRAME 1.1.3 #
         self.frame113 = tk.Frame(master=self.frame11, background='black')
         self.frame113.grid(row=0, column=2, sticky=(tk.N+tk.E+tk.S+tk.W), padx=(5,0))
-        self.number_of_green_boxes = tk.Label(self.frame113, text='Number of green boxes : 0', bg='forestgreen', fg='black', anchor=tk.W, width=18, font=('',10))
+        self.number_of_green_boxes = tk.Label(self.frame113, text='Number of green boxes : 0', bg=visualize.safe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.number_of_green_boxes.grid(row=3, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(1,0))
-        self.green_area = tk.Label(self.frame113, text='Green area                   : 0.00%', bg='forestgreen', fg='black', anchor=tk.W, width=18, font=('',10))
+        self.green_area = tk.Label(self.frame113, text='Green area                   : 0.00%', bg=visualize.safe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.green_area.grid(row=4, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
-        self.show_safe_area_button = tk.Button(self.frame113, text='X', command=self.show_safe_area, width=2, height=1, bg='forest green')
+        self.show_safe_area_button = tk.Button(self.frame113, text='X', command=self.show_safe_area, width=2, height=1, bg=visualize.safe_color)
         self.show_safe_area_button.grid(row=3, column=0, rowspan=2, sticky=tk.E, padx=10)        
-        self.number_of_red_boxes = tk.Label(self.frame113, text='Number of red boxes     : 0', bg='firebrick', fg='black', anchor=tk.W, width=18, font=('',10))
+        self.number_of_red_boxes = tk.Label(self.frame113, text='Number of red boxes     : 0', bg=visualize.unsafe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.number_of_red_boxes.grid(row=5, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
-        self.red_area = tk.Label(self.frame113, text='Red area                      : 0.00%', bg='firebrick', fg='black', anchor=tk.W, width=18, font=('',10))
+        self.red_area = tk.Label(self.frame113, text='Red area                      : 0.00%', bg=visualize.unsafe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.red_area.grid(row=6, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
-        self.show_unsafe_area_button = tk.Button(self.frame113, text='X', command=self.show_unsafe_area, width=2, height=1, bg='firebrick')
+        self.show_unsafe_area_button = tk.Button(self.frame113, text='X', command=self.show_unsafe_area, width=2, height=1, bg=visualize.unsafe_color)
         self.show_unsafe_area_button.grid(row=5, column=0, rowspan=2, sticky=tk.E, padx=10)
         self.white_area_left = tk.Label(self.frame113, text='White area left              : 100%', bg='white', fg='black', anchor=tk.W, width=18, font=('',10))
         self.white_area_left.grid(row=7, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
@@ -209,7 +209,9 @@ class MainApplication(tk.Frame):
         self.show_hyperplane = tk.BooleanVar()
         self.hyperplane_option = tk.Checkbutton(self.frame21, text='Hyperplane',variable=self.show_hyperplane, onvalue=True, offvalue=False, command=self.set_hyperplane_option)
         self.hyperplane_option.grid(row=0, column=5, sticky=tk.NW, padx=5, pady=5)
-
+        self.colorblind_mode = tk.BooleanVar()
+        self.colorblind_option = tk.Checkbutton(self.frame21, text='Colorblind',variable=self.colorblind_mode, onvalue=True, offvalue=False, command=self.set_colorblind_option)
+        self.colorblind_option.grid(row=0, column=6, sticky=tk.NW, padx=5, pady=5)
         self.current_splitting_heuristic = tk.StringVar(self)
         self.current_splitting_heuristic.set(splitting_heuristics.current_splitting_heuristic)
         self.splitting_option = tk.OptionMenu(self.frame21, self.current_splitting_heuristic, *splitting_heuristics.splitting_heuristics, command=self.set_splitting_heuristic)
@@ -251,11 +253,31 @@ class MainApplication(tk.Frame):
         
 
 
-
     def set_hyperplane_option(self):
         settings.show_hyperplane = self.show_hyperplane.get()
         self.update()
 
+
+    def set_colorblind_option(self):
+        settings.colorblind_mode = self.colorblind_mode.get()
+        if not settings.colorblind_mode:
+            visualize.safe_color = 'forestgreen'
+            visualize.unsafe_color = 'firebrick'
+        else:
+            visualize.safe_color = 'dodgerblue'
+            visualize.unsafe_color = 'goldenrod'
+        
+        self.number_of_green_boxes.config(bg=visualize.safe_color)
+        self.green_area.config(bg=visualize.safe_color)
+        self.show_safe_area_button.config(bg=visualize.safe_color)
+        
+        self.number_of_red_boxes.config(bg=visualize.unsafe_color)
+        self.red_area.config(bg=visualize.unsafe_color)
+        self.show_unsafe_area_button.config(bg=visualize.unsafe_color)
+        
+        self.update()
+
+    
     def set_splitting_heuristic(self, args):
         splitting_heuristics.current_splitting_heuristic = self.current_splitting_heuristic.get()
         self.restore_default()
