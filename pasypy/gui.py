@@ -316,12 +316,12 @@ class MainApplication(tk.Frame):
     def border(self):
         lim_inf = self.text1.get()
         if lim_inf:
-            lim_inf = float(lim_inf)
+            lim_inf = float(lim_inf.replace(',','.'))
         else:
             lim_inf = variables.x_axe_limit[0]
         lim_sup = self.text2.get()
         if lim_sup:
-            lim_sup = float(lim_sup)
+            lim_sup = float(lim_sup.replace(',','.'))
         else:
             lim_sup = variables.x_axe_limit[1]
         variables.x_axe_limit = [lim_inf, lim_sup]
