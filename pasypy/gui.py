@@ -402,7 +402,7 @@ class MainApplication(tk.Frame):
 
 
     def open_file(self):        
-        self.file_path = tk.filedialog.askopenfilename()
+        self.file_path = tk.filedialog.askopenfilename(filetypes=[('SMT-LIB', '.smt2')])
         self.read_file()
 
     def reload_file(self):
