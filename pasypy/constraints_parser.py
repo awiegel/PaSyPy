@@ -32,8 +32,11 @@ def set_new_constraints():
 
 
 def parse_from_file(file_path):
-    variables.Constraints = parse_smt2_file(file_path)[0]
-    set_new_constraints()
+    try:
+        variables.Constraints = parse_smt2_file(file_path)[0]
+        set_new_constraints()
+    except:
+        variables.Constraints = None
 
 
 def parse_from_textfield(text):

@@ -379,7 +379,10 @@ class MainApplication(tk.Frame):
             constraints_parser.parse_from_file(self.file_path)
 
             self.text.delete('1.0', 'end-1c')
-            self.text.insert('1.0', variables.Constraints)
+            if variables.Constraints is not None:
+                self.text.insert('1.0', variables.Constraints)
+            else:
+                self.ready_label.configure(text='ERROR')
 
             self.restore_default()
 
@@ -399,6 +402,9 @@ class MainApplication(tk.Frame):
         self.add_axes_field()
         
         self.changed = True
+        
+        if variables.Constraints is not None:
+            self.ready_label.configure(text='READY')
 
 
     def open_file(self):        
