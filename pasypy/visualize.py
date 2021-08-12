@@ -134,7 +134,7 @@ def draw_red_area():
                             pass
 
             filter_multiple_axes(temp, RS)
-            plot_multi_dimensional(RS, 'firebrick')
+            plot_multi_dimensional(RS, unsafe_color)
 
 
     create_logfile('unsafe_area', variables.R)
