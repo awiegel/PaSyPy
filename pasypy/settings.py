@@ -5,6 +5,8 @@ from pasypy import visualize
 
 show_hyperplane = False
 colorblind_mode = False
+white_boxes = False
+skip_visualization = False
 
 class Settings(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -35,7 +37,6 @@ class Settings(tk.Frame):
             if show_hyperplane:
                 self.hyperplane_option.select()
             
-            
             self.colorblind_mode = tk.BooleanVar()
             self.colorblind_option = tk.Checkbutton(self.testframe, text='Colorblind',variable=self.colorblind_mode, onvalue=True, offvalue=False, command=self.set_colorblind_option, font=('',10), bg='white', fg='black', anchor=tk.W)
             self.colorblind_option.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
@@ -43,14 +44,30 @@ class Settings(tk.Frame):
             if colorblind_mode:
                 self.colorblind_option.select()
             
+            self.white_boxes = tk.BooleanVar()
+            self.white_boxes_option = tk.Checkbutton(self.testframe, text='White Boxes',variable=self.white_boxes, onvalue=True, offvalue=False, command=self.set_white_boxes_option, font=('',10), bg='white', fg='black', anchor=tk.W)
+            self.white_boxes_option.grid(row=2, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+            
+            if white_boxes:
+                self.white_boxes_option.select()
+            
+            self.skip_visualization = tk.BooleanVar()
+            self.skip_visualization_option = tk.Checkbutton(self.testframe, text='Skip Visualization',variable=self.skip_visualization, onvalue=True, offvalue=False, command=self.set_skip_visualization_option, font=('',10), bg='white', fg='black', anchor=tk.W)
+            self.skip_visualization_option.grid(row=3, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+            
+            if skip_visualization:
+                self.skip_visualization_option.select()
+
             self.xdi = tk.PhotoImage(file='GitHub-Emblem.png')
             self.xd = tk.Label(self.testframe, image=self.xdi, bg='black')
-            self.xd.grid(row=2, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+            self.xd.grid(row=4, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             self.xd.bind('<Button-1>', self.get_help)
             
             tk.Grid.rowconfigure(self.testframe, index=0, weight=1)
             tk.Grid.rowconfigure(self.testframe, index=1, weight=1)
             tk.Grid.rowconfigure(self.testframe, index=2, weight=1)
+            tk.Grid.rowconfigure(self.testframe, index=3, weight=1)
+            tk.Grid.rowconfigure(self.testframe, index=4, weight=1)
             tk.Grid.columnconfigure(self.testframe, index=0, weight=1)
 
             self.testframe.update()
@@ -90,4 +107,16 @@ class Settings(tk.Frame):
         self.parent.red_area.config(bg=visualize.unsafe_color)
         self.parent.show_unsafe_area_button.config(bg=visualize.unsafe_color)
         
+        self.parent.start_calculation()
+
+
+    def set_white_boxes_option(self):
+        global white_boxes
+        white_boxes = self.white_boxes.get()
+        self.parent.start_calculation()
+
+
+    def set_skip_visualization_option(self):
+        global skip_visualization
+        skip_visualization = self.skip_visualization.get()
         self.parent.start_calculation()
