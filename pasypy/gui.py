@@ -7,6 +7,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 from pasypy import variables, pasypy, constraints_parser, visualize, time, settings, splitting_heuristics
+import webbrowser
 
 
 class MainApplication(tk.Frame):
@@ -15,8 +16,8 @@ class MainApplication(tk.Frame):
         self.parent = parent
 
         self.parent.title('PaSyPy - Parameter Synthesis with Python')
-        self.parent.geometry('1250x750')
-        self.parent.minsize(1250, 750)
+        self.parent.geometry('1200x770')
+        self.parent.minsize(1200, 770)
         self.parent.configure(background='white')
         # self.parent.wm_attributes('-fullscreen','true')
 
@@ -44,9 +45,9 @@ class MainApplication(tk.Frame):
         #### START - FRAME 1.1.1.1 #
         self.frame1111 = tk.Frame(master=self.frame111, background='white')       
         self.frame1111.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(1,0))
-        self.ready_label1 = tk.Label(self.frame1111, text='>> STATUS <<', height=1, bg='black', fg='white', font=('',15))
+        self.ready_label1 = tk.Label(self.frame1111, text='>> STATUS <<', height=1, bg='black', fg='white', font=('',16))
         self.ready_label1.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=(5,0))
-        self.ready_label = tk.Label(self.frame1111, text='WAITING', height=1, bg='black', fg='white', font=('',15))
+        self.ready_label = tk.Label(self.frame1111, text='WAITING', height=1, bg='black', fg='white', font=('',16))
         self.ready_label.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=(0,5))
         
         tk.Grid.rowconfigure(self.frame1111, index=0, weight=1)
@@ -57,7 +58,7 @@ class MainApplication(tk.Frame):
         #### START - FRAME 1.1.1.2 #
         self.frame1112 = tk.Frame(master=self.frame111, background='white')
         self.frame1112.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
-        self.compute_button = tk.Button(self.frame1112, text='Compute', command=self.update, bg='steel blue', fg='white', font=('',25))
+        self.compute_button = tk.Button(self.frame1112, text='Compute', command=self.start_calculation, bg='steel blue', fg='white', font=('',25))
         self.compute_button.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
         
         tk.Grid.rowconfigure(self.frame1112, index=0, weight=1)
@@ -77,18 +78,23 @@ class MainApplication(tk.Frame):
         self.frame1121 = tk.Frame(master=self.frame112, background='white')        
         self.frame1121.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(1,0))
         self.accuracy = tk.Label(self.frame1121, text='Accuracy: 2^{}'.format(variables.depth_limit), bg='white', fg='black', anchor=tk.W, width=12, font=('',10))
-        self.accuracy.grid(row=0, column=0, columnspan=2, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=(5,0))
+        self.accuracy.grid(row=0, column=0, columnspan=2, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5)
         self.decrease_accuracy_button = tk.Button(self.frame1121, text='-', command=self.decrease_accuracy, bg='black', fg='white')
         self.decrease_accuracy_button.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=(5,2.5))
         self.increase_accuracy_button = tk.Button(self.frame1121, text='+', command=self.increase_accuracy, bg='black', fg='white')
         self.increase_accuracy_button.grid(row=1, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=(2.5,5))
+        
+        tk.Grid.rowconfigure(self.frame1121, index=0, weight=1)
+        tk.Grid.columnconfigure(self.frame1121, index=0, weight=1)
+        tk.Grid.rowconfigure(self.frame1121, index=1, weight=1)
+        tk.Grid.columnconfigure(self.frame1121, index=1, weight=1)
         #### END - FRAME 1.1.2.1 #
 
         #### START - FRAME 1.1.2.2 #
         self.frame1122 = tk.Frame(master=self.frame112, background='white')        
         self.frame1122.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
-        self.hyphen = tk.Label(self.frame1122, text='----------', bg='white', fg='black', font=('',25))
-        self.hyphen.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=1)
+        self.hyphen = tk.Label(self.frame1122, text='------------------', bg='white', fg='black', font=('',13))
+        self.hyphen.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W))
 
         tk.Grid.rowconfigure(self.frame1122, index=0, weight=1)
         tk.Grid.columnconfigure(self.frame1122, index=0, weight=1)
@@ -96,13 +102,13 @@ class MainApplication(tk.Frame):
 
         #### START - FRAME 1.1.2.3 #
         self.frame1123 = tk.Frame(master=self.frame112, background='white')
-        self.frame1123.grid(row=2, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
+        self.frame1123.grid(row=2, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
         self.interval = tk.Label(self.frame1123, text='Interval:', bg='white', fg='black', anchor=tk.W, font=('',10))
         self.interval.grid(row=0, column=0, columnspan=2, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5)
         self.text1 = tk.Entry(self.frame1123, width=5, relief='solid')
-        self.text1.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+        self.text1.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=(5,0))
         self.text2 = tk.Entry(self.frame1123, width=5, relief='solid')
-        self.text2.grid(row=1, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+        self.text2.grid(row=1, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=(5,0))
         self.border_button = tk.Button(self.frame1123, text='SAVE', command=self.border, bg='gray', fg='white')
         self.border_button.grid(row=0, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5)
 
@@ -112,10 +118,32 @@ class MainApplication(tk.Frame):
         tk.Grid.columnconfigure(self.frame1123, index=1, weight=1)
         #### END - FRAME 1.1.2.3 #
 
+        self.frame1124 = tk.Frame(master=self.frame112, background='white')        
+        self.frame1124.grid(row=3, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
+        self.hyphen = tk.Label(self.frame1124, text='------------------', bg='white', fg='black', font=('',13))
+        self.hyphen.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W))
+        
+        tk.Grid.rowconfigure(self.frame1124, index=0, weight=1)
+        tk.Grid.columnconfigure(self.frame1124, index=0, weight=1)
+
+
+        self.frame1125 = tk.Frame(master=self.frame112, background='white')        
+        self.frame1125.grid(row=4, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
+        self.current_splitting_heuristic = tk.StringVar(self)
+        self.current_splitting_heuristic.set(splitting_heuristics.current_splitting_heuristic)
+        
+        self.splitting_option = tk.OptionMenu(self.frame1125, self.current_splitting_heuristic, *splitting_heuristics.splitting_heuristics, command=self.set_splitting_heuristic)
+        self.splitting_option.configure(state='normal', font=('',10), width=8, relief='solid')
+        self.splitting_option.grid(row=0, column=0, sticky=tk.NW, padx=5, pady=(0,1))
+
+        tk.Grid.rowconfigure(self.frame1125, index=0, weight=1)
+        tk.Grid.columnconfigure(self.frame1125, index=0, weight=1)
 
         tk.Grid.rowconfigure(self.frame112, index=0, weight=1)
         tk.Grid.rowconfigure(self.frame112, index=1, weight=1)
         tk.Grid.rowconfigure(self.frame112, index=2, weight=1)
+        tk.Grid.rowconfigure(self.frame112, index=3, weight=1)
+        tk.Grid.rowconfigure(self.frame112, index=4, weight=1)
         tk.Grid.columnconfigure(self.frame112, index=0, weight=1)
         ### END - FRAME 1.1.2 #
 
@@ -126,13 +154,13 @@ class MainApplication(tk.Frame):
         self.number_of_green_boxes = tk.Label(self.frame113, text='Number of green boxes : 0', bg=visualize.safe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.number_of_green_boxes.grid(row=3, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(1,0))
         self.green_area = tk.Label(self.frame113, text='Green area                   : 0.00%', bg=visualize.safe_color, fg='black', anchor=tk.W, width=18, font=('',10))
-        self.green_area.grid(row=4, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
+        self.green_area.grid(row=4, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
         self.show_safe_area_button = tk.Button(self.frame113, text='X', command=self.show_safe_area, width=2, height=1, bg=visualize.safe_color)
         self.show_safe_area_button.grid(row=3, column=0, rowspan=2, sticky=tk.E, padx=10)        
         self.number_of_red_boxes = tk.Label(self.frame113, text='Number of red boxes     : 0', bg=visualize.unsafe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.number_of_red_boxes.grid(row=5, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
         self.red_area = tk.Label(self.frame113, text='Red area                      : 0.00%', bg=visualize.unsafe_color, fg='black', anchor=tk.W, width=18, font=('',10))
-        self.red_area.grid(row=6, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
+        self.red_area.grid(row=6, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
         self.show_unsafe_area_button = tk.Button(self.frame113, text='X', command=self.show_unsafe_area, width=2, height=1, bg=visualize.unsafe_color)
         self.show_unsafe_area_button.grid(row=5, column=0, rowspan=2, sticky=tk.E, padx=10)
         self.white_area_left = tk.Label(self.frame113, text='White area left              : 100%', bg='white', fg='black', anchor=tk.W, width=18, font=('',10))
@@ -140,8 +168,10 @@ class MainApplication(tk.Frame):
         
         self.time = tk.Label(self.frame113, text='Computation Time         :', bg='black', fg='white', anchor=tk.W, width=18, font=('',10))
         self.time.grid(row=8, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
+        self.time2 = tk.Label(self.frame113, text='Visualization Time         :', bg='black', fg='white', anchor=tk.W, width=18, font=('',10))
+        self.time2.grid(row=9, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
         self.acc = tk.Label(self.frame113, text='Computed Accuracy      :', bg='black', fg='white', anchor=tk.W, width=18, font=('',10))
-        self.acc.grid(row=9, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
+        self.acc.grid(row=10, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
         
         tk.Grid.rowconfigure(self.frame113, index=0, weight=1)
         tk.Grid.rowconfigure(self.frame113, index=1, weight=1)
@@ -152,6 +182,7 @@ class MainApplication(tk.Frame):
         tk.Grid.rowconfigure(self.frame113, index=6, weight=1)
         tk.Grid.rowconfigure(self.frame113, index=7, weight=1)
         tk.Grid.rowconfigure(self.frame113, index=8, weight=1)
+        tk.Grid.rowconfigure(self.frame113, index=9, weight=1)
         tk.Grid.columnconfigure(self.frame113, index=0, weight=1)
         ### END - FRAME 1.1.3 #
 
@@ -178,6 +209,7 @@ class MainApplication(tk.Frame):
         self.background_image = tk.PhotoImage(file='logo_ths.png')
         self.background_label = tk.Label(self.frame13, image=self.background_image)
         self.background_label.grid(row=0, column=0, sticky=tk.SW, padx=1, pady=1)
+        self.background_label.bind('<Button-1>', self.on_click)
         ## END - FRAME 1.3 #
 
         tk.Grid.rowconfigure(self.frame1, index=0, weight=0)
@@ -206,17 +238,7 @@ class MainApplication(tk.Frame):
         self.file_path_label.grid(row=0, column=4, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
         # self.exit_button = tk.Button(self.frame21, text='Exit', command=self.parent.quit, width=10, height=2, bg='black', fg='white')
         # self.exit_button.grid(row=0, column=5, sticky=tk.E, padx=5, pady=5)
-        self.show_hyperplane = tk.BooleanVar()
-        self.hyperplane_option = tk.Checkbutton(self.frame21, text='Hyperplane',variable=self.show_hyperplane, onvalue=True, offvalue=False, command=self.set_hyperplane_option)
-        self.hyperplane_option.grid(row=0, column=5, sticky=tk.NW, padx=5, pady=5)
-        self.colorblind_mode = tk.BooleanVar()
-        self.colorblind_option = tk.Checkbutton(self.frame21, text='Colorblind',variable=self.colorblind_mode, onvalue=True, offvalue=False, command=self.set_colorblind_option)
-        self.colorblind_option.grid(row=0, column=6, sticky=tk.NW, padx=5, pady=5)
-        self.current_splitting_heuristic = tk.StringVar(self)
-        self.current_splitting_heuristic.set(splitting_heuristics.current_splitting_heuristic)
-        self.splitting_option = tk.OptionMenu(self.frame21, self.current_splitting_heuristic, *splitting_heuristics.splitting_heuristics, command=self.set_splitting_heuristic)
-        self.splitting_option.configure(state='normal', font=('',10), width=8, relief='solid')
-        self.splitting_option.grid(row=0, column=6, sticky=tk.NW, padx=5, pady=5)
+
         ## END - FRAME 2.1 #
 
         ## START - FRAME 2.2 #
@@ -251,34 +273,16 @@ class MainApplication(tk.Frame):
         self.changed = True
         self.current_depth_limit = 0
         
-
-
-    def set_hyperplane_option(self):
-        settings.show_hyperplane = self.show_hyperplane.get()
-        self.update()
-
-
-    def set_colorblind_option(self):
-        settings.colorblind_mode = self.colorblind_mode.get()
-        if not settings.colorblind_mode:
-            visualize.safe_color = 'forestgreen'
-            visualize.unsafe_color = 'firebrick'
-        else:
-            visualize.safe_color = 'dodgerblue'
-            visualize.unsafe_color = 'goldenrod'
+        self.window = None
         
-        self.number_of_green_boxes.config(bg=visualize.safe_color)
-        self.green_area.config(bg=visualize.safe_color)
-        self.show_safe_area_button.config(bg=visualize.safe_color)
         
-        self.number_of_red_boxes.config(bg=visualize.unsafe_color)
-        self.red_area.config(bg=visualize.unsafe_color)
-        self.show_unsafe_area_button.config(bg=visualize.unsafe_color)
-        
-        self.update()
+    def on_click(self, event=None):
 
-    
+        webbrowser.open('https://ths.rwth-aachen.de/')
+
+
     def set_splitting_heuristic(self, args):
+
         splitting_heuristics.current_splitting_heuristic = self.current_splitting_heuristic.get()
         self.restore_default()
 
@@ -472,23 +476,28 @@ class MainApplication(tk.Frame):
         self.line.grid(row=0, column=0, sticky=tk.NW, padx=1,pady=1)
 
 
-    def start_computation_with_visualize_and_time(self):
-        time.create_timestamp()
+    def compute(self):
+        self.ready_label.configure(text='COMPUTING...')
+        self.ready_label.update()
+        time.create_timestamp('Computation')
         pasypy.main()
-        time.create_timestamp()
-        time.calculate_time()
-        self.time.config(text='Computation Time         : {} sec.'.format(round(time.total_time, 3)))
+        time.calculate_time('Computation')
+        self.time.config(text='Computation Time         : {} sec.'.format(round(time.get_time('Computation'), 3)))
 
+
+    def visualize(self):
+        self.ready_label.configure(text='VISUALIZING...')
+        self.ready_label.update()
+        time.create_timestamp('Visualization')
         figure = visualize.generate_graph()
         self.add_plot(figure)
-        self.update_window()
+        time.calculate_time('Visualization')
+        self.time2.config(text='Visualization Time         : {} sec.'.format(round(time.get_time('Visualization'), 3)))
 
 
-    def update(self):
+    def start_calculation(self):
         if variables.Constraints is not None:
             if (self.changed or (variables.depth_limit > self.current_depth_limit)):
-                self.ready_label.configure(text='COMPUTING...')
-                self.ready_label.update()
                 self.get_graph_axes()
 
                 if variables.Sub_Queue:
@@ -500,34 +509,19 @@ class MainApplication(tk.Frame):
                 else:
                     self.changed = False
 
-                self.start_computation_with_visualize_and_time()
+
+                self.compute()
+                self.visualize()
                 self.current_depth_limit = variables.depth_limit
                 self.acc.configure(text='Computed Accuracy      : 2^{}'.format(self.current_depth_limit))
 
-                self.add_axes_field(update=True)
-
-                self.ready_label.configure(text='FINISHED')
             else:
                 self.get_graph_axes()
-                figure = visualize.generate_graph()
-                self.add_plot(figure)
-                self.update_window()
-                self.add_axes_field(update=True)
+                self.visualize()
 
-
-    def reset(self):
-        Bounds = ()
-        for _ in range(len(variables.parameters)):
-            Bounds += (variables.x_axe_limit,)
-        Bounds += (1,)
-        variables.Queue = [Bounds]
-        variables.Sub_Queue = []
-        variables.G = []
-        variables.R = []
-
-        self.line.destroy()
-
-        self.start_computation_with_visualize_and_time()
+            self.update_window()
+            self.add_axes_field(update=True)
+            self.ready_label.configure(text='FINISHED')
 
 
     def update_window(self):
