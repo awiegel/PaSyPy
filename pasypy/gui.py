@@ -239,6 +239,10 @@ class MainApplication(tk.Frame):
         # self.exit_button = tk.Button(self.frame21, text='Exit', command=self.parent.quit, width=10, height=2, bg='black', fg='white')
         # self.exit_button.grid(row=0, column=5, sticky=tk.E, padx=5, pady=5)
 
+        self.settings_image = tk.PhotoImage(file='gear.png')
+        self.settings_label = tk.Label(self.frame12, image=self.settings_image, bg='black', fg='black')
+        self.settings_label.grid(row=0, column=0, sticky=tk.NE, padx=1, pady=1)
+        self.settings_label.bind('<Button-1>', self.on_click)
         ## END - FRAME 2.1 #
 
         ## START - FRAME 2.2 #
@@ -315,6 +319,7 @@ class MainApplication(tk.Frame):
 
         self.opt_x_axe.lift()
         self.opt_y_axe.lift()
+        self.settings_label.lift()
 
 
     def border(self):
@@ -354,6 +359,11 @@ class MainApplication(tk.Frame):
         self.opt_y_axe = tk.OptionMenu(self.frame12, self.variable_y_axe, *[''])
         self.opt_y_axe.configure(state='disabled', font=('',10), width=1, relief='solid')
         self.opt_y_axe.grid(row=0, column=0, sticky=tk.W, padx=1)
+        
+        self.settings_image = tk.PhotoImage(file='gear.png')
+        self.settings_label = tk.Label(self.frame12, image=self.settings_image, bg='white', fg='black')
+        self.settings_label.grid(row=0, column=0, sticky=tk.NE, padx=(0,1), pady=(1,0))
+        self.settings_label.bind('<Button-1>', settings.Settings(self).on_click)
 
 
     def get_graph_axes(self):
