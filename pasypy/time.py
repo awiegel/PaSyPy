@@ -1,24 +1,23 @@
 import timeit
 
-timestamps = []
-total_time = 0
+timestamps = {
+    'Computation'  : 0,
+    'Visualization': 0
+}
 
 
-def create_timestamp():
-    timestamp = timeit.default_timer()
-    for i in timestamps:
-        timestamp -= i
-    timestamps.append(timestamp)
+def create_timestamp(key):
+    _clear_timestamp(key)
+    timestamps[key] = timeit.default_timer()
 
 
-def calculate_time():
-    global total_time
-    total_time = 0
-    for timestamp in timestamps[1:]:
-        total_time += timestamp
-    _clear_timestamps()
+def calculate_time(key):
+    timestamps[key] = timeit.default_timer() - timestamps[key]
 
 
-def _clear_timestamps():
-    global timestamps
-    timestamps = []
+def get_time(key):
+    return timestamps[key]
+
+
+def _clear_timestamp(key):
+    timestamps[key] = 0
