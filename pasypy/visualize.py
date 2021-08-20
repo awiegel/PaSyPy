@@ -35,9 +35,14 @@ def create_logfile(name, B):
     logfile.close()
 
 
+def create_logfiles():
+    create_logfile('safe_area', variables.G)
+    create_logfile('unsafe_area', variables.R)
+
+
 def filter_depth(unfiltered, filtered):
     for i in unfiltered:
-        if (i[len(variables.parameters)] < ((2**variables.depth_limit)/2)):
+        if (i[len(variables.parameters)] <= ((2**variables.depth_limit))):
             filtered.append(i) 
 
 
@@ -59,19 +64,33 @@ def filter_multiple_axes(temp_boxes, color):
                 break
 
 
+def get_hatch_pattern(area_color):
+    if not settings.hatch_pattern:
+        hatch_pattern = ''
+    else:
+        if area_color == safe_color:
+            hatch_pattern = 'o'
+        else:
+            hatch_pattern = 'x'
+    return hatch_pattern
+
+
 def plot_one_dimensional(area, area_color):
+    hatch_pattern = get_hatch_pattern(area_color)
     for i in area:
         plt.plot([i[0][0],i[0][1],i[0][1],i[0][0],i[0][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color='black')
-        plt.fill([i[0][0],i[0][1],i[0][1],i[0][0],i[0][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color=area_color)
+        plt.fill([i[0][0],i[0][1],i[0][1],i[0][0],i[0][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color=area_color, edgecolor='black', linewidth=0, hatch=hatch_pattern)
+
 
 def plot_multi_dimensional(area, area_color):
+    hatch_pattern = get_hatch_pattern(area_color)
     for i in area:
         plt.plot([i[variables.x_axe_position][0],i[variables.x_axe_position][1],i[variables.x_axe_position][1],i[variables.x_axe_position][0],i[variables.x_axe_position][0]],
                  [i[variables.y_axe_position][0],i[variables.y_axe_position][0],i[variables.y_axe_position][1],i[variables.y_axe_position][1],i[variables.y_axe_position][0]],
                  color='black')
         plt.fill([i[variables.x_axe_position][0],i[variables.x_axe_position][1],i[variables.x_axe_position][1],i[variables.x_axe_position][0],i[variables.x_axe_position][0]],
                  [i[variables.y_axe_position][0],i[variables.y_axe_position][0],i[variables.y_axe_position][1],i[variables.y_axe_position][1],i[variables.y_axe_position][0]],
-                 color=area_color)
+                 color=area_color, edgecolor='black', linewidth=0, hatch=hatch_pattern)
 
 def draw_green_area():
     global GS
@@ -185,9 +204,9 @@ def generate_graph():
     plt.close('all')
     figure = plt.figure()
     init_graph()
-    draw_green_area()
     draw_red_area()
-    
+    draw_green_area()
+
     ax = plt.gca()
     ax.callbacks.connect('xlim_changed', on_xlims_change)
     ax.callbacks.connect('ylim_changed', on_ylims_change)
