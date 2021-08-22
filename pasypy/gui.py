@@ -6,7 +6,13 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
 
-from pasypy import variables, pasypy, constraints_parser, visualize, time, settings, splitting_heuristics
+from pasypy import variables, settings, splitting_heuristic
+from pasypy.pasypy import PaSyPy
+from pasypy.visualize import Visualize
+from pasypy.timer import Timer
+from pasypy.constraints_parser import ConstraintsParser
+from pasypy.area_calculation import AreaCalculation
+
 import webbrowser
 
 
@@ -130,9 +136,9 @@ class MainApplication(tk.Frame):
         self.frame1125 = tk.Frame(master=self.frame112, background='white')        
         self.frame1125.grid(row=4, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
         self.current_splitting_heuristic = tk.StringVar(self)
-        self.current_splitting_heuristic.set(splitting_heuristics.current_splitting_heuristic)
+        self.current_splitting_heuristic.set(splitting_heuristic.current_splitting_heuristic)
         
-        self.splitting_option = tk.OptionMenu(self.frame1125, self.current_splitting_heuristic, *splitting_heuristics.splitting_heuristics, command=self.set_splitting_heuristic)
+        self.splitting_option = tk.OptionMenu(self.frame1125, self.current_splitting_heuristic, *splitting_heuristic.splitting_heuristic, command=self.set_splitting_heuristic)
         self.splitting_option.configure(state='normal', font=('',10), width=8, relief='solid')
         self.splitting_option.grid(row=0, column=0, sticky=tk.NW, padx=5, pady=(0,1))
 
@@ -151,17 +157,17 @@ class MainApplication(tk.Frame):
         ### START - FRAME 1.1.3 #
         self.frame113 = tk.Frame(master=self.frame11, background='black')
         self.frame113.grid(row=0, column=2, sticky=(tk.N+tk.E+tk.S+tk.W), padx=(5,0))
-        self.number_of_green_boxes = tk.Label(self.frame113, text='Number of green boxes : 0', bg=visualize.safe_color, fg='black', anchor=tk.W, width=18, font=('',10))
+        self.number_of_green_boxes = tk.Label(self.frame113, text='Number of green boxes : 0', bg=settings.safe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.number_of_green_boxes.grid(row=3, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(1,0))
-        self.green_area = tk.Label(self.frame113, text='Green area                   : 0.00%', bg=visualize.safe_color, fg='black', anchor=tk.W, width=18, font=('',10))
+        self.green_area = tk.Label(self.frame113, text='Green area                   : 0.00%', bg=settings.safe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.green_area.grid(row=4, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
-        self.show_safe_area_button = tk.Button(self.frame113, text='X', command=self.show_safe_area, width=2, height=1, bg=visualize.safe_color)
+        self.show_safe_area_button = tk.Button(self.frame113, text='X', command=self.show_safe_area, width=2, height=1, bg=settings.safe_color)
         self.show_safe_area_button.grid(row=3, column=0, rowspan=2, sticky=tk.E, padx=10)        
-        self.number_of_red_boxes = tk.Label(self.frame113, text='Number of red boxes     : 0', bg=visualize.unsafe_color, fg='black', anchor=tk.W, width=18, font=('',10))
+        self.number_of_red_boxes = tk.Label(self.frame113, text='Number of red boxes     : 0', bg=settings.unsafe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.number_of_red_boxes.grid(row=5, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
-        self.red_area = tk.Label(self.frame113, text='Red area                      : 0.00%', bg=visualize.unsafe_color, fg='black', anchor=tk.W, width=18, font=('',10))
+        self.red_area = tk.Label(self.frame113, text='Red area                      : 0.00%', bg=settings.unsafe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.red_area.grid(row=6, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
-        self.show_unsafe_area_button = tk.Button(self.frame113, text='X', command=self.show_unsafe_area, width=2, height=1, bg=visualize.unsafe_color)
+        self.show_unsafe_area_button = tk.Button(self.frame113, text='X', command=self.show_unsafe_area, width=2, height=1, bg=settings.unsafe_color)
         self.show_unsafe_area_button.grid(row=5, column=0, rowspan=2, sticky=tk.E, padx=10)
         self.white_area_left = tk.Label(self.frame113, text='White area left              : 100%', bg='white', fg='black', anchor=tk.W, width=18, font=('',10))
         self.white_area_left.grid(row=7, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
@@ -266,6 +272,9 @@ class MainApplication(tk.Frame):
         self.add_empty_axes()
 
         self.file_path = None
+        
+        self.timer = Timer()
+        self.area_calculation = AreaCalculation()
 
         self.parent.bind('+', lambda _: self.increase_accuracy())
         self.parent.bind('-', lambda _: self.decrease_accuracy())
@@ -290,7 +299,7 @@ class MainApplication(tk.Frame):
 
 
     def set_splitting_heuristic(self, args):
-        splitting_heuristics.current_splitting_heuristic = self.current_splitting_heuristic.get()
+        splitting_heuristic.current_splitting_heuristic = self.current_splitting_heuristic.get()
         self.restore_default()
 
 
@@ -393,7 +402,7 @@ class MainApplication(tk.Frame):
         if self.file_path:
             self.file_path_label.configure(text=os.path.basename(self.file_path), anchor=tk.W)
 
-            constraints_parser.parse_from_file(self.file_path)
+            ConstraintsParser().parse_from_file(self.file_path)
 
             self.text.delete('1.0', 'end-1c')
             if variables.Constraints is not None:
@@ -436,7 +445,7 @@ class MainApplication(tk.Frame):
         text = self.text.get('1.0', 'end-1c')
         if self.text.compare('1.0', '!=', 'end-1c') and text != str(variables.Constraints):
             
-            constraints_parser.parse_from_textfield(text)
+            ConstraintsParser().parse_from_textfield(text)
             
             self.restore_default()
 
@@ -492,23 +501,24 @@ class MainApplication(tk.Frame):
     def compute(self):
         self.ready_label.configure(text='COMPUTING...')
         self.ready_label.update()
-        time.create_timestamp('Computation')
-        pasypy.main()
-        time.calculate_time('Computation')
-        self.time.config(text='Computation Time         : {} sec.'.format(round(time.get_time('Computation'), 3)))
+        self.timer.create_timestamp('Computation')
+        PaSyPy().main()
+        self.timer.calculate_time('Computation')
+        self.time.config(text='Computation Time         : {} sec.'.format(round(self.timer.get_time('Computation'), 3)))
 
 
     def visualize(self):
         if not settings.skip_visualization:
             self.ready_label.configure(text='VISUALIZING...')
             self.ready_label.update()
-            time.create_timestamp('Visualization')
-            figure = visualize.generate_graph()
+            self.timer.create_timestamp('Visualization')
+            figure = Visualize().generate_graph()
+            
             self.add_plot(figure)
-            time.calculate_time('Visualization')
-            self.time2.config(text='Visualization Time         : {} sec.'.format(round(time.get_time('Visualization'), 3)))
+            self.timer.calculate_time('Visualization')
+            self.time2.config(text='Visualization Time         : {} sec.'.format(round(self.timer.get_time('Visualization'), 3)))
         else:
-            visualize.create_logfiles()
+            Visualize().create_logfiles()
 
 
     def start_calculation(self):
@@ -541,11 +551,11 @@ class MainApplication(tk.Frame):
 
 
     def update_window(self):
-        green_area = pasypy.calculate_area(variables.G)
+        green_area = self.area_calculation.calculate_area(variables.G)
         self.number_of_green_boxes.config(text='Number of green boxes : {}'.format(len(variables.G)))
         self.green_area.config(text='Green area                   : {:.2%}'.format(green_area))
 
-        red_area = pasypy.calculate_area(variables.R)
+        red_area = self.area_calculation.calculate_area(variables.R)
         self.number_of_red_boxes.config(text='Number of red boxes     : {}'.format(len(variables.R)))
         self.red_area.config(text='Red area                      : {:.2%}'.format(red_area))
 

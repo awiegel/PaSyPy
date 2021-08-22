@@ -1,13 +1,14 @@
 import tkinter as tk
 import webbrowser
 
-from pasypy import visualize
-
 show_hyperplane = False
 colorblind_mode = False
 white_boxes = False
 hatch_pattern = False
 skip_visualization = False
+
+safe_color = 'forestgreen'
+unsafe_color = 'firebrick'
 
 class Settings(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -66,10 +67,10 @@ class Settings(tk.Frame):
             if skip_visualization:
                 self.skip_visualization_option.select()
 
-            self.github = tk.PhotoImage(file='GitHub-Emblem.png')
-            self.github_label = tk.Label(self.testframe, image=self.github, bg='black')
-            self.github_label.grid(row=5, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
-            self.github_label.bind('<Button-1>', self.get_help)
+            self.xdi = tk.PhotoImage(file='GitHub-Emblem.png')
+            self.xd = tk.Label(self.testframe, image=self.xdi, bg='black')
+            self.xd.grid(row=5, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+            self.xd.bind('<Button-1>', self.get_help)
 
             tk.Grid.rowconfigure(self.testframe, index=0, weight=1)
             tk.Grid.rowconfigure(self.testframe, index=1, weight=1)
@@ -100,22 +101,22 @@ class Settings(tk.Frame):
 
 
     def set_colorblind_option(self):
-        global colorblind_mode
+        global colorblind_mode, safe_color, unsafe_color
         colorblind_mode = self.colorblind_mode.get()
         if not colorblind_mode:
-            visualize.safe_color = 'forestgreen'
-            visualize.unsafe_color = 'firebrick'
+            safe_color = 'forestgreen'
+            unsafe_color = 'firebrick'
         else:
-            visualize.safe_color = 'dodgerblue'
-            visualize.unsafe_color = 'goldenrod'
+            safe_color = 'dodgerblue'
+            unsafe_color = 'goldenrod'
 
-        self.parent.number_of_green_boxes.config(bg=visualize.safe_color)
-        self.parent.green_area.config(bg=visualize.safe_color)
-        self.parent.show_safe_area_button.config(bg=visualize.safe_color)
+        self.parent.number_of_green_boxes.config(bg=safe_color)
+        self.parent.green_area.config(bg=safe_color)
+        self.parent.show_safe_area_button.config(bg=safe_color)
 
-        self.parent.number_of_red_boxes.config(bg=visualize.unsafe_color)
-        self.parent.red_area.config(bg=visualize.unsafe_color)
-        self.parent.show_unsafe_area_button.config(bg=visualize.unsafe_color)
+        self.parent.number_of_red_boxes.config(bg=unsafe_color)
+        self.parent.red_area.config(bg=unsafe_color)
+        self.parent.show_unsafe_area_button.config(bg=unsafe_color)
 
         self.parent.start_calculation()
 
