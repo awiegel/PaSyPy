@@ -278,15 +278,18 @@ class MainApplication(tk.Frame):
         self.current_depth_limit = 0
         
         self.window = None
+        self.parent.protocol('WM_DELETE_WINDOW', self.top_closes)
         
-        
-    def on_click(self, event=None):
 
+    def top_closes(self, event=None):
+        self.parent.quit()
+
+
+    def on_click(self, event=None):
         webbrowser.open('https://ths.rwth-aachen.de/')
 
 
     def set_splitting_heuristic(self, args):
-
         splitting_heuristics.current_splitting_heuristic = self.current_splitting_heuristic.get()
         self.restore_default()
 
