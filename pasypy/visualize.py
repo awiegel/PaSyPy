@@ -13,6 +13,8 @@ RS = []
 safe_color = 'forestgreen'
 unsafe_color = 'firebrick'
 
+WS = []
+
 
 def init_graph():
     plt.xlim(variables.x_axe_limit)
@@ -43,7 +45,9 @@ def create_logfiles():
 def filter_depth(unfiltered, filtered):
     for i in unfiltered:
         if (i[len(variables.parameters)] <= ((2**variables.depth_limit))):
-            filtered.append(i) 
+            filtered.append(i)
+        else:
+            WS.append(i)
 
 
 def filter_multiple_axes(temp_boxes, color):
@@ -70,8 +74,10 @@ def get_hatch_pattern(area_color):
     else:
         if area_color == safe_color:
             hatch_pattern = 'o'
-        else:
+        elif area_color == unsafe_color:
             hatch_pattern = 'x'
+        else:
+            hatch_pattern = ''
     return hatch_pattern
 
 
@@ -91,6 +97,13 @@ def plot_multi_dimensional(area, area_color):
         plt.fill([i[variables.x_axe_position][0],i[variables.x_axe_position][1],i[variables.x_axe_position][1],i[variables.x_axe_position][0],i[variables.x_axe_position][0]],
                  [i[variables.y_axe_position][0],i[variables.y_axe_position][0],i[variables.y_axe_position][1],i[variables.y_axe_position][1],i[variables.y_axe_position][0]],
                  color=area_color, edgecolor='black', linewidth=0, hatch=hatch_pattern)
+
+def plot_multi_dimensional2(area):
+    for i in area:
+        plt.plot([i[variables.x_axe_position][0],i[variables.x_axe_position][1],i[variables.x_axe_position][1],i[variables.x_axe_position][0],i[variables.x_axe_position][0]],
+                 [i[variables.y_axe_position][0],i[variables.y_axe_position][0],i[variables.y_axe_position][1],i[variables.y_axe_position][1],i[variables.y_axe_position][0]],
+                 color='black')
+
 
 def draw_green_area():
     global GS
@@ -159,6 +172,47 @@ def draw_red_area():
     create_logfile('unsafe_area', variables.R)
 
 
+def draw_white_area():
+    if len(variables.parameters) == 1:
+        white_boxes = variables.Sub_Queue + WS
+        plot_one_dimensional(white_boxes, 'white')
+    else:
+        if len(variables.parameters) == 2:
+            white_boxes = variables.Sub_Queue + WS
+            plot_multi_dimensional(white_boxes, 'white')
+        else:
+            white_boxes = variables.Sub_Queue
+            for w in white_boxes[:]:
+                for g in GS:
+                    if ((w[variables.x_axe_position][0] >= g[variables.x_axe_position][0]) and (w[variables.x_axe_position][1] <= g[variables.x_axe_position][1])) and \
+                        ((w[variables.y_axe_position][0] >= g[variables.y_axe_position][0]) and (w[variables.y_axe_position][1] <= g[variables.y_axe_position][1])):
+                        white_boxes.remove(w)
+                for g in RS:
+                    if ((w[variables.x_axe_position][0] >= g[variables.x_axe_position][0]) and (w[variables.x_axe_position][1] <= g[variables.x_axe_position][1])) and \
+                        ((w[variables.y_axe_position][0] >= g[variables.y_axe_position][0]) and (w[variables.y_axe_position][1] <= g[variables.y_axe_position][1])):
+                        white_boxes.remove(w)
+            
+            test = []
+            for i in white_boxes:
+                for x in range(len(i)):
+                    if x == (len(i) - 1):
+                        i = list(i)
+                        i[x] = 0
+                        i = tuple(i)
+                    elif x != variables.x_axe_position and x != variables.y_axe_position:
+                        i = list(i)
+                        i[x] = []
+                        i = tuple(i)
+                    else:
+                        pass
+                test.append(i)
+            b = ()
+            for sublist in test:
+                if sublist not in b:
+                    b += (sublist,)
+            plot_multi_dimensional2(b)
+            
+
 def draw_hyperplane(ax):
     X = []
     Y = []
@@ -201,11 +255,15 @@ def on_ylims_change(event_ax):
 
 # Complete visualization part
 def generate_graph():
+    WS.clear()
+
     plt.close('all')
     figure = plt.figure()
     init_graph()
     draw_red_area()
     draw_green_area()
+    if settings.white_boxes:
+        draw_white_area()
 
     ax = plt.gca()
     ax.callbacks.connect('xlim_changed', on_xlims_change)
