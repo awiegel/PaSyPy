@@ -496,13 +496,16 @@ class MainApplication(tk.Frame):
 
 
     def visualize(self):
-        self.ready_label.configure(text='VISUALIZING...')
-        self.ready_label.update()
-        time.create_timestamp('Visualization')
-        figure = visualize.generate_graph()
-        self.add_plot(figure)
-        time.calculate_time('Visualization')
-        self.time2.config(text='Visualization Time         : {} sec.'.format(round(time.get_time('Visualization'), 3)))
+        if not settings.skip_visualization:
+            self.ready_label.configure(text='VISUALIZING...')
+            self.ready_label.update()
+            time.create_timestamp('Visualization')
+            figure = visualize.generate_graph()
+            self.add_plot(figure)
+            time.calculate_time('Visualization')
+            self.time2.config(text='Visualization Time         : {} sec.'.format(round(time.get_time('Visualization'), 3)))
+        else:
+            visualize.create_logfiles()
 
 
     def start_calculation(self):
