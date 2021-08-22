@@ -4,19 +4,20 @@ import z3
 solver = z3.ParOr('smt', 'default').solver(logFile='logs/logfile.log')
 solver_neg = z3.ParOr('smt', 'default').solver(logFile='logs/logfile_neg.log')
 
-Constraints = None
+constraints = None
 
 parameters = []
 
 # starting box with intervalls [0,1] € R and depth 1
-Queue = []
-Sub_Queue = []
+queue = []
+sub_queue = []
 
-G = []
-R = []
+safe_area = []
+unsafe_area = []
 
-# stops at the limit (1/(2**depth_limit)). Can also be stopped before by pressing Ctrl+C. Amount of splits where 1 is initial box and 2 is the initial box split into 2**dimensions boxes.
-depth_limit = 5
+# stops at the limit (1/(2**depth_limit)). Can also be stopped before by pressing Ctrl+C.
+# Amount of splits where 1 is initial box and 2 is the initial box split into 2**dimensions boxes.
+depth_limit = 8
 
 x_axe_position = 0
 y_axe_position = 0

@@ -1,8 +1,13 @@
 from pasypy import variables
 
+
 class AreaCalculation:
 
-    def calculate_area(self, boxes):
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def calculate_area(boxes):
         area = 0
         for i in boxes:
             mult = 1
