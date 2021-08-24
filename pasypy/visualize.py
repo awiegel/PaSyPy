@@ -96,10 +96,8 @@ class Visualize:
                             ((sub_area2[variables.y_axe_position][0] >= sub_area[variables.y_axe_position][0]) and (sub_area2[variables.y_axe_position][1] <= sub_area[variables.y_axe_position][1]))) and \
                             (((sub_area2[variables.x_axe_position][0] != sub_area[variables.x_axe_position][0]) or (sub_area2[variables.x_axe_position][1] != sub_area[variables.x_axe_position][1])) or \
                             ((sub_area2[variables.y_axe_position][0] != sub_area[variables.y_axe_position][0]) or (sub_area2[variables.y_axe_position][1] != sub_area[variables.y_axe_position][1]))):
-                            try:
-                                temp.remove(sub_area2)
-                            except:
-                                pass
+                            temp.remove(sub_area2)
+                            break
                 self.filter_multiple_axes(temp, self.safe_area)
                 self.plot_multi_dimensional(self.safe_area, settings.safe_color)
 
@@ -120,32 +118,27 @@ class Visualize:
                     for sub_area_sub_queue in variables.sub_queue:
                         if ((sub_area_sub_queue[variables.x_axe_position][0] >= sub_area[variables.x_axe_position][0]) and (sub_area_sub_queue[variables.x_axe_position][1] <= sub_area[variables.x_axe_position][1])) and \
                             ((sub_area_sub_queue[variables.y_axe_position][0] >= sub_area[variables.y_axe_position][0]) and (sub_area_sub_queue[variables.y_axe_position][1] <= sub_area[variables.y_axe_position][1])):
-                            try:
-                                temp.remove(sub_area)
-                            except:
-                                pass
+                            temp.remove(sub_area)
+                            break
                 self.filter_multiple_axes(temp, self.unsafe_area)
                 self.plot_multi_dimensional(self.unsafe_area, settings.unsafe_color)
 
     def draw_white_area(self):
         if len(variables.parameters) == 1:
-            white_boxes = variables.sub_queue + self.unknown_area
+            white_boxes = variables.sub_queue.copy() + self.unknown_area.copy()
             self.plot_one_dimensional(white_boxes, 'white')
         else:
             if len(variables.parameters) == 2:
-                white_boxes = variables.sub_queue + self.unknown_area
+                white_boxes = variables.sub_queue.copy() + self.unknown_area.copy()
                 self.plot_multi_dimensional(white_boxes, 'white')
             else:
-                white_boxes = variables.sub_queue
+                white_boxes = variables.sub_queue.copy() + variables.safe_area.copy() + variables.unsafe_area.copy()
                 for unknown_area in white_boxes[:]:
-                    for safe_area in self.safe_area:
+                    for safe_area in variables.safe_area:
                         if ((unknown_area[variables.x_axe_position][0] >= safe_area[variables.x_axe_position][0]) and (unknown_area[variables.x_axe_position][1] <= safe_area[variables.x_axe_position][1])) and \
-                            ((unknown_area[variables.y_axe_position][0] >= safe_area[variables.y_axe_position][0]) and (unknown_area[variables.y_axe_position][1] <= safe_area[variables.y_axe_position][1])):
+                            ((unknown_area[variables.y_axe_position][0] >= safe_area[variables.y_axe_position][0]) and (unknown_area[variables.y_axe_position][1] <= safe_area[variables.y_axe_position][1])) and safe_area != unknown_area:
                             white_boxes.remove(unknown_area)
-                    for unsafe_area in self.unsafe_area:
-                        if ((unknown_area[variables.x_axe_position][0] >= unsafe_area[variables.x_axe_position][0]) and (unknown_area[variables.x_axe_position][1] <= unsafe_area[variables.x_axe_position][1])) and \
-                            ((unknown_area[variables.y_axe_position][0] >= unsafe_area[variables.y_axe_position][0]) and (unknown_area[variables.y_axe_position][1] <= unsafe_area[variables.y_axe_position][1])):
-                            white_boxes.remove(unknown_area)
+                            break
                 temp = []
                 for unknown_area in white_boxes:
                     for index, _ in enumerate(unknown_area):

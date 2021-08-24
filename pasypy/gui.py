@@ -333,6 +333,7 @@ class MainApplication(tk.Frame):
         self.restore_default()
 
     def add_empty_graph(self):
+        plt.close('all')
         self.add_plot(plt.figure())
         plt.xlim(variables.x_axe_limit)
         plt.ylim(variables.y_axe_limit)
@@ -406,12 +407,16 @@ class MainApplication(tk.Frame):
         text = self.text.get('1.0', 'end-1c')
         if self.text.compare('1.0', '!=', 'end-1c') and text != str(variables.constraints):
             ConstraintsParser().parse_from_textfield(text)
+            if variables.constraints is not None:
+                self.ready_label.configure(text='READY')
+            else:
+                self.ready_label.configure(text='ERROR')
             self.restore_default()
 
     def save(self):
         if variables.constraints is not None:
-            path = tk.filedialog.asksaveasfilename(defaultextension='.smt2')
-            if path is not None:
+            path = tk.filedialog.asksaveasfilename(filetypes=[('SMT-LIB', '.smt2')], defaultextension='.smt2')
+            if path:
                 variables.solver.reset()
                 variables.solver.add(variables.constraints)
                 smt2_file = open(path, 'w')
@@ -451,8 +456,7 @@ class MainApplication(tk.Frame):
             self.ready_label.configure(text='VISUALIZING...')
             self.ready_label.update()
             self.computation_timer.create_timestamp('Visualization')
-            self.visualize = Visualize()
-            figure = self.visualize.generate_graph()
+            figure = Visualize().generate_graph()
             self.add_plot(figure)
             self.computation_timer.calculate_time('Visualization')
             self.visualization_time.config(text='Visualization Time         : {} sec.'.format(round(self.computation_timer.get_time('Visualization'), 3)))

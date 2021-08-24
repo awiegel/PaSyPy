@@ -118,5 +118,3 @@ class Settings(tk.Frame):
     def set_skip_visualization_option(self):
         global skip_visualization
         skip_visualization = self.skip_visualization.get()
-        self.parent.add_empty_graph()
-        self.parent.add_empty_axes()
