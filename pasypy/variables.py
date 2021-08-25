@@ -1,10 +1,12 @@
+"""Contains global variables needed for this tool."""
+
 import z3
 
 
 solver = z3.ParOr('smt', 'default').solver(logFile='logs/logfile.log')
 solver_neg = z3.ParOr('smt', 'default').solver(logFile='logs/logfile_neg.log')
 
-constraints = None
+constraints = None # pylint: disable=C0103 # is not a constant
 
 parameters = []
 
@@ -17,10 +19,10 @@ unsafe_area = []
 
 # stops at the limit (1/(2**depth_limit)). Can also be stopped before by pressing Ctrl+C.
 # Amount of splits where 1 is initial box and 2 is the initial box split into 2**dimensions boxes.
-depth_limit = 8
+depth_limit = 8 # pylint: disable=C0103 # is not a constant
 
-x_axe_position = 0
-y_axe_position = 0
+x_axe_position = 0 # pylint: disable=C0103 # is not a constant
+y_axe_position = 0 # pylint: disable=C0103 # is not a constant
 
 x_axe_limit = [0.0, 1.0]
 y_axe_limit = [0.0, 1.0]

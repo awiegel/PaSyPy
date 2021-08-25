@@ -1,18 +1,29 @@
+"""Handles the parsing of the given constraints."""
+
 import re
-from z3 import * # pylint: disable=W0614,W0401
+from z3 import * # pylint: disable=W0614,W0401 # wildcard import is necessary to parse the constraints dynamically
 from pasypy import variables
 
 del u # z3 wildcard import is necessary and it defines 'u' which cannot be used in constraints -> delete it
 
 
 class ConstraintsParser:
+    """Handles the parsing of the given constraints."""
+
+    def __init__(self):
+        pass
+
     def _get_number_of_vars(self, formula):
+        """Extracts all parameters from the new constraints.
+
+        :param formula: The currently considered part of the formula.
+        """
         if isinstance(formula, z3.z3.QuantifierRef):
             self._get_number_of_vars(formula.body())
         elif isinstance(formula, z3.z3.BoolRef):
             for sub_formula in formula.children():
                 self._get_number_of_vars(sub_formula)
-        elif type(formula) is z3.z3.ArithRef:
+        elif type(formula) is z3.z3.ArithRef: # pylint: disable=C0123 # isinstance checks for subclasses which cannot be used here
             if len(formula.children()) > 0:
                 for sub_formula in formula.children():
                     self._get_number_of_vars(sub_formula)
@@ -23,10 +34,15 @@ class ConstraintsParser:
             pass
 
     def _set_new_constraints(self):
+        """Sets the new constraints after successfully parsing."""
         variables.parameters = []
         self._get_number_of_vars(variables.constraints)
 
     def parse_from_file(self, file_path):
+        """Parses the constraints from a SMT-LIB file (.smt2).
+
+        :param file_path: The path to the SMT-LIB file (.smt2).
+        """
         try:
             variables.constraints = parse_smt2_file(file_path, ctx=Context())[0] # provide own context because parser might be stuck in main context
             variables.constraints = parse_smt2_file(file_path)[0] # re-read correct file with main context
@@ -36,10 +52,15 @@ class ConstraintsParser:
             print(e)
 
     def parse_from_textfield(self, text):
+        """Parses the constraints from the text field.
+
+        :param text: The text from the text field.
+        :raises z3.z3types.Z3Exception: Value gets parsed but is not an actual BoolRef value.
+        """
         temp_locals = []
         while True:
             try:
-                variables.constraints = eval(text)
+                variables.constraints = eval(text) # pylint: disable=W0123 # eval is used here to parse the constraints dynamically
                 break
             except NameError as e:
                 var = re.findall(r"name '(\w+)' is not defined",str(e))[0]

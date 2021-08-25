@@ -1,3 +1,5 @@
+"""The graphical user interface (GUI) of this tool."""
+
 import os
 import webbrowser
 import tkinter as tk
@@ -6,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
-from pasypy import variables, settings, splitting_heuristic
+from pasypy import variables, settings, color, splitting_heuristic
 from pasypy.pasypy import PaSyPy
 from pasypy.visualize import Visualize
 from pasypy.logger import Logger
@@ -16,7 +18,10 @@ from pasypy.area_calculation import AreaCalculation
 
 
 class MainApplication(tk.Frame):
+    """The graphical user interface (GUI) of this tool."""
+
     def __init__(self, parent, *args, **kwargs):
+        """Creates the complete graphical user interface (GUI) with all its functionality sorted by frames."""
         matplotlib.use('Agg')
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
@@ -169,17 +174,17 @@ class MainApplication(tk.Frame):
         ### START - FRAME 1.1.3 #
         self.frame113 = tk.Frame(master=self.frame11, background='black')
         self.frame113.grid(row=0, column=2, sticky=(tk.N+tk.E+tk.S+tk.W), padx=(5,0))
-        self.number_of_green_boxes = tk.Label(self.frame113, text='Number of green boxes : 0', bg=settings.safe_color, fg='black', anchor=tk.W, width=18, font=('',10))
+        self.number_of_green_boxes = tk.Label(self.frame113, text='Number of green boxes : 0', bg=color.safe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.number_of_green_boxes.grid(row=3, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(1,0))
-        self.green_area = tk.Label(self.frame113, text='Green area                   : 0.00%', bg=settings.safe_color, fg='black', anchor=tk.W, width=18, font=('',10))
+        self.green_area = tk.Label(self.frame113, text='Green area                   : 0.00%', bg=color.safe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.green_area.grid(row=4, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
-        self.show_safe_area_button = tk.Button(self.frame113, text='X', command=Logger().show_safe_area, width=2, height=1, bg=settings.safe_color)
+        self.show_safe_area_button = tk.Button(self.frame113, text='X', command=Logger().show_safe_area, width=2, height=1, bg=color.safe_color)
         self.show_safe_area_button.grid(row=3, column=0, rowspan=2, sticky=tk.E, padx=10)
-        self.number_of_red_boxes = tk.Label(self.frame113, text='Number of red boxes     : 0', bg=settings.unsafe_color, fg='black', anchor=tk.W, width=18, font=('',10))
+        self.number_of_red_boxes = tk.Label(self.frame113, text='Number of red boxes     : 0', bg=color.unsafe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.number_of_red_boxes.grid(row=5, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
-        self.red_area = tk.Label(self.frame113, text='Red area                      : 0.00%', bg=settings.unsafe_color, fg='black', anchor=tk.W, width=18, font=('',10))
+        self.red_area = tk.Label(self.frame113, text='Red area                      : 0.00%', bg=color.unsafe_color, fg='black', anchor=tk.W, width=18, font=('',10))
         self.red_area.grid(row=6, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
-        self.show_unsafe_area_button = tk.Button(self.frame113, text='X', command=Logger().show_unsafe_area, width=2, height=1, bg=settings.unsafe_color)
+        self.show_unsafe_area_button = tk.Button(self.frame113, text='X', command=Logger().show_unsafe_area, width=2, height=1, bg=color.unsafe_color)
         self.show_unsafe_area_button.grid(row=5, column=0, rowspan=2, sticky=tk.E, padx=10)
         self.white_area_left = tk.Label(self.frame113, text='White area left              : 100%', bg='white', fg='black', anchor=tk.W, width=18, font=('',10))
         self.white_area_left.grid(row=7, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
@@ -275,17 +280,49 @@ class MainApplication(tk.Frame):
         self.add_empty_graph()
         self.add_empty_axes()
 
-    def _top_closes(self, event=None):
+    def _top_closes(self, event=None): # pylint: disable=W0613 # argument is required
+        """Called when main window is closed.
+        Approach to increase closing speed.
+
+        :param event: Event listener, defaults to None
+        """
         self.parent.quit()
 
-    def on_click(self, event=None):
+    @staticmethod
+    def on_click(event=None): # pylint: disable=W0613 # argument is required
+        """Opens the link to the official Theory of Hybrid Systems research group (RWTH i2), headed by Prof. Dr. Erika Ábrahám.
+
+        :param event: Event listener, defaults to None
+        """
         webbrowser.open('https://ths.rwth-aachen.de/')
 
-    def set_splitting_heuristic(self, args=None):
-        splitting_heuristic.current_splitting_heuristic = self.current_splitting_heuristic.get()
-        self.restore_default()
+    def add_empty_graph(self):
+        """Adds the empty graph on initialization or resetting to default."""
+        plt.close('all')
+        self.add_plot(plt.figure())
+        plt.xlim(variables.x_axe_limit)
+        plt.ylim(variables.y_axe_limit)
+
+    def add_empty_axes(self):
+        """Adds the empty fields for the parameters on the graph and the settings wheel."""
+        self.variable_x_axe = tk.StringVar(self)
+        self.opt_x_axe = tk.OptionMenu(self.frame12, self.variable_x_axe, *[''])
+        self.opt_x_axe.configure(state='disabled', font=('',10), width=1, relief='solid')
+        self.opt_x_axe.grid(row=0, column=0, sticky=tk.S, pady=1)
+        self.variable_y_axe = tk.StringVar(self)
+        self.opt_y_axe = tk.OptionMenu(self.frame12, self.variable_y_axe, *[''])
+        self.opt_y_axe.configure(state='disabled', font=('',10), width=1, relief='solid')
+        self.opt_y_axe.grid(row=0, column=0, sticky=tk.W, padx=1)
+        self.settings_image = tk.PhotoImage(file='gear.png')
+        self.settings_label = tk.Label(self.frame12, image=self.settings_image, bg='white', fg='black')
+        self.settings_label.grid(row=0, column=0, sticky=tk.NE, padx=(0,1), pady=(1,0))
+        self.settings_label.bind('<Button-1>', settings.Settings(self).on_click)
 
     def add_axes_field(self, update=False):
+        """Adds the axes fields with actual parameters.
+
+        :param update: If true sets the currently selected parameters and else the first two parameters from the constraint, defaults to False
+        """
         self.opt_x_axe.children['menu'].delete(0, 'end')
         self.opt_y_axe.children['menu'].delete(0, 'end')
 
@@ -314,45 +351,8 @@ class MainApplication(tk.Frame):
         self.opt_y_axe.lift()
         self.settings_label.lift()
 
-    def border(self):
-        lim_inf = self.minimum.get()
-        if lim_inf:
-            lim_inf = float(lim_inf.replace(',','.'))
-        else:
-            lim_inf = variables.x_axe_limit[0]
-        lim_sup = self.maximum.get()
-        if lim_sup:
-            lim_sup = float(lim_sup.replace(',','.'))
-        else:
-            lim_sup = variables.x_axe_limit[1]
-        variables.x_axe_limit = [lim_inf, lim_sup]
-        variables.x_axe_limit_temp = variables.x_axe_limit
-        if len(variables.parameters) > 1:
-            variables.y_axe_limit = [lim_inf, lim_sup]
-        variables.y_axe_limit_temp = variables.y_axe_limit
-        self.restore_default()
-
-    def add_empty_graph(self):
-        plt.close('all')
-        self.add_plot(plt.figure())
-        plt.xlim(variables.x_axe_limit)
-        plt.ylim(variables.y_axe_limit)
-
-    def add_empty_axes(self):
-        self.variable_x_axe = tk.StringVar(self)
-        self.opt_x_axe = tk.OptionMenu(self.frame12, self.variable_x_axe, *[''])
-        self.opt_x_axe.configure(state='disabled', font=('',10), width=1, relief='solid')
-        self.opt_x_axe.grid(row=0, column=0, sticky=tk.S, pady=1)
-        self.variable_y_axe = tk.StringVar(self)
-        self.opt_y_axe = tk.OptionMenu(self.frame12, self.variable_y_axe, *[''])
-        self.opt_y_axe.configure(state='disabled', font=('',10), width=1, relief='solid')
-        self.opt_y_axe.grid(row=0, column=0, sticky=tk.W, padx=1)
-        self.settings_image = tk.PhotoImage(file='gear.png')
-        self.settings_label = tk.Label(self.frame12, image=self.settings_image, bg='white', fg='black')
-        self.settings_label.grid(row=0, column=0, sticky=tk.NE, padx=(0,1), pady=(1,0))
-        self.settings_label.bind('<Button-1>', settings.Settings(self).on_click)
-
     def get_graph_axes(self):
+        """Sets the position of the currently active parameters inside the array to know which axes have to be visualized."""
         if len(variables.parameters) == 1:
             variables.x_axe_position = 0
         else:
@@ -370,7 +370,27 @@ class MainApplication(tk.Frame):
                     if self.variable_x_axe.get() != str(value):
                         variables.y_axe_position = index
 
+    def border(self):
+        """Sets the complete considered interval."""
+        lim_inf = self.minimum.get()
+        if lim_inf:
+            lim_inf = float(lim_inf.replace(',','.'))
+        else:
+            lim_inf = variables.x_axe_limit[0]
+        lim_sup = self.maximum.get()
+        if lim_sup:
+            lim_sup = float(lim_sup.replace(',','.'))
+        else:
+            lim_sup = variables.x_axe_limit[1]
+        variables.x_axe_limit = [lim_inf, lim_sup]
+        variables.x_axe_limit_temp = variables.x_axe_limit
+        if len(variables.parameters) > 1:
+            variables.y_axe_limit = [lim_inf, lim_sup]
+        variables.y_axe_limit_temp = variables.y_axe_limit
+        self.restore_default()
+
     def read_file(self):
+        """Reads the constraints from the selected file and tries to parse them."""
         if self.file_path:
             self.file_path_label.configure(text=os.path.basename(self.file_path), anchor=tk.W)
             ConstraintsParser().parse_from_file(self.file_path)
@@ -381,7 +401,126 @@ class MainApplication(tk.Frame):
                 self.ready_label.configure(text='ERROR')
             self.restore_default()
 
+    def open_file(self):
+        """Opens a SMT-LIB file (.smt2)."""
+        self.file_path = tk.filedialog.askopenfilename(filetypes=[('SMT-LIB', '.smt2')])
+        self.read_file()
+
+    def reload_file(self):
+        """Reloads the last opened SMT-LIB file (.smt2)."""
+        self.read_file()
+
+    def edit(self):
+        """Sets the constraints from the text field as the new constraints."""
+        text = self.text.get('1.0', 'end-1c')
+        if self.text.compare('1.0', '!=', 'end-1c') and text != str(variables.constraints):
+            ConstraintsParser().parse_from_textfield(text)
+            if variables.constraints is not None:
+                self.ready_label.configure(text='READY')
+            else:
+                self.ready_label.configure(text='ERROR')
+            self.restore_default()
+
+    @staticmethod
+    def save():
+        """Saves the constraints from the text field to a file (.smt2 by default)."""
+        if variables.constraints is not None:
+            path = tk.filedialog.asksaveasfilename(filetypes=[('SMT-LIB', '.smt2')], defaultextension='.smt2')
+            if path:
+                variables.solver.reset()
+                variables.solver.add(variables.constraints)
+                smt2_file = open(path, 'w')
+                smt2_file.write(variables.solver.to_smt2())
+                smt2_file.close()
+
+    def increase_accuracy(self):
+        """Increases the current accuracy."""
+        variables.depth_limit += 1
+        self.accuracy.config(text='Accuracy: 2^{}'.format(variables.depth_limit))
+
+    def decrease_accuracy(self):
+        """Decreases the current accuracy."""
+        if variables.depth_limit > 1:
+            variables.depth_limit -= 1
+            self.accuracy.config(text='Accuracy: 2^{}'.format(variables.depth_limit))
+
+    def set_splitting_heuristic(self, args=None): # pylint: disable=W0613 # argument is required
+        """Sets the 'current splitting heuristic' option from the option menu.
+
+        :param args: Event listener, defaults to None
+        """
+        splitting_heuristic.current_splitting_heuristic = self.current_splitting_heuristic.get()
+        self.restore_default()
+
+    def add_plot(self, figure):
+        """Adds the navigation toolbar to the plot.
+
+        :param figure: The plot as a root for the navigation toolbar.
+        """
+        self.line = FigureCanvasTkAgg(figure, master=self.frame12)
+
+        toolbar_frame = tk.Frame(self.frame12, highlightbackground='black', highlightcolor='black', highlightthickness=1)
+        toolbar_frame.grid(row=0, column=0, sticky=tk.NW, padx=(0,1), pady=(0,1))
+        toolbar = NavigationToolbar2Tk(self.line, toolbar_frame)
+        toolbar.config(background='white')
+        toolbar._message_label.config(background='white') # pylint: disable=W0212 # only way to modify navigationtoolbar
+        self.line = self.line.get_tk_widget()
+        self.line.grid(row=0, column=0, sticky=tk.NW, padx=1,pady=1)
+
+    def compute(self):
+        """Computes the constraints, particularly tries to find safe and unsafe areas."""
+        self.ready_label.configure(text='COMPUTING...')
+        self.ready_label.update()
+        self.computation_timer.create_timestamp('Computation')
+        PaSyPy().main()
+        self.computation_timer.calculate_time('Computation')
+        self.computation_time.config(text='Computation Time         : {} sec.'.format(round(self.computation_timer.get_time('Computation'), 3)))
+
+    def visualize(self):
+        """Visualizes all safe, unsafe and unknown areas."""
+        if not settings.skip_visualization:
+            self.ready_label.configure(text='VISUALIZING...')
+            self.ready_label.update()
+            self.computation_timer.create_timestamp('Visualization')
+            figure = Visualize().generate_graph()
+            self.add_plot(figure)
+            self.computation_timer.calculate_time('Visualization')
+            self.visualization_time.config(text='Visualization Time         : {} sec.'.format(round(self.computation_timer.get_time('Visualization'), 3)))
+
+    def start_calculation(self):
+        """After checking pre-conditions, starts the calculation consisting of computation and visualization."""
+        if variables.constraints is not None:
+            self.get_graph_axes()
+            if (self.changed or (variables.depth_limit > self.current_depth_limit)):
+                if variables.sub_queue:
+                    variables.queue.extend(variables.sub_queue)
+                    variables.sub_queue = []
+                if (variables.x_axe_limit_temp != variables.x_axe_limit) or (variables.y_axe_limit_temp != variables.y_axe_limit):
+                    self.changed = True
+                else:
+                    self.changed = False
+                self.compute()
+                self.visualize()
+                self.current_depth_limit = variables.depth_limit
+                self.computed_accuracy.configure(text='Computed Accuracy      : 2^{}'.format(self.current_depth_limit))
+            else:
+                self.visualize()
+            self.update_window()
+            self.add_axes_field(update=True)
+            self.ready_label.configure(text='FINISHED')
+
+    def update_window(self):
+        """Updates the information window."""
+        green_area = self.area_calculation.calculate_area(variables.safe_area)
+        self.number_of_green_boxes.config(text='Number of green boxes : {}'.format(len(variables.safe_area)))
+        self.green_area.config(text='Green area                   : {:.2%}'.format(green_area))
+        red_area = self.area_calculation.calculate_area(variables.unsafe_area)
+        self.number_of_red_boxes.config(text='Number of red boxes     : {}'.format(len(variables.unsafe_area)))
+        self.red_area.config(text='Red area                      : {:.2%}'.format(red_area))
+        self.white_area_left.config(text='White area left              : {:.2%}'.format(1 - (green_area + red_area)))
+
     def restore_default(self):
+        """Restores all relevant variables to default as they were at the beginning of the program."""
         boundaries = ()
         for _ in range(len(variables.parameters)):
             boundaries += (variables.x_axe_limit,)
@@ -395,102 +534,6 @@ class MainApplication(tk.Frame):
         self.changed = True
         if variables.constraints is not None:
             self.ready_label.configure(text='READY')
-
-    def open_file(self):
-        self.file_path = tk.filedialog.askopenfilename(filetypes=[('SMT-LIB', '.smt2')])
-        self.read_file()
-
-    def reload_file(self):
-        self.read_file()
-
-    def edit(self):
-        text = self.text.get('1.0', 'end-1c')
-        if self.text.compare('1.0', '!=', 'end-1c') and text != str(variables.constraints):
-            ConstraintsParser().parse_from_textfield(text)
-            if variables.constraints is not None:
-                self.ready_label.configure(text='READY')
-            else:
-                self.ready_label.configure(text='ERROR')
-            self.restore_default()
-
-    def save(self):
-        if variables.constraints is not None:
-            path = tk.filedialog.asksaveasfilename(filetypes=[('SMT-LIB', '.smt2')], defaultextension='.smt2')
-            if path:
-                variables.solver.reset()
-                variables.solver.add(variables.constraints)
-                smt2_file = open(path, 'w')
-                smt2_file.write(variables.solver.to_smt2())
-                smt2_file.close()
-
-    def increase_accuracy(self):
-        variables.depth_limit += 1
-        self.accuracy.config(text='Accuracy: 2^{}'.format(variables.depth_limit))
-
-    def decrease_accuracy(self):
-        if variables.depth_limit > 1:
-            variables.depth_limit -= 1
-            self.accuracy.config(text='Accuracy: 2^{}'.format(variables.depth_limit))
-
-    def add_plot(self, figure):
-        self.line = FigureCanvasTkAgg(figure, master=self.frame12)
-
-        toolbar_frame = tk.Frame(self.frame12, highlightbackground='black', highlightcolor='black', highlightthickness=1)
-        toolbar_frame.grid(row=0, column=0, sticky=tk.NW, padx=(0,1), pady=(0,1))
-        toolbar = NavigationToolbar2Tk(self.line, toolbar_frame)
-        toolbar.config(background='white')
-        toolbar._message_label.config(background='white')
-        self.line = self.line.get_tk_widget()
-        self.line.grid(row=0, column=0, sticky=tk.NW, padx=1,pady=1)
-
-    def compute(self):
-        self.ready_label.configure(text='COMPUTING...')
-        self.ready_label.update()
-        self.computation_timer.create_timestamp('Computation')
-        PaSyPy().main()
-        self.computation_timer.calculate_time('Computation')
-        self.computation_time.config(text='Computation Time         : {} sec.'.format(round(self.computation_timer.get_time('Computation'), 3)))
-
-    def visualize2(self):
-        if not settings.skip_visualization:
-            self.ready_label.configure(text='VISUALIZING...')
-            self.ready_label.update()
-            self.computation_timer.create_timestamp('Visualization')
-            figure = Visualize().generate_graph()
-            self.add_plot(figure)
-            self.computation_timer.calculate_time('Visualization')
-            self.visualization_time.config(text='Visualization Time         : {} sec.'.format(round(self.computation_timer.get_time('Visualization'), 3)))
-
-    def start_calculation(self):
-        if variables.constraints is not None:
-            if (self.changed or (variables.depth_limit > self.current_depth_limit)):
-                self.get_graph_axes()
-                if variables.sub_queue:
-                    variables.queue.extend(variables.sub_queue)
-                    variables.sub_queue = []
-                if (variables.x_axe_limit_temp != variables.x_axe_limit) or (variables.y_axe_limit_temp != variables.y_axe_limit):
-                    self.changed = True
-                else:
-                    self.changed = False
-                self.compute()
-                self.visualize2()
-                self.current_depth_limit = variables.depth_limit
-                self.computed_accuracy.configure(text='Computed Accuracy      : 2^{}'.format(self.current_depth_limit))
-            else:
-                self.get_graph_axes()
-                self.visualize2()
-            self.update_window()
-            self.add_axes_field(update=True)
-            self.ready_label.configure(text='FINISHED')
-
-    def update_window(self):
-        green_area = self.area_calculation.calculate_area(variables.safe_area)
-        self.number_of_green_boxes.config(text='Number of green boxes : {}'.format(len(variables.safe_area)))
-        self.green_area.config(text='Green area                   : {:.2%}'.format(green_area))
-        red_area = self.area_calculation.calculate_area(variables.unsafe_area)
-        self.number_of_red_boxes.config(text='Number of red boxes     : {}'.format(len(variables.unsafe_area)))
-        self.red_area.config(text='Red area                      : {:.2%}'.format(red_area))
-        self.white_area_left.config(text='White area left              : {:.2%}'.format(1 - (green_area + red_area)))
 
 
 if __name__ != '__main__':

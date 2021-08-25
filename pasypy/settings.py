@@ -1,24 +1,45 @@
+"""Contains settings used by this tool."""
+
 import tkinter as tk
 import webbrowser
 
+from pasypy import color
+from pasypy.color import Color
 
-hyperplane = False
-colorblind_mode = False
-white_boxes = False
-hatch_pattern = False
-skip_visualization = False
-
-safe_color = 'forestgreen'
-unsafe_color = 'firebrick'
+hyperplane = False # pylint: disable=C0103 # is not a constant
+colorblind_mode = False # pylint: disable=C0103 # is not a constant
+white_boxes = False # pylint: disable=C0103 # is not a constant
+hatch_pattern = False # pylint: disable=C0103 # is not a constant
+skip_visualization = False # pylint: disable=C0103 # is not a constant
 
 
 class Settings(tk.Frame):
+    """Contains settings used by this tool."""
+
     def __init__(self, parent):
+        """Creates all attributes as empty elements."""
         tk.Frame.__init__(self, parent)
         self.parent = parent
         self.window = None
+        self.settings_frame = None
+        self.hyperplane = None
+        self.hyperplane_option = None
+        self.hatch_pattern = None
+        self.hatch_pattern_option = None
+        self.white_boxes = None
+        self.white_boxes_option = None
+        self.colorblind_mode = None
+        self.colorblind_option = None
+        self.skip_visualization = None
+        self.skip_visualization_option = None
+        self.github = None
+        self.github_label = None
 
-    def on_click(self, event=None):
+    def on_click(self, event=None): # pylint: disable=W0613 # argument is required
+        """The settings window gets only created when clicked on the settings wheel.
+
+        :param event: Event listener, defaults to None
+        """
         if not self.window:
             self.window = tk.Toplevel()
             self.window.title('Settings')
@@ -26,8 +47,8 @@ class Settings(tk.Frame):
             self.window.geometry('+%d+%d' % ((self.winfo_x() + 700), (self.winfo_y() + 300)))
             self.window.configure(background='white')
             self.window.transient(self)
-            self.tk.call('wm', 'iconphoto', self.window._w, tk.PhotoImage(file='gear.png'))
-            self.settings_frame = tk.Frame(master=self.window, background='black')     
+            self.tk.call('wm', 'iconphoto', self.window._w, tk.PhotoImage(file='gear.png')) # pylint: disable=W0212 # only way to modify navigationtoolbar
+            self.settings_frame = tk.Frame(master=self.window, background='black')
             self.settings_frame.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
 
             self.hyperplane = tk.BooleanVar()
@@ -75,46 +96,60 @@ class Settings(tk.Frame):
             self.settings_frame.update()
             self.window.minsize((self.settings_frame.winfo_width() + 10), (self.settings_frame.winfo_height() + 10))
 
-    def _top_closes(self, event=None):
+    def _top_closes(self, event=None): # pylint: disable=W0613 # argument is required
+        """Called when settings window is closed.
+
+        :param event: Event listener, defaults to None
+        """
         self.window.destroy()
         self.window = None
 
-    def get_help(self, event=None):
+    @staticmethod
+    def get_help(event=None): # pylint: disable=W0613 # argument is required
+        """Opens the link to the official github project of this tool.
+
+        :param event: Event listener, defaults to None
+        """
         webbrowser.open('https://github.com/awiegel/PaSyPy')
 
     def set_hyperplane_option(self):
-        global hyperplane
+        """Sets the 'hyperplane' option from the checkbox."""
+        global hyperplane # pylint: disable=C0103 # is not a constant
         hyperplane = self.hyperplane.get()
         self.parent.start_calculation()
 
-    def set_colorblind_option(self):
-        global colorblind_mode, safe_color, unsafe_color
-        colorblind_mode = self.colorblind_mode.get()
-        if not colorblind_mode:
-            safe_color = 'forestgreen'
-            unsafe_color = 'firebrick'
-        else:
-            safe_color = 'dodgerblue'
-            unsafe_color = 'goldenrod'
-
-        self.parent.number_of_green_boxes.config(bg=safe_color)
-        self.parent.green_area.config(bg=safe_color)
-        self.parent.show_safe_area_button.config(bg=safe_color)
-        self.parent.number_of_red_boxes.config(bg=unsafe_color)
-        self.parent.red_area.config(bg=unsafe_color)
-        self.parent.show_unsafe_area_button.config(bg=unsafe_color)
-        self.parent.start_calculation()
-
-    def set_white_boxes_option(self):
-        global white_boxes
-        white_boxes = self.white_boxes.get()
-        self.parent.start_calculation()
-
     def set_hatch_pattern_option(self):
-        global hatch_pattern
+        """Sets the 'hatch pattern' option from the checkbox."""
+        global hatch_pattern # pylint: disable=C0103 # is not a constant
         hatch_pattern = self.hatch_pattern.get()
         self.parent.start_calculation()
 
+    def set_white_boxes_option(self):
+        """Sets the 'white boxes' option from the checkbox."""
+        global white_boxes # pylint: disable=C0103 # is not a constant
+        white_boxes = self.white_boxes.get()
+        self.parent.start_calculation()
+
+    def set_colorblind_option(self):
+        """Sets the 'colorblind' option from the checkbox."""
+        global colorblind_mode # pylint: disable=C0103 # is not a constant
+        colorblind_mode = self.colorblind_mode.get()
+        if not colorblind_mode:
+            color.safe_color = Color.GREEN.value
+            color.unsafe_color = Color.RED.value
+        else:
+            color.safe_color = Color.BLUE.value
+            color.unsafe_color = Color.YELLOW.value
+
+        self.parent.number_of_green_boxes.config(bg=color.safe_color)
+        self.parent.green_area.config(bg=color.safe_color)
+        self.parent.show_safe_area_button.config(bg=color.safe_color)
+        self.parent.number_of_red_boxes.config(bg=color.unsafe_color)
+        self.parent.red_area.config(bg=color.unsafe_color)
+        self.parent.show_unsafe_area_button.config(bg=color.unsafe_color)
+        self.parent.start_calculation()
+
     def set_skip_visualization_option(self):
-        global skip_visualization
+        """Sets the 'skip visualization' option from the checkbox."""
+        global skip_visualization # pylint: disable=C0103 # is not a constant
         skip_visualization = self.skip_visualization.get()

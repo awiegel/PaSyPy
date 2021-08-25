@@ -1,3 +1,5 @@
+"""Tries to find safe and unsafe regions of the parameter space."""
+
 import z3
 
 from pasypy import variables
@@ -6,15 +8,55 @@ from pasypy.logger import Logger
 
 
 class PaSyPy:
+    """Tries to find safe and unsafe regions of the parameter space."""
+
     def __init__(self):
+        """Initializes the solvers used by this class."""
         self.init_solvers()
 
-    def add_boundary(self, solver, area):
+    @staticmethod
+    def init_solvers():
+        """Initializes the solvers by resetting them and adding the constraints."""
+        variables.solver.reset()
+        variables.solver_neg.reset()
+        variables.solver.add(variables.constraints)
+        variables.solver_neg.add(z3.Not(variables.constraints))
+
+    @staticmethod
+    def add_boundary(solver, area):
+        """Adds the boundaries of given area to the set of constraints.
+
+        :param solver: The used solver. There are two solvers available, one for the original constraints and the other for the negated constraints.
+        :param area: The considered area.
+        """
         for index, value in enumerate(variables.parameters):
             solver.add(value >= area[index][0])
             solver.add(value <= area[index][1])
 
+    @staticmethod
+    def check_zoom():
+        """Compares the first element in the queue with the currently applied zoom area.
+
+        :return: True if element is inside the currently applied zoom area.
+        """
+        inside_zoom = ((variables.queue[0][variables.x_axe_position][0] >= variables.x_axe_limit_temp[0]) and \
+                       (variables.queue[0][variables.x_axe_position][1] <= variables.x_axe_limit_temp[1]))
+        if inside_zoom and (len(variables.parameters) > 1):
+            inside_zoom = ((variables.queue[0][variables.y_axe_position][0] >= variables.y_axe_limit_temp[0]) and \
+                           (variables.queue[0][variables.y_axe_position][1] <= variables.y_axe_limit_temp[1]))
+        return inside_zoom
+
     def solveit(self, area):
+        """Checks if the given area is safe, unsafe or unknown and requires splitting.
+        For this the solver first checks if the original constraints on given area are satisfiable (sat).
+        If not, the area is unsafe (red by default).
+        Otherwise the solver checks the negated constraints on given area for satisfiability (sat).
+        If it is unsatifiable (unsat), the area is safe (green by default).
+        If it is satisfiable (sat), meaning the original constraints and the negated constraints are both satisfiable (sat),
+        the area contains both safe and unsafe candidates and has to be split further into smaller sub areas.
+
+        :param area: The considered area.
+        """
         variables.queue.pop(0)
         variables.solver.push()
         self.add_boundary(variables.solver, area)
@@ -37,21 +79,8 @@ class PaSyPy:
         else:
             print('TIMEOUT', variables.solver.reason_unknown()) # pragma: no cover
 
-    def check_zoom(self):
-        inside_zoom = ((variables.queue[0][variables.x_axe_position][0] >= variables.x_axe_limit_temp[0]) and \
-                       (variables.queue[0][variables.x_axe_position][1] <= variables.x_axe_limit_temp[1]))
-        if inside_zoom and (len(variables.parameters) > 1):
-            inside_zoom = ((variables.queue[0][variables.y_axe_position][0] >= variables.y_axe_limit_temp[0]) and \
-                           (variables.queue[0][variables.y_axe_position][1] <= variables.y_axe_limit_temp[1]))
-        return inside_zoom
-
-    def init_solvers(self):
-        variables.solver.reset()
-        variables.solver_neg.reset()
-        variables.solver.add(variables.constraints)
-        variables.solver_neg.add(z3.Not(variables.constraints))
-
     def main(self):
+        """The main function of this tool which tries to find safe and unsafe regions of the parameter space."""
         while variables.queue:
             if self.check_zoom() and (variables.queue[0][len(variables.parameters)] <= (2**variables.depth_limit)):
                 self.solveit(variables.queue[0])
