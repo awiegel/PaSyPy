@@ -47,41 +47,46 @@ class Settings(tk.Frame):
             self.window.geometry('+%d+%d' % ((self.winfo_x() + 700), (self.winfo_y() + 300)))
             self.window.configure(background='white')
             self.window.transient(self)
-            self.tk.call('wm', 'iconphoto', self.window._w, tk.PhotoImage(file='gear.png')) # pylint: disable=W0212 # only way to modify navigationtoolbar
+            self.tk.call('wm', 'iconphoto', self.window._w, tk.PhotoImage(file='images/gear.png')) # pylint: disable=W0212 # only way to modify navigationtoolbar
             self.settings_frame = tk.Frame(master=self.window, background='black')
             self.settings_frame.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
 
             self.hyperplane = tk.BooleanVar()
-            self.hyperplane_option = tk.Checkbutton(self.settings_frame, text='Hyperplane',variable=self.hyperplane, onvalue=True, offvalue=False, command=self.set_hyperplane_option, font=('',10), bg='white', fg='black', anchor=tk.W)
+            self.hyperplane_option = tk.Checkbutton(self.settings_frame, text='Hyperplane',variable=self.hyperplane, onvalue=True, offvalue=False,
+                                                    command=self.set_hyperplane_option, font=('',10), bg='white', fg='black', anchor=tk.W)
             self.hyperplane_option.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             if hyperplane:
                 self.hyperplane_option.select()
 
             self.hatch_pattern = tk.BooleanVar()
-            self.hatch_pattern_option = tk.Checkbutton(self.settings_frame, text='Hatch Pattern',variable=self.hatch_pattern, onvalue=True, offvalue=False, command=self.set_hatch_pattern_option, font=('',10), bg='white', fg='black', anchor=tk.W)
+            self.hatch_pattern_option = tk.Checkbutton(self.settings_frame, text='Hatch Pattern',variable=self.hatch_pattern, onvalue=True, offvalue=False,
+                                                       command=self.set_hatch_pattern_option, font=('',10), bg='white', fg='black', anchor=tk.W)
             self.hatch_pattern_option.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             if hatch_pattern:
                 self.hatch_pattern_option.select()
 
             self.white_boxes = tk.BooleanVar()
-            self.white_boxes_option = tk.Checkbutton(self.settings_frame, text='White Boxes',variable=self.white_boxes, onvalue=True, offvalue=False, command=self.set_white_boxes_option, font=('',10), bg='white', fg='black', anchor=tk.W)
+            self.white_boxes_option = tk.Checkbutton(self.settings_frame, text='White Boxes',variable=self.white_boxes, onvalue=True, offvalue=False,
+                                                     command=self.set_white_boxes_option, font=('',10), bg='white', fg='black', anchor=tk.W)
             self.white_boxes_option.grid(row=2, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             if white_boxes:
                 self.white_boxes_option.select()
 
             self.colorblind_mode = tk.BooleanVar()
-            self.colorblind_option = tk.Checkbutton(self.settings_frame, text='Colorblind',variable=self.colorblind_mode, onvalue=True, offvalue=False, command=self.set_colorblind_option, font=('',10), bg='white', fg='black', anchor=tk.W)
+            self.colorblind_option = tk.Checkbutton(self.settings_frame, text='Colorblind',variable=self.colorblind_mode, onvalue=True, offvalue=False,
+                                                    command=self.set_colorblind_option, font=('',10), bg='white', fg='black', anchor=tk.W)
             self.colorblind_option.grid(row=3, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             if colorblind_mode:
                 self.colorblind_option.select()
 
             self.skip_visualization = tk.BooleanVar()
-            self.skip_visualization_option = tk.Checkbutton(self.settings_frame, text='Skip Visualization',variable=self.skip_visualization, onvalue=True, offvalue=False, command=self.set_skip_visualization_option, font=('',10), bg='white', fg='black', anchor=tk.W)
+            self.skip_visualization_option = tk.Checkbutton(self.settings_frame, text='Skip Visualization',variable=self.skip_visualization, onvalue=True, offvalue=False,
+                                                            command=self.set_skip_visualization_option, font=('',10), bg='white', fg='black', anchor=tk.W)
             self.skip_visualization_option.grid(row=4, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             if skip_visualization:
                 self.skip_visualization_option.select()
 
-            self.github = tk.PhotoImage(file='GitHub-Emblem.png')
+            self.github = tk.PhotoImage(file='images/GitHub-Emblem.png')
             self.github_label = tk.Label(self.settings_frame, image=self.github, bg='black')
             self.github_label.grid(row=5, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             self.github_label.bind('<Button-1>', self.get_help)

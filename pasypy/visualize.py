@@ -102,11 +102,11 @@ class Visualize:
         hatch_pattern = self.get_hatch_pattern(area_color)
         for i in area:
             plt.plot([i[variables.x_axe_position][0],i[variables.x_axe_position][1],i[variables.x_axe_position][1],i[variables.x_axe_position][0],i[variables.x_axe_position][0]],
-                    [i[variables.y_axe_position][0],i[variables.y_axe_position][0],i[variables.y_axe_position][1],i[variables.y_axe_position][1],i[variables.y_axe_position][0]],
-                    color='black')
+                     [i[variables.y_axe_position][0],i[variables.y_axe_position][0],i[variables.y_axe_position][1],i[variables.y_axe_position][1],i[variables.y_axe_position][0]],
+                     color='black')
             plt.fill([i[variables.x_axe_position][0],i[variables.x_axe_position][1],i[variables.x_axe_position][1],i[variables.x_axe_position][0],i[variables.x_axe_position][0]],
-                    [i[variables.y_axe_position][0],i[variables.y_axe_position][0],i[variables.y_axe_position][1],i[variables.y_axe_position][1],i[variables.y_axe_position][0]],
-                    color=area_color, edgecolor='black', linewidth=0, hatch=hatch_pattern)
+                     [i[variables.y_axe_position][0],i[variables.y_axe_position][0],i[variables.y_axe_position][1],i[variables.y_axe_position][1],i[variables.y_axe_position][0]],
+                     color=area_color, edgecolor='black', linewidth=0, hatch=hatch_pattern)
 
     @staticmethod
     def plot_multi_dimensional_without_fill(area):
@@ -116,8 +116,8 @@ class Visualize:
         """
         for i in area:
             plt.plot([i[variables.x_axe_position][0],i[variables.x_axe_position][1],i[variables.x_axe_position][1],i[variables.x_axe_position][0],i[variables.x_axe_position][0]],
-                    [i[variables.y_axe_position][0],i[variables.y_axe_position][0],i[variables.y_axe_position][1],i[variables.y_axe_position][1],i[variables.y_axe_position][0]],
-                    color='black')
+                     [i[variables.y_axe_position][0],i[variables.y_axe_position][0],i[variables.y_axe_position][1],i[variables.y_axe_position][1],i[variables.y_axe_position][0]],
+                     color='black')
 
     def draw_green_area(self):
         """Draws the safe (green by default) area. Filters on more than two parameters with the order: safe > unknown > unsafe."""
@@ -135,10 +135,14 @@ class Visualize:
                 temp = safe_area_depth_filtered.copy()
                 for sub_area in safe_area_depth_filtered[:]:
                     for sub_area2 in safe_area_depth_filtered[:]:
-                        if (((sub_area2[variables.x_axe_position][0] >= sub_area[variables.x_axe_position][0]) and (sub_area2[variables.x_axe_position][1] <= sub_area[variables.x_axe_position][1])) and \
-                            ((sub_area2[variables.y_axe_position][0] >= sub_area[variables.y_axe_position][0]) and (sub_area2[variables.y_axe_position][1] <= sub_area[variables.y_axe_position][1]))) and \
-                            (((sub_area2[variables.x_axe_position][0] != sub_area[variables.x_axe_position][0]) or (sub_area2[variables.x_axe_position][1] != sub_area[variables.x_axe_position][1])) or \
-                            ((sub_area2[variables.y_axe_position][0] != sub_area[variables.y_axe_position][0]) or (sub_area2[variables.y_axe_position][1] != sub_area[variables.y_axe_position][1]))):
+                        if (((sub_area2[variables.x_axe_position][0] >= sub_area[variables.x_axe_position][0])   and \
+                             (sub_area2[variables.x_axe_position][1] <= sub_area[variables.x_axe_position][1]))  and \
+                            ((sub_area2[variables.y_axe_position][0] >= sub_area[variables.y_axe_position][0])   and \
+                             (sub_area2[variables.y_axe_position][1] <= sub_area[variables.y_axe_position][1]))) and \
+                           (((sub_area2[variables.x_axe_position][0] != sub_area[variables.x_axe_position][0])   or \
+                             (sub_area2[variables.x_axe_position][1] != sub_area[variables.x_axe_position][1]))  or \
+                            ((sub_area2[variables.y_axe_position][0] != sub_area[variables.y_axe_position][0])   or \
+                             (sub_area2[variables.y_axe_position][1] != sub_area[variables.y_axe_position][1]))):
                             temp.remove(sub_area)
                             break
                 self.filter_multiple_axes(temp, self.safe_area)
@@ -160,8 +164,10 @@ class Visualize:
                 temp = unsafe_area_depth_filtered.copy()
                 for sub_area in unsafe_area_depth_filtered[:]:
                     for sub_area_sub_queue in variables.sub_queue:
-                        if ((sub_area_sub_queue[variables.x_axe_position][0] >= sub_area[variables.x_axe_position][0]) and (sub_area_sub_queue[variables.x_axe_position][1] <= sub_area[variables.x_axe_position][1])) and \
-                            ((sub_area_sub_queue[variables.y_axe_position][0] >= sub_area[variables.y_axe_position][0]) and (sub_area_sub_queue[variables.y_axe_position][1] <= sub_area[variables.y_axe_position][1])):
+                        if ((sub_area_sub_queue[variables.x_axe_position][0] >= sub_area[variables.x_axe_position][0])  and \
+                            (sub_area_sub_queue[variables.x_axe_position][1] <= sub_area[variables.x_axe_position][1])) and \
+                           ((sub_area_sub_queue[variables.y_axe_position][0] >= sub_area[variables.y_axe_position][0])  and \
+                            (sub_area_sub_queue[variables.y_axe_position][1] <= sub_area[variables.y_axe_position][1])):
                             temp.remove(sub_area)
                             break
                 self.filter_multiple_axes(temp, self.unsafe_area)
@@ -180,8 +186,11 @@ class Visualize:
                 white_boxes = variables.sub_queue.copy() + variables.safe_area.copy() + variables.unsafe_area.copy()
                 for unknown_area in white_boxes[:]:
                     for safe_area in variables.safe_area:
-                        if ((unknown_area[variables.x_axe_position][0] >= safe_area[variables.x_axe_position][0]) and (unknown_area[variables.x_axe_position][1] <= safe_area[variables.x_axe_position][1])) and \
-                            ((unknown_area[variables.y_axe_position][0] >= safe_area[variables.y_axe_position][0]) and (unknown_area[variables.y_axe_position][1] <= safe_area[variables.y_axe_position][1])) and safe_area != unknown_area:
+                        if ((unknown_area[variables.x_axe_position][0] >= safe_area[variables.x_axe_position][0])  and \
+                            (unknown_area[variables.x_axe_position][1] <= safe_area[variables.x_axe_position][1])) and \
+                           ((unknown_area[variables.y_axe_position][0] >= safe_area[variables.y_axe_position][0])  and \
+                            (unknown_area[variables.y_axe_position][1] <= safe_area[variables.y_axe_position][1])) and \
+                            (safe_area != unknown_area):
                             white_boxes.remove(unknown_area)
                             break
                 temp = []
@@ -216,12 +225,12 @@ class Visualize:
         for i in self.safe_area:
             for x_pos in range(2):
                 for y_pos in range(2):
-                    X.append([i[variables.x_axe_position][x_pos],i[variables.y_axe_position][y_pos]])
+                    X.append([i[variables.x_axe_position][x_pos], i[variables.y_axe_position][y_pos]])
                     Y.append(0)
         for i in self.unsafe_area:
             for x_pos in range(2):
                 for y_pos in range(2):
-                    X.append([i[variables.x_axe_position][x_pos],i[variables.y_axe_position][y_pos]])
+                    X.append([i[variables.x_axe_position][x_pos], i[variables.y_axe_position][y_pos]])
                     Y.append(1)
         if 0 in Y and 1 in Y:
             clf = svm.SVC(kernel='rbf', C=1000)

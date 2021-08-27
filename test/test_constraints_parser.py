@@ -14,8 +14,8 @@ class TestConstraintsParser(unittest.TestCase):
         y = z3.Real('y')
         constraints = z3.And(x >= 1/2, y >= 1/2, x >= y)
 
-        self.assertEqual(variables.Constraints, constraints)
-        self.assertEqual(type(variables.Constraints), type(constraints))
+        self.assertEqual(variables.constraints, constraints)
+        self.assertEqual(type(variables.constraints), type(constraints))
         self.assertEqual(variables.parameters, [x,y])
 
 
@@ -30,8 +30,8 @@ class TestConstraintsParser(unittest.TestCase):
         q = z3.Real('q')
         constraints = z3.Exists(z, z3.Exists([p,q], z3.And(x >= 1/2, y >= 1/2, y <= z, z <= x, p >= 1/4, p <= z, q <= 3/4, q >= z)))
 
-        self.assertEqual(variables.Constraints, constraints)
-        self.assertEqual(type(variables.Constraints), type(constraints))
+        self.assertEqual(variables.constraints, constraints)
+        self.assertEqual(type(variables.constraints), type(constraints))
         self.assertEqual(variables.parameters, [x,y])
 
 
@@ -44,8 +44,8 @@ class TestConstraintsParser(unittest.TestCase):
         z = z3.Real('z')
         constraints = z3.Exists(z, z3.And(x >= 1/2, y >= 1/2, z > x, z < y))
 
-        self.assertEqual(variables.Constraints, constraints)
-        self.assertEqual(type(variables.Constraints), type(constraints))
+        self.assertEqual(variables.constraints, constraints)
+        self.assertEqual(type(variables.constraints), type(constraints))
         self.assertEqual(variables.parameters, [x,y])
     
     
@@ -58,6 +58,6 @@ class TestConstraintsParser(unittest.TestCase):
         z = z3.Real('z')
         constraints = z3.Exists(z, z3.And(z + z + x >= 1/2, z + z - y >= 1/2, z > x, z < y))
 
-        self.assertEqual(variables.Constraints, constraints)
-        self.assertEqual(type(variables.Constraints), type(constraints))
+        self.assertEqual(variables.constraints, constraints)
+        self.assertEqual(type(variables.constraints), type(constraints))
         self.assertEqual(variables.parameters, [x,y])

@@ -226,7 +226,7 @@ class MainApplication(tk.Frame):
         self.frame13 = tk.Frame(master=self.frame1, background='black')
         self.frame13.grid(row=2, column=0, sticky=tk.SW, padx=5, pady=5)
 
-        self.background_image = tk.PhotoImage(file='logo_ths.png')
+        self.background_image = tk.PhotoImage(file='images/logo_ths.png')
         self.background_label = tk.Label(self.frame13, image=self.background_image)
         self.background_label.grid(row=0, column=0, sticky=tk.SW, padx=1, pady=1)
         self.background_label.bind('<Button-1>', self.on_click)
@@ -256,7 +256,7 @@ class MainApplication(tk.Frame):
         self.file_path_label = tk.Label(self.frame21, text='no file loaded', height=2, bg='black', fg='white', anchor=tk.W, font=('',10))
         self.file_path_label.grid(row=0, column=4, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
 
-        self.settings_image = tk.PhotoImage(file='gear.png')
+        self.settings_image = tk.PhotoImage(file='images/gear.png')
         self.settings_label = tk.Label(self.frame12, image=self.settings_image, bg='black', fg='black')
         self.settings_label.grid(row=0, column=0, sticky=tk.NE, padx=1, pady=1)
         self.settings_label.bind('<Button-1>', self.on_click)
@@ -313,7 +313,7 @@ class MainApplication(tk.Frame):
         self.opt_y_axe = tk.OptionMenu(self.frame12, self.variable_y_axe, *[''])
         self.opt_y_axe.configure(state='disabled', font=('',10), width=1, relief='solid')
         self.opt_y_axe.grid(row=0, column=0, sticky=tk.W, padx=1)
-        self.settings_image = tk.PhotoImage(file='gear.png')
+        self.settings_image = tk.PhotoImage(file='images/gear.png')
         self.settings_label = tk.Label(self.frame12, image=self.settings_image, bg='white', fg='black')
         self.settings_label.grid(row=0, column=0, sticky=tk.NE, padx=(0,1), pady=(1,0))
         self.settings_label.bind('<Button-1>', settings.Settings(self).on_click)
