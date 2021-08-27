@@ -1,2 +1,5 @@
 logs
 __pycache__
+*.smt2
+htmlcov
+.coverage
