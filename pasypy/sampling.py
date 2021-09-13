@@ -1,11 +1,11 @@
-"""Optimize performance by sampling."""
+"""Optimizes performance by sampling."""
 
 from z3.z3 import RatNumRef
 from pasypy import variables
 
 
 class PreSampling:
-    """Optimize performance by pre-sampling constraints on input."""
+    """Optimizes performance by pre-sampling constraints on input."""
 
     EQUIVALENCE_CLASSES = [['>=','<'],['<=','>'],['==','!=']]
     FACTOR =  0.00000001
@@ -101,3 +101,147 @@ class PreSampling:
         self.pre_sampling_length = len(variables.queue)
         variables.queue = variables.queue + temp_list
         self._set_depth()
+
+
+class Sampling:
+    """Optimizes performance by sampling before every split."""
+
+    def __init__(self):
+        pass
+
+    def sampling_default(self, area, borders):
+        """Tries to find a more suitable candidate for splitting on each axis.
+
+        :param area: The currently considered area across all dimensions.
+        :param borders: The array where new borders are appended.
+        """
+        for index, value in enumerate(variables.parameters):
+            factor = (area[index][1] - area[index][0]) / 1000
+            self.add_mid_points(area, index)
+            first_point = (area[index][0] + area[index][1]) / 2
+            first_point_status = self.check_point(first_point, index)
+
+            found = False
+            test_point_status = self.check_bounds(area[index][0], first_point, value)
+            if test_point_status != first_point_status:
+                counter = 0
+                test_point = first_point
+                while counter < 499:
+                    test_point -= factor
+                    test_point_status = self.check_point(test_point, index)
+                    if test_point_status != first_point_status:
+                        found = True
+                        break
+                    counter += 1
+
+            if not found:
+                test_point_status = self.check_bounds(first_point, area[index][1], value)
+                if test_point_status != first_point_status:
+                    counter = 0
+                    test_point = first_point
+                    while counter < 499:
+                        test_point += factor
+                        test_point_status = self.check_point(test_point, index)
+                        if test_point_status != first_point_status:
+                            found = True
+                            break
+                        counter += 1
+            if found:
+                borders.append([[area[index][0], test_point], [test_point, area[index][1]]])
+            else:
+                borders.append([[area[index][0], first_point], [first_point, area[index][1]]])
+            self.remove_mid_points()
+
+
+    def sampling_simple(self, area, borders, index):
+        """Tries to find a more suitable candidate for splitting on a single axis.
+
+        :param area: The currently considered area across all dimensions.
+        :param borders: The array where new borders are appended.
+        :param index: The index of the currently considered parameter.
+        """
+        factor = (area[index][1] - area[index][0]) / 1000
+        self.add_mid_points(area, index)
+        first_point = (area[index][0] + area[index][1]) / 2
+        first_point_status = self.check_point(first_point, index)
+
+        found = False
+        test_point_status = self.check_bounds(area[index][0], first_point, variables.parameters[index])
+        if test_point_status != first_point_status:
+            counter = 0
+            test_point = first_point
+            while counter < 499:
+                test_point -= factor
+                test_point_status = self.check_point(test_point, index)
+                if test_point_status != first_point_status:
+                    found = True
+                    break
+                counter += 1
+
+        if not found:
+            test_point_status = self.check_bounds(first_point, area[index][1], variables.parameters[index])
+            if test_point_status != first_point_status:
+                counter = 0
+                test_point = first_point
+                while counter < 499:
+                    test_point += factor
+                    test_point_status = self.check_point(test_point, index)
+                    if test_point_status != first_point_status:
+                        found = True
+                        break
+                    counter += 1
+
+        self.remove_mid_points()
+        if found:
+            borders.append([area[index][0], test_point])
+            borders.append([test_point, area[index][1]])
+        else:
+            borders.append([area[index][0], first_point])
+            borders.append([first_point, area[index][1]])
+
+    @staticmethod
+    def check_bounds(left, right, parameter):
+        """Checks a specific interval for satisfiability.
+
+        :param left: The left boundary of the interval.
+        :param right: The right boundary of the interval.
+        :param parameter: The currently considered parameter.
+        :return: The status of the solver check.
+        """
+        variables.solver.push()
+        variables.solver.add(parameter > left)
+        variables.solver.add(parameter < right)
+        status = variables.solver.check()
+        variables.solver.pop()
+        return status
+
+    @staticmethod
+    def check_point(point, current_index):
+        """Checks a specific point for satisfiability.
+
+        :param point: The exact point to check.
+        :param current_index: The index of the currently considered parameter.
+        :return: The status of the solver check.
+        """
+        variables.solver.push()
+        variables.solver.add(variables.parameters[current_index] == point)
+        status = variables.solver.check()
+        variables.solver.pop()
+        return status
+
+    @staticmethod
+    def add_mid_points(area, current_index):
+        """Adds the exact middle point on each axis different to the currently considered axis.
+
+        :param area: The currently considered area across all dimensions.
+        :param current_index: The index of the currently considered parameter.
+        """
+        variables.solver.push()
+        for index, value in enumerate(variables.parameters):
+            if index != current_index:
+                variables.solver.add(value == (area[current_index][0] + area[current_index][1])/2)
+
+    @staticmethod
+    def remove_mid_points():
+        """Removes all middle points."""
+        variables.solver.pop()

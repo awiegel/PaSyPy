@@ -5,6 +5,8 @@ import random
 import z3
 
 from pasypy import variables
+from pasypy import settings
+from pasypy.sampling import Sampling
 
 
 SPLITTING_HEURISTIC = ['Default','Simple','Extended','Random']
@@ -31,9 +33,13 @@ class SplittingHeuristic:
         """
         depth = area[len(variables.parameters)]*(2**len(variables.parameters))
         borders = []
-        for i in range(len(variables.parameters)):
-            half_area = (area[i][1] - area[i][0]) / 2
-            borders.append([[(area[i][0] + half_area), area[i][1]], [area[i][0], (area[i][1] - half_area)]])
+
+        if settings.sampling:
+            Sampling().sampling_default(area, borders)
+        else:
+            for i in range(len(variables.parameters)):
+                half_area = (area[i][1] - area[i][0]) / 2
+                borders.append([[(area[i][0] + half_area), area[i][1]], [area[i][0], (area[i][1] - half_area)]])
         cross = itertools.product(*borders, repeat=1)
         for i in cross:
             i = i[:len(variables.parameters)] + (depth,)
@@ -47,24 +53,27 @@ class SplittingHeuristic:
         :param area: The currently considered area across all dimensions.
         """
         depth = area[len(variables.parameters)]*2
-        counter = 0
+        borders = []
+        index = 0
         temp_depth = (depth/2)/2
         while temp_depth >= 1:
             temp_depth /= 2
-            counter += 1
-        counter %= len(variables.parameters)
-        half_area = (area[counter][1] - area[counter][0]) / 2
-        new_interval1 = [area[counter][0], (area[counter][1] - half_area)]
-        new_interval2 = [(area[counter][0] + half_area), area[counter][1]]
-        area1 = area
-        area1 = list(area1)
-        area1[counter] = new_interval1
+            index += 1
+        index %= len(variables.parameters)
+
+        if settings.sampling:
+            Sampling().sampling_simple(area, borders, index)
+        else:
+            half_area = (area[index][1] - area[index][0]) / 2
+            borders.append([area[index][0], (area[index][1] - half_area)])
+            borders.append([(area[index][0] + half_area), area[index][1]])
+        area1 = list(area)
+        area1[index] = borders[0]
         area1[len(variables.parameters)] = depth
         area1 = tuple(area1)
         variables.queue.append(area1)
-        area2 = area
-        area2 = list(area2)
-        area2[counter] = new_interval2
+        area2 = list(area)
+        area2[index] = borders[1]
         area2[len(variables.parameters)] = depth
         area2 = tuple(area2)
         variables.queue.append(area2)

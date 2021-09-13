@@ -7,7 +7,7 @@ from pasypy import color
 from pasypy.color import Color
 
 pre_sampling = True # pylint: disable=C0103 # is not a constant
-sampling = True # pylint: disable=C0103 # is not a constant
+sampling = False # pylint: disable=C0103 # is not a constant
 hyperplane = False # pylint: disable=C0103 # is not a constant
 white_boxes = False # pylint: disable=C0103 # is not a constant
 colorblind_mode = False # pylint: disable=C0103 # is not a constant
@@ -134,11 +134,13 @@ class Settings(tk.Frame):
         """Sets the 'Pre-Sampling' option from the checkbox."""
         global pre_sampling # pylint: disable=C0103 # is not a constant
         pre_sampling = self.pre_sampling.get()
+        self.parent.edit()
 
     def set_sampling_option(self):
         """Sets the 'Sampling' option from the checkbox."""
         global sampling # pylint: disable=C0103 # is not a constant
         sampling = self.sampling.get()
+        self.parent.edit()
 
     def set_hyperplane_option(self):
         """Sets the 'hyperplane' option from the checkbox."""
