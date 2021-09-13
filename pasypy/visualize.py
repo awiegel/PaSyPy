@@ -119,6 +119,19 @@ class Visualize:
                      [i[variables.y_axe_position][0],i[variables.y_axe_position][0],i[variables.y_axe_position][1],i[variables.y_axe_position][1],i[variables.y_axe_position][0]],
                      color='black')
 
+    @staticmethod
+    def _check_if_region_is_inside_other_region(region1, region2):
+        """Checks if one region2 is inside region1.
+
+        :param region1: The overlying region.
+        :param region2: The underlying region.
+        :return: True, if region2 is inside region1.
+        """
+        return ((region2[variables.x_axe_position][0] >= region1[variables.x_axe_position][0])  and \
+                (region2[variables.x_axe_position][1] <= region1[variables.x_axe_position][1])) and \
+               ((region2[variables.y_axe_position][0] >= region1[variables.y_axe_position][0])  and \
+                (region2[variables.y_axe_position][1] <= region1[variables.y_axe_position][1]))
+
     def draw_green_area(self):
         """Draws the safe (green by default) area. Filters on more than two parameters with the order: safe > unknown > unsafe."""
         safe_area_depth_filtered = []
@@ -135,10 +148,7 @@ class Visualize:
                 temp = safe_area_depth_filtered.copy()
                 for sub_area in safe_area_depth_filtered[:]:
                     for sub_area2 in safe_area_depth_filtered[:]:
-                        if (((sub_area2[variables.x_axe_position][0] >= sub_area[variables.x_axe_position][0])   and \
-                             (sub_area2[variables.x_axe_position][1] <= sub_area[variables.x_axe_position][1]))  and \
-                            ((sub_area2[variables.y_axe_position][0] >= sub_area[variables.y_axe_position][0])   and \
-                             (sub_area2[variables.y_axe_position][1] <= sub_area[variables.y_axe_position][1]))) and \
+                        if (self._check_if_region_is_inside_other_region(sub_area2, sub_area))                   and \
                            (((sub_area2[variables.x_axe_position][0] != sub_area[variables.x_axe_position][0])   or \
                              (sub_area2[variables.x_axe_position][1] != sub_area[variables.x_axe_position][1]))  or \
                             ((sub_area2[variables.y_axe_position][0] != sub_area[variables.y_axe_position][0])   or \
@@ -164,10 +174,7 @@ class Visualize:
                 temp = unsafe_area_depth_filtered.copy()
                 for sub_area in unsafe_area_depth_filtered[:]:
                     for sub_area_sub_queue in variables.sub_queue:
-                        if ((sub_area_sub_queue[variables.x_axe_position][0] >= sub_area[variables.x_axe_position][0])  and \
-                            (sub_area_sub_queue[variables.x_axe_position][1] <= sub_area[variables.x_axe_position][1])) and \
-                           ((sub_area_sub_queue[variables.y_axe_position][0] >= sub_area[variables.y_axe_position][0])  and \
-                            (sub_area_sub_queue[variables.y_axe_position][1] <= sub_area[variables.y_axe_position][1])):
+                        if self._check_if_region_is_inside_other_region(sub_area, sub_area_sub_queue):
                             temp.remove(sub_area)
                             break
                 self.filter_multiple_axes(temp, self.unsafe_area)
@@ -186,11 +193,8 @@ class Visualize:
                 white_boxes = variables.sub_queue.copy() + variables.safe_area.copy() + variables.unsafe_area.copy()
                 for unknown_area in white_boxes[:]:
                     for safe_area in variables.safe_area:
-                        if ((unknown_area[variables.x_axe_position][0] >= safe_area[variables.x_axe_position][0])  and \
-                            (unknown_area[variables.x_axe_position][1] <= safe_area[variables.x_axe_position][1])) and \
-                           ((unknown_area[variables.y_axe_position][0] >= safe_area[variables.y_axe_position][0])  and \
-                            (unknown_area[variables.y_axe_position][1] <= safe_area[variables.y_axe_position][1])) and \
-                            (safe_area != unknown_area):
+                        if self._check_if_region_is_inside_other_region(safe_area, unknown_area) and \
+                           (safe_area != unknown_area):
                             white_boxes.remove(unknown_area)
                             break
                 temp = []
