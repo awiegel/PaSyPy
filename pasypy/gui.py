@@ -33,6 +33,7 @@ class MainApplication(tk.Frame):
         tk.Grid.rowconfigure(self.parent, index=0, weight=1)
         tk.Grid.columnconfigure(self.parent, index=0, weight=0)
         tk.Grid.columnconfigure(self.parent, index=1, weight=1)
+        self.tk.call('wm', 'iconphoto', self.parent._w, tk.PhotoImage(file='images/PaSyPy_logo.png'))
 
         self.line = 0
         self.file_path = None
