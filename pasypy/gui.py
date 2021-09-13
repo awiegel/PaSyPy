@@ -389,17 +389,24 @@ class MainApplication(tk.Frame):
         variables.y_axe_limit_temp = variables.y_axe_limit
         self.restore_default()
 
+    def _check_correct_parsing(self, constraints_parser, insert=False):
+        if variables.constraints is not None:
+            if insert:
+                self.text.insert('1.0', variables.constraints)
+            if settings.pre_sampling:
+                constraints_parser.pre_sampling.pre_sampling()
+        else:
+            self.ready_label.configure(text='ERROR')
+
     def read_file(self):
         """Reads the constraints from the selected file and tries to parse them."""
         if self.file_path:
             self.file_path_label.configure(text=os.path.basename(self.file_path), anchor=tk.W)
-            ConstraintsParser().parse_from_file(self.file_path)
-            self.text.delete('1.0', 'end-1c')
-            if variables.constraints is not None:
-                self.text.insert('1.0', variables.constraints)
-            else:
-                self.ready_label.configure(text='ERROR')
+            constraints_parser = ConstraintsParser()
+            constraints_parser.parse_from_file(self.file_path)
             self.restore_default()
+            self.text.delete('1.0', 'end-1c')
+            self._check_correct_parsing(constraints_parser, True)
 
     def open_file(self):
         """Opens a SMT-LIB file (.smt2)."""
@@ -413,13 +420,11 @@ class MainApplication(tk.Frame):
     def edit(self):
         """Sets the constraints from the text field as the new constraints."""
         text = self.text.get('1.0', 'end-1c')
-        if self.text.compare('1.0', '!=', 'end-1c') and text != str(variables.constraints):
-            ConstraintsParser().parse_from_textfield(text)
-            if variables.constraints is not None:
-                self.ready_label.configure(text='READY')
-            else:
-                self.ready_label.configure(text='ERROR')
+        if self.text.compare('1.0', '!=', 'end-1c'):
+            constraints_parser = ConstraintsParser()
+            constraints_parser.parse_from_textfield(text)
             self.restore_default()
+            self._check_correct_parsing(constraints_parser)
 
     @staticmethod
     def save():

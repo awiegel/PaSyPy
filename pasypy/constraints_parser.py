@@ -3,6 +3,8 @@
 import re
 from z3 import * # pylint: disable=W0614,W0401 # wildcard import is necessary to parse the constraints dynamically
 from pasypy import variables
+from pasypy import settings
+from pasypy.sampling import PreSampling
 
 del u # z3 wildcard import is necessary and it defines 'u' which cannot be used in constraints -> delete it
 
@@ -11,7 +13,8 @@ class ConstraintsParser:
     """Handles the parsing of the given constraints."""
 
     def __init__(self):
-        pass
+        if settings.pre_sampling:
+            self.pre_sampling = PreSampling()
 
     def _get_number_of_vars(self, formula):
         """Extracts all parameters from the new constraints.
@@ -21,6 +24,8 @@ class ConstraintsParser:
         if isinstance(formula, z3.z3.QuantifierRef):
             self._get_number_of_vars(formula.body())
         elif isinstance(formula, z3.z3.BoolRef):
+            if settings.pre_sampling:
+                self.pre_sampling.get_pre_sampling_candidate(formula)
             for sub_formula in formula.children():
                 self._get_number_of_vars(sub_formula)
         elif type(formula) is z3.z3.ArithRef: # pylint: disable=C0123 # isinstance checks for subclasses which cannot be used here
