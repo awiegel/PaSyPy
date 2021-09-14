@@ -508,7 +508,7 @@ class MainApplication(tk.Frame):
         """After checking pre-conditions, starts the calculation consisting of computation and visualization."""
         if variables.constraints is not None:
             self.get_graph_axes()
-            if (self.changed or (variables.depth_limit > self.current_depth_limit)):
+            if self.changed or (variables.depth_limit > self.current_depth_limit) or variables.queue:
                 if variables.sub_queue:
                     variables.queue.extend(variables.sub_queue)
                     variables.sub_queue = []
