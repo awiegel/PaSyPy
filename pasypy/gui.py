@@ -40,12 +40,10 @@ class MainApplication(tk.Frame):
         self.computation_timer = Timer()
         self.area_calculation = AreaCalculation()
 
-        self.parent.bind('+', lambda _: self.increase_accuracy())
-        self.parent.bind('-', lambda _: self.decrease_accuracy())
-        self.parent.bind('<Escape>', lambda _: self.parent.quit())
-        self.parent.bind('o', lambda _: self.open_file())
-        self.parent.bind('r', lambda _: self.reload_file())
-        self.parent.bind('<space>', lambda _: self.update())
+        self.parent.bind('<Control-plus>', lambda _: self.increase_accuracy())
+        self.parent.bind('<Control-minus>', lambda _: self.decrease_accuracy())
+        self.parent.bind('<Control-o>', lambda _: self.open_file())
+        self.parent.bind('<Control-r>', lambda _: self.reload_file())
 
         self.changed = True
         self.current_depth_limit = 0
