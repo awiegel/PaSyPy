@@ -52,7 +52,7 @@ class ConstraintsParser:
             variables.constraints = parse_smt2_file(file_path, ctx=Context())[0] # provide own context because parser might be stuck in main context
             variables.constraints = parse_smt2_file(file_path)[0] # re-read correct file with main context
             self._set_new_constraints()
-        except z3.z3types.Z3Exception as e:
+        except z3types.Z3Exception as e:
             variables.constraints = None
             print(e)
 
