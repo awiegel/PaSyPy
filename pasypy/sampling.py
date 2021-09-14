@@ -1,6 +1,7 @@
 """Optimizes performance by sampling."""
 
-from z3.z3 import RatNumRef
+import z3
+
 from pasypy import variables
 
 
@@ -22,7 +23,7 @@ class PreSampling:
 
         :param formula: The currently considered part of the formula.
         """
-        if (formula.num_args() == 2) and (isinstance(formula.children()[0], RatNumRef) != isinstance(formula.children()[1], RatNumRef)):
+        if (formula.num_args() == 2) and (isinstance(formula.children()[0], z3.z3.RatNumRef) != isinstance(formula.children()[1], z3.z3.RatNumRef)):
             self.candidates.append(formula)
 
     def _create_instructions(self):
@@ -116,38 +117,34 @@ class Sampling:
         :param borders: The array where new borders are appended.
         """
         for index, value in enumerate(variables.parameters):
-            factor = (area[index][1] - area[index][0]) / 1000
             self.add_mid_points(area, index)
             first_point = (area[index][0] + area[index][1]) / 2
             first_point_status = self.check_point(first_point, index)
-
             found = False
-            test_point_status = self.check_bounds(area[index][0], first_point, value)
-            if test_point_status != first_point_status:
-                counter = 0
-                test_point = first_point
-                while counter < 499:
-                    test_point -= factor
-                    test_point_status = self.check_point(test_point, index)
+            new_mid = 0
+            if self.check_bounds(area[index][0], first_point, value, first_point_status):
+                new_mid = (area[index][0] + first_point) / 2
+                while not found:
+                    test_point_status = self.check_point(new_mid, index)
                     if test_point_status != first_point_status:
                         found = True
                         break
-                    counter += 1
+                    new_mid = (area[index][0] + new_mid) / 2
 
             if not found:
-                test_point_status = self.check_bounds(first_point, area[index][1], value)
-                if test_point_status != first_point_status:
-                    counter = 0
-                    test_point = first_point
-                    while counter < 499:
-                        test_point += factor
-                        test_point_status = self.check_point(test_point, index)
+                if self.check_bounds(first_point, area[index][1], value, first_point_status):
+                    new_mid = (area[index][1] + first_point) / 2
+                    while not found:
+                        test_point_status = self.check_point(new_mid, index)
                         if test_point_status != first_point_status:
                             found = True
                             break
-                        counter += 1
+                        new_mid = (area[index][1] + new_mid) / 2
+                        if test_point_status != first_point_status:
+                            found = True
+                            break
             if found:
-                borders.append([[area[index][0], test_point], [test_point, area[index][1]]])
+                borders.append([[area[index][0], new_mid], [new_mid, area[index][1]]])
             else:
                 borders.append([[area[index][0], first_point], [first_point, area[index][1]]])
             self.remove_mid_points()
@@ -160,60 +157,69 @@ class Sampling:
         :param borders: The array where new borders are appended.
         :param index: The index of the currently considered parameter.
         """
-        factor = (area[index][1] - area[index][0]) / 1000
         self.add_mid_points(area, index)
         first_point = (area[index][0] + area[index][1]) / 2
         first_point_status = self.check_point(first_point, index)
 
         found = False
-        test_point_status = self.check_bounds(area[index][0], first_point, variables.parameters[index])
-        if test_point_status != first_point_status:
-            counter = 0
-            test_point = first_point
-            while counter < 499:
-                test_point -= factor
-                test_point_status = self.check_point(test_point, index)
+        new_mid = 0
+        if self.check_bounds(area[index][0], first_point, variables.parameters[index], first_point_status):
+            new_mid = (area[index][0] + first_point) / 2
+            while not found:
+                test_point_status = self.check_point(new_mid, index)
                 if test_point_status != first_point_status:
                     found = True
                     break
-                counter += 1
+                new_mid = (area[index][0] + new_mid) / 2
 
         if not found:
-            test_point_status = self.check_bounds(first_point, area[index][1], variables.parameters[index])
-            if test_point_status != first_point_status:
-                counter = 0
-                test_point = first_point
-                while counter < 499:
-                    test_point += factor
-                    test_point_status = self.check_point(test_point, index)
+            if self.check_bounds(first_point, area[index][1], variables.parameters[index], first_point_status):
+                new_mid = (area[index][1] + first_point) / 2
+                while not found:
+                    test_point_status = self.check_point(new_mid, index)
                     if test_point_status != first_point_status:
                         found = True
                         break
-                    counter += 1
+                    new_mid = (area[index][1] + new_mid) / 2
+                    if test_point_status != first_point_status:
+                        found = True
+                        break
 
         self.remove_mid_points()
         if found:
-            borders.append([area[index][0], test_point])
-            borders.append([test_point, area[index][1]])
+            borders.append([area[index][0], new_mid])
+            borders.append([new_mid, area[index][1]])
         else:
             borders.append([area[index][0], first_point])
             borders.append([first_point, area[index][1]])
-
     @staticmethod
-    def check_bounds(left, right, parameter):
+    def check_bounds(left, right, parameter, first_status):
         """Checks a specific interval for satisfiability.
 
         :param left: The left boundary of the interval.
         :param right: The right boundary of the interval.
         :param parameter: The currently considered parameter.
-        :return: The status of the solver check.
+        :return: True, if array potentially contains better region candidate.
         """
+        better_candidate = False
         variables.solver.push()
         variables.solver.add(parameter > left)
         variables.solver.add(parameter < right)
         status = variables.solver.check()
         variables.solver.pop()
-        return status
+        if first_status == z3.sat:
+            if status == first_status:
+                variables.solver_neg.push()
+                variables.solver_neg.add(parameter > left)
+                variables.solver_neg.add(parameter < right)
+                status = variables.solver_neg.check()
+                variables.solver_neg.pop()
+                if status == first_status:
+                    better_candidate = True
+        else:
+            if status == z3.sat:
+                better_candidate = True
+        return better_candidate
 
     @staticmethod
     def check_point(point, current_index):
@@ -240,6 +246,7 @@ class Sampling:
         for index, value in enumerate(variables.parameters):
             if index != current_index:
                 variables.solver.add(value == (area[current_index][0] + area[current_index][1])/2)
+                variables.solver_neg.add(value == (area[current_index][0] + area[current_index][1])/2)
 
     @staticmethod
     def remove_mid_points():
