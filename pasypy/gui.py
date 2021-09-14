@@ -35,6 +35,7 @@ class MainApplication(tk.Frame):
         tk.Grid.columnconfigure(self.parent, index=1, weight=1)
         self.tk.call('wm', 'iconphoto', self.parent._w, tk.PhotoImage(file='images/PaSyPy_logo.png'))
 
+        self.running = False
         self.line = 0
         self.file_path = None
         self.computation_timer = Timer()
@@ -78,8 +79,10 @@ class MainApplication(tk.Frame):
         #### START - FRAME 1.1.1.2 #
         self.frame1112 = tk.Frame(master=self.frame111, background='white')
         self.frame1112.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
-        self.compute_button = tk.Button(self.frame1112, text='Compute', command=self.start_calculation, bg='steel blue', fg='white', font=('',25))
-        self.compute_button.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+        self.compute_button = tk.Button(self.frame1112, text='Compute', command=self.start_calculation, bg='steel blue', fg='white', font=('',20))
+        self.compute_button.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=(0,5))
+        self.stop_button = tk.Button(self.frame1112, text='X', command=self.stop_calculation, bg='steel blue', fg='white', font=('',20))
+        self.stop_button.grid(row=0, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=(0,5), pady=(0,5))
 
         tk.Grid.rowconfigure(self.frame1112, index=0, weight=1)
         tk.Grid.columnconfigure(self.frame1112, index=0, weight=1)
@@ -484,7 +487,9 @@ class MainApplication(tk.Frame):
         self.ready_label.configure(text='COMPUTING...')
         self.ready_label.update()
         self.computation_timer.create_timestamp('Computation')
-        PaSyPy().main()
+        self.running = True
+        PaSyPy().main(self)
+        self.running = False
         self.computation_timer.calculate_time('Computation')
         self.computation_time.config(text='Computation Time         : {} sec.'.format(round(self.computation_timer.get_time('Computation'), 3)))
 
@@ -520,6 +525,10 @@ class MainApplication(tk.Frame):
             self.update_window()
             self.add_axes_field(update=True)
             self.ready_label.configure(text='FINISHED')
+
+    def stop_calculation(self):
+        """Immediately stops the computation."""
+        self.running = False
 
     def update_window(self):
         """Updates the information window."""

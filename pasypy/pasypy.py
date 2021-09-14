@@ -79,12 +79,13 @@ class PaSyPy:
         else:
             print('TIMEOUT', variables.solver.reason_unknown()) # pragma: no cover
 
-    def main(self):
+    def main(self, application):
         """The main function of this tool which tries to find safe and unsafe regions of the parameter space."""
-        while variables.queue:
+        while variables.queue and application.running:
             if self.check_zoom() and (variables.queue[0][len(variables.parameters)] <= (2**variables.depth_limit)):
                 self.solveit(variables.queue[0])
             else:
                 variables.sub_queue.append(variables.queue[0])
                 variables.queue.pop(0)
+            application.update() # prevents the GUI to get stuck in this loop
         Logger().create_logfiles()
