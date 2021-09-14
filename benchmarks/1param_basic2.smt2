@@ -1,0 +1,6 @@
+(set-logic NRA)
+(set-info :source | Produced by Alexander Wiegel |)
+(set-info :smt-lib-version 2.0)
+(declare-fun x () Real)
+(assert (or (<=  x 0.2) (>=  x 0.8)))
+(check-sat)

@@ -1,0 +1,7 @@
+(set-logic NRA)
+(set-info :source | Produced by Alexander Wiegel |)
+(set-info :smt-lib-version 2.0)
+(declare-fun x () Real)
+(declare-fun y () Real)
+(assert (and (>= (* 2 (* x (* x x))) (- (* x y) 0.1)) (>= x 0.1) (>= y 0.1)))
+(check-sat)

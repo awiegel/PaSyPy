@@ -1,0 +1,8 @@
+(set-logic QF_NRA)
+(set-info :source | Produced by tarski version 1.29  |)
+(set-info :smt-lib-version 2.0)
+(declare-fun m () Real)
+(declare-fun v11 () Real)
+(declare-fun v10 () Real)
+(assert (exists ((v11 Real)(v10 Real))  (and (>  m 0) (>  v11 0) (=  (+ (+ 1 (* v11 (* v11 (- 4)))) (* v10 (* v10 4))) 0) (= (* (- 1) (+ (- 1) (* v11 (* v11 (+ (- 1) m))))) 0))))
+(check-sat)
