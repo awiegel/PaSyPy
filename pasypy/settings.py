@@ -59,14 +59,14 @@ class Settings(tk.Frame):
 
             self.pre_sampling = tk.BooleanVar()
             self.pre_sampling_option = tk.Checkbutton(self.settings_frame, text='Pre-Sampling',variable=self.pre_sampling, onvalue=True, offvalue=False,
-                                                            command=self.set_pre_sampling_option, font=('',10), bg='white', fg='black', anchor=tk.W)
+                                                      command=self.set_pre_sampling_option, font=('',10), bg='white', fg='black', anchor=tk.W)
             self.pre_sampling_option.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             if pre_sampling:
                 self.pre_sampling_option.select()
 
             self.sampling = tk.BooleanVar()
             self.sampling_option = tk.Checkbutton(self.settings_frame, text='Sampling',variable=self.sampling, onvalue=True, offvalue=False,
-                                                            command=self.set_sampling_option, font=('',10), bg='white', fg='black', anchor=tk.W)
+                                                  command=self.set_sampling_option, font=('',10), bg='white', fg='black', anchor=tk.W, state='disabled')
             self.sampling_option.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             if sampling:
                 self.sampling_option.select()
