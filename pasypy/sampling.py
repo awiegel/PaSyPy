@@ -8,7 +8,7 @@ class PreSampling:
     """Optimizes performance by pre-sampling constraints on input."""
 
     EQUIVALENCE_CLASSES = [['>=','<'],['<=','>'],['==','!=']]
-    FACTOR =  0.00000001
+    FACTOR =  0.0001
 
     def __init__(self):
         """Initializes the pre-sampling class."""
