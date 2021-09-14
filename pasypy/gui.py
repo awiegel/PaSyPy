@@ -375,12 +375,20 @@ class MainApplication(tk.Frame):
         """Sets the complete considered interval."""
         lim_inf = self.minimum.get()
         if lim_inf:
-            lim_inf = float(lim_inf.replace(',','.'))
+            try:
+                lim_inf = float(lim_inf.replace(',','.'))
+            except ValueError as error:
+                print(error)
+                return
         else:
             lim_inf = variables.x_axe_limit[0]
         lim_sup = self.maximum.get()
         if lim_sup:
-            lim_sup = float(lim_sup.replace(',','.'))
+            try:
+                lim_sup = float(lim_sup.replace(',','.'))
+            except ValueError as error:
+                print(error)
+                return
         else:
             lim_sup = variables.x_axe_limit[1]
         variables.x_axe_limit = [lim_inf, lim_sup]
