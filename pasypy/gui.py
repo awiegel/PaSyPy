@@ -13,7 +13,7 @@ from pasypy.pasypy import PaSyPy
 from pasypy.visualize import Visualize
 from pasypy.logger import Logger
 from pasypy.timer import Timer
-from pasypy.constraints_parser import ConstraintsParser
+from pasypy.formula_parser import FormulaParser
 from pasypy.area_calculation import AreaCalculation
 
 
@@ -41,8 +41,8 @@ class MainApplication(tk.Frame):
         self.computation_timer = Timer()
         self.area_calculation = AreaCalculation()
 
-        self.parent.bind('<Control-plus>', lambda _: self.increase_accuracy())
-        self.parent.bind('<Control-minus>', lambda _: self.decrease_accuracy())
+        self.parent.bind('<Control-plus>', lambda _: self.increase_splits())
+        self.parent.bind('<Control-minus>', lambda _: self.decrease_splits())
         self.parent.bind('<Control-o>', lambda _: self.open_file())
         self.parent.bind('<Control-r>', lambda _: self.reload_file())
 
@@ -100,12 +100,12 @@ class MainApplication(tk.Frame):
         #### START - FRAME 1.1.2.1 #
         self.frame1121 = tk.Frame(master=self.frame112, background='white')
         self.frame1121.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(1,0))
-        self.accuracy = tk.Label(self.frame1121, text='Accuracy: 2^{}'.format(variables.depth_limit), bg='white', fg='black', anchor=tk.W, width=12, font=('',10))
-        self.accuracy.grid(row=0, column=0, columnspan=2, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5)
-        self.decrease_accuracy_button = tk.Button(self.frame1121, text='-', command=self.decrease_accuracy, bg='black', fg='white')
-        self.decrease_accuracy_button.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=(5,2.5))
-        self.increase_accuracy_button = tk.Button(self.frame1121, text='+', command=self.increase_accuracy, bg='black', fg='white')
-        self.increase_accuracy_button.grid(row=1, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=(2.5,5))
+        self.splits = tk.Label(self.frame1121, text='Max Splits: 2^{}'.format(variables.depth_limit), bg='white', fg='black', anchor=tk.W, width=12, font=('',10))
+        self.splits.grid(row=0, column=0, columnspan=2, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5)
+        self.decrease_splits_button = tk.Button(self.frame1121, text='-', command=self.decrease_splits, bg='black', fg='white')
+        self.decrease_splits_button.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=(5,2.5))
+        self.increase_splits_button = tk.Button(self.frame1121, text='+', command=self.increase_splits, bg='black', fg='white')
+        self.increase_splits_button.grid(row=1, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=(2.5,5))
 
         tk.Grid.rowconfigure(self.frame1121, index=0, weight=1)
         tk.Grid.columnconfigure(self.frame1121, index=0, weight=1)
@@ -195,8 +195,8 @@ class MainApplication(tk.Frame):
         self.computation_time.grid(row=8, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
         self.visualization_time = tk.Label(self.frame113, text='Visualization Time         :', bg='black', fg='white', anchor=tk.W, width=18, font=('',10))
         self.visualization_time.grid(row=9, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
-        self.computed_accuracy = tk.Label(self.frame113, text='Computed Accuracy      :', bg='black', fg='white', anchor=tk.W, width=18, font=('',10))
-        self.computed_accuracy.grid(row=10, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
+        self.computed_splits = tk.Label(self.frame113, text='Number of Splits           :', bg='black', fg='white', anchor=tk.W, width=18, font=('',10))
+        self.computed_splits.grid(row=10, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
 
         tk.Grid.rowconfigure(self.frame113, index=0, weight=1)
         tk.Grid.rowconfigure(self.frame113, index=1, weight=1)
@@ -323,7 +323,7 @@ class MainApplication(tk.Frame):
     def add_axes_field(self, update=False):
         """Adds the axes fields with actual parameters.
 
-        :param update: If true sets the currently selected parameters and else the first two parameters from the constraint, defaults to False
+        :param update: If true sets the currently selected parameters and else the first two parameters from the formula, defaults to False
         """
         self.opt_x_axe.children['menu'].delete(0, 'end')
         self.opt_y_axe.children['menu'].delete(0, 'end')
@@ -399,24 +399,24 @@ class MainApplication(tk.Frame):
         variables.y_axe_limit_temp = variables.y_axe_limit
         self.restore_default()
 
-    def _check_correct_parsing(self, constraints_parser, insert=False):
-        if variables.constraints is not None:
+    def _check_correct_parsing(self, formula_parser, insert=False):
+        if variables.formula is not None:
             if insert:
-                self.text.insert('1.0', variables.constraints)
+                self.text.insert('1.0', variables.formula)
             if settings.pre_sampling:
-                constraints_parser.pre_sampling.pre_sampling()
+                formula_parser.pre_sampling.pre_sampling()
         else:
             self.ready_label.configure(text='ERROR')
 
     def read_file(self):
-        """Reads the constraints from the selected file and tries to parse them."""
+        """Reads the formula from the selected file and tries to parse them."""
         if self.file_path:
             self.file_path_label.configure(text=os.path.basename(self.file_path), anchor=tk.W)
-            constraints_parser = ConstraintsParser()
-            constraints_parser.parse_from_file(self.file_path)
+            formula_parser = FormulaParser()
+            formula_parser.parse_from_file(self.file_path)
             self.restore_default()
             self.text.delete('1.0', 'end-1c')
-            self._check_correct_parsing(constraints_parser, True)
+            self._check_correct_parsing(formula_parser, True)
 
     def open_file(self):
         """Opens a SMT-LIB file (.smt2)."""
@@ -428,36 +428,36 @@ class MainApplication(tk.Frame):
         self.read_file()
 
     def edit(self):
-        """Sets the constraints from the text field as the new constraints."""
+        """Sets the formula from the text field as the new formula."""
         text = self.text.get('1.0', 'end-1c')
         if self.text.compare('1.0', '!=', 'end-1c'):
-            constraints_parser = ConstraintsParser()
-            constraints_parser.parse_from_textfield(text)
+            formula_parser = FormulaParser()
+            formula_parser.parse_from_textfield(text)
             self.restore_default()
-            self._check_correct_parsing(constraints_parser)
+            self._check_correct_parsing(formula_parser)
 
     @staticmethod
     def save():
-        """Saves the constraints from the text field to a file (.smt2 by default)."""
-        if variables.constraints is not None:
+        """Saves the formula from the text field to a file (.smt2 by default)."""
+        if variables.formula is not None:
             path = tk.filedialog.asksaveasfilename(filetypes=[('SMT-LIB', '.smt2')], defaultextension='.smt2')
             if path:
                 variables.solver.reset()
-                variables.solver.add(variables.constraints)
+                variables.solver.add(variables.formula)
                 smt2_file = open(path, 'w')
                 smt2_file.write(variables.solver.to_smt2())
                 smt2_file.close()
 
-    def increase_accuracy(self):
-        """Increases the current accuracy."""
+    def increase_splits(self):
+        """Increases the current splits."""
         variables.depth_limit += 1
-        self.accuracy.config(text='Accuracy: 2^{}'.format(variables.depth_limit))
+        self.splits.config(text='Max Splits: 2^{}'.format(variables.depth_limit))
 
-    def decrease_accuracy(self):
-        """Decreases the current accuracy."""
+    def decrease_splits(self):
+        """Decreases the current splits."""
         if variables.depth_limit > 1:
             variables.depth_limit -= 1
-            self.accuracy.config(text='Accuracy: 2^{}'.format(variables.depth_limit))
+            self.splits.config(text='Max Splits: 2^{}'.format(variables.depth_limit))
 
     def set_splitting_heuristic(self, args=None): # pylint: disable=W0613 # argument is required
         """Sets the 'current splitting heuristic' option from the option menu.
@@ -483,7 +483,7 @@ class MainApplication(tk.Frame):
         self.line.grid(row=0, column=0, sticky=tk.NW, padx=1,pady=1)
 
     def compute(self):
-        """Computes the constraints, particularly tries to find safe and unsafe areas."""
+        """Computes the formula, particularly tries to find safe and unsafe areas."""
         self.ready_label.configure(text='COMPUTING...')
         self.ready_label.update()
         self.computation_timer.create_timestamp('Computation')
@@ -506,7 +506,7 @@ class MainApplication(tk.Frame):
 
     def start_calculation(self):
         """After checking pre-conditions, starts the calculation consisting of computation and visualization."""
-        if variables.constraints is not None:
+        if variables.formula is not None:
             self.get_graph_axes()
             if self.changed or (variables.depth_limit > self.current_depth_limit) or variables.queue:
                 if variables.sub_queue:
@@ -519,7 +519,7 @@ class MainApplication(tk.Frame):
                 self.compute()
                 self.visualize()
                 self.current_depth_limit = variables.depth_limit
-                self.computed_accuracy.configure(text='Computed Accuracy      : 2^{}'.format(self.current_depth_limit))
+                self.computed_splits.configure(text='Number of Splits           : 2^{}'.format(self.current_depth_limit))
             else:
                 self.visualize()
             self.update_window()
@@ -553,7 +553,7 @@ class MainApplication(tk.Frame):
         self.add_empty_graph()
         self.add_axes_field()
         self.changed = True
-        if variables.constraints is not None:
+        if variables.formula is not None:
             self.ready_label.configure(text='READY')
 
 

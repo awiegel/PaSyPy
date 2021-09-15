@@ -15,7 +15,7 @@ class TestPaSyPy(unittest.TestCase):
         x = z3.Real('x') # pylint: disable=C0103 # parameter name is conform
         y = z3.Real('y') # pylint: disable=C0103 # parameter name is conform
         z = z3.Real('z') # pylint: disable=C0103 # parameter name is conform
-        variables.constraints = z3.Exists(z, z3.And(x >= 1/2, y >= 1/2, x > z, z > y))
+        variables.formula = z3.Exists(z, z3.And(x >= 1/2, y >= 1/2, x > z, z > y))
         variables.parameters = [x,y]
         cls.pasypy = PaSyPy()
 

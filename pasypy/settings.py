@@ -8,7 +8,7 @@ from pasypy.color import Color
 
 pre_sampling = True # pylint: disable=C0103 # is not a constant
 sampling = False # pylint: disable=C0103 # is not a constant
-hyperplane = False # pylint: disable=C0103 # is not a constant
+regression = False # pylint: disable=C0103 # is not a constant
 white_boxes = False # pylint: disable=C0103 # is not a constant
 colorblind_mode = False # pylint: disable=C0103 # is not a constant
 hatch_pattern = False # pylint: disable=C0103 # is not a constant
@@ -28,8 +28,8 @@ class Settings(tk.Frame):
         self.pre_sampling_option = None
         self.sampling = None
         self.sampling_option = None
-        self.hyperplane = None
-        self.hyperplane_option = None
+        self.regression = None
+        self.regression_option = None
         self.white_boxes = None
         self.white_boxes_option = None
         self.hatch_pattern = None
@@ -71,12 +71,12 @@ class Settings(tk.Frame):
             if sampling:
                 self.sampling_option.select()
 
-            self.hyperplane = tk.BooleanVar()
-            self.hyperplane_option = tk.Checkbutton(self.settings_frame, text='Hyperplane',variable=self.hyperplane, onvalue=True, offvalue=False,
-                                                    command=self.set_hyperplane_option, font=('',10), bg='white', fg='black', anchor=tk.W)
-            self.hyperplane_option.grid(row=2, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
-            if hyperplane:
-                self.hyperplane_option.select()
+            self.regression = tk.BooleanVar()
+            self.regression_option = tk.Checkbutton(self.settings_frame, text='Regression',variable=self.regression, onvalue=True, offvalue=False,
+                                                    command=self.set_regression_option, font=('',10), bg='white', fg='black', anchor=tk.W)
+            self.regression_option.grid(row=2, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+            if regression:
+                self.regression_option.select()
 
             self.white_boxes = tk.BooleanVar()
             self.white_boxes_option = tk.Checkbutton(self.settings_frame, text='White Boxes',variable=self.white_boxes, onvalue=True, offvalue=False,
@@ -142,10 +142,10 @@ class Settings(tk.Frame):
         sampling = self.sampling.get()
         self.parent.edit()
 
-    def set_hyperplane_option(self):
-        """Sets the 'hyperplane' option from the checkbox."""
-        global hyperplane # pylint: disable=C0103 # is not a constant
-        hyperplane = self.hyperplane.get()
+    def set_regression_option(self):
+        """Sets the 'regression' option from the checkbox."""
+        global regression # pylint: disable=C0103 # is not a constant
+        regression = self.regression.get()
         self.parent.start_calculation()
 
     def set_white_boxes_option(self):

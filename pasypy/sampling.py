@@ -6,7 +6,7 @@ from pasypy import variables
 
 
 class PreSampling:
-    """Optimizes performance by pre-sampling constraints on input."""
+    """Optimizes performance by pre-sampling the formula on input."""
 
     EQUIVALENCE_CLASSES = [['>=','<'],['<=','>'],['==','!=']]
     FACTOR =  0.0001

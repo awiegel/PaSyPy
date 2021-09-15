@@ -16,17 +16,17 @@ class PaSyPy:
 
     @staticmethod
     def init_solvers():
-        """Initializes the solvers by resetting them and adding the constraints."""
+        """Initializes the solvers by resetting them and adding the formula."""
         variables.solver.reset()
         variables.solver_neg.reset()
-        variables.solver.add(variables.constraints)
-        variables.solver_neg.add(z3.Not(variables.constraints))
+        variables.solver.add(variables.formula)
+        variables.solver_neg.add(z3.Not(variables.formula))
 
     @staticmethod
     def add_boundary(solver, area):
-        """Adds the boundaries of given area to the set of constraints.
+        """Adds the boundaries of given area to the formula.
 
-        :param solver: The used solver. There are two solvers available, one for the original constraints and the other for the negated constraints.
+        :param solver: The used solver. There are two solvers available, one for the original formula and the other for the negated formula.
         :param area: The considered area.
         """
         for index, value in enumerate(variables.parameters):
@@ -48,11 +48,11 @@ class PaSyPy:
 
     def solveit(self, area):
         """Checks if the given area is safe, unsafe or unknown and requires splitting.
-        For this the solver first checks if the original constraints on given area are satisfiable (sat).
+        For this the solver first checks if the original formula on given area are satisfiable (sat).
         If not, the area is unsafe (red by default).
-        Otherwise the solver checks the negated constraints on given area for satisfiability (sat).
+        Otherwise the solver checks the negated formula on given area for satisfiability (sat).
         If it is unsatifiable (unsat), the area is safe (green by default).
-        If it is satisfiable (sat), meaning the original constraints and the negated constraints are both satisfiable (sat),
+        If it is satisfiable (sat), meaning the original formula and the negated formula are both satisfiable (sat),
         the area contains both safe and unsafe candidates and has to be split further into smaller sub areas.
 
         :param area: The considered area.

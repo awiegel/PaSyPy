@@ -6,7 +6,7 @@ import z3
 solver = z3.ParOr('smt', 'default').solver(logFile='logs/logfile.log')
 solver_neg = z3.ParOr('smt', 'default').solver(logFile='logs/logfile_neg.log')
 
-constraints = None # pylint: disable=C0103 # is not a constant
+formula = None # pylint: disable=C0103 # is not a constant
 
 parameters = []
 

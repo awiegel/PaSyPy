@@ -28,7 +28,7 @@ class Visualize:
             plt.yticks([])
 
     def filter_depth(self, unfiltered, filtered):
-        """Filters already found safe and unsafe areas on decreasing accuracy.
+        """Filters already found safe and unsafe areas on decreasing splits.
 
         :param unfiltered: The original unfiltered area.
         :param filtered: The final filtered area.
@@ -79,7 +79,7 @@ class Visualize:
         return hatch_pattern
 
     def plot_one_dimensional(self, area, area_color):
-        """Plots constraints with only one dimension.
+        """Plots formulas with only one dimension.
         The x-axis represents the only parameter and the y-axis is fixed around the center point.
         If active applies a hatch pattern for better distinction between safe and unsafe area.
 
@@ -92,7 +92,7 @@ class Visualize:
             plt.fill([i[0][0],i[0][1],i[0][1],i[0][0],i[0][0]], [0.4, 0.4, 0.6, 0.6, 0.4], color=area_color, edgecolor='black', linewidth=0, hatch=hatch_pattern)
 
     def plot_multi_dimensional(self, area, area_color):
-        """Plots constraints with only one dimension.
+        """Plots formulas with multiple dimensions.
         The x-axis represents the first selected parameter and the y-axis the second selected parameter.
         If active applies a hatch pattern for better distinction between safe and unsafe area.
 
@@ -217,10 +217,10 @@ class Visualize:
                         temp_unique += (unknown_area,)
                 self.plot_multi_dimensional_without_fill(temp_unique)
 
-    def draw_hyperplane(self, ax):
-        """Draws the (fake) hyperplane.
+    def draw_regression(self, ax):
+        """Performs nonlinear regression.
         This is actually a support vector machine created based on the safe and unsafe area as training data sets.
-        Only works for constraints with more than one parameter.
+        Only works for formulas with more than one parameter.
 
         :param ax: The fundamental of the graph.
         """
@@ -282,6 +282,6 @@ class Visualize:
         ax.callbacks.connect('ylim_changed', self.on_ylims_change)
         variables.x_axe_limit_temp = variables.x_axe_limit
         variables.y_axe_limit_temp = variables.y_axe_limit
-        if (len(variables.parameters) > 1) and settings.hyperplane:
-            self.draw_hyperplane(ax)
+        if (len(variables.parameters) > 1) and settings.regression:
+            self.draw_regression(ax)
         return figure

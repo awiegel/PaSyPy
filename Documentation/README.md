@@ -21,9 +21,9 @@ Creates this package.
 **pasypy.py** \
 The Main module that processes and computes the queue.
 When trying to find safe and unsafe regions of the parameter space on an interval there are three different outcomes:
-* If the viewed area is **sat** and the negated constraint is **unsat**, the area is considered <span style="color:green">safe (green)</span>.
-* If the viewed area is **unsat**, the area is considered <span style="color:red">unsafe (red)</span>.
-* If the viewed area is both **sat** and the negated constraint is **sat**, the area contains both <span style="color:gray">safe and unsafe regions (white)</span>.
+* If the formula on viewed area is **sat** and the negated formula is **unsat**, the area is considered <span style="color:green">safe (green)</span>.
+* If the formula on viewed area is **unsat**, the area is considered <span style="color:red">unsafe (red)</span>.
+* If the formula on viewed area is both **sat** and the negated formula is **sat**, the area contains both <span style="color:gray">safe and unsafe regions (white)</span>.
 
 **visualize.py** \
 Visualizes all areas by drawing safe (green) and unsafe (red) regions with `matplotlib` library.
@@ -34,14 +34,14 @@ Builds the complete graphical user interface (GUI) with `tkinter` library.
 **variables.py** \
 Contains all variables used across different modules.
 
-**constraints_parser.py** \
-Handles the parsing of the given constraints.
-The constraints can either come from an `SMT-LIB` file or directly from the text field.
+**formula_parser.py** \
+Handles the parsing of the given formula.
+The formula can either come from an `SMT-LIB` file or directly from the text field.
 
 <div class="page"/>
 
 **splitting_heuristic.py** \
-If the viewed area is both **sat** and the negated constraint is **sat**, the area contains both <span style="color:gray">safe and unsafe regions (white)</span>.
+If the formula on viewed area is both **sat** and the negated formula is **sat**, the area contains both <span style="color:gray">safe and unsafe regions (white)</span>.
 The region then has to be split into smaller sub-regions.
 For this there are different splitting heuristics available:
 * **Default:** Splits every region in exactly 2<sup>Dimensions</sup> equally large new regions.
@@ -60,7 +60,7 @@ Calculates safe, unsafe and unknown areas in percentage.
 Contains adjustable settings:
 * **Pre-Sampling:** Optimizes performance prior to computation by generating better candidates.
 * **Sampling:** Optimizes performance prior to each splitting step by generating better candidates.
-* **Hyperplane:** Approximation curve (hyperplane) with safe and unsafe regions as training sets.
+* **Regression:** Approximation curve (regression) with safe and unsafe regions as training sets.
 * **White Boxes:** Also draws unknown (white) region borders.
 * **Hatch Pattern:** Pattern for better differentiation between safe and unsafe regions.
 * **Colorblind:** In case of color blindness, changes colors from green/red to blue/yellow.
@@ -113,12 +113,12 @@ This tool works on every platform (**Windows**, **MacOS**, **Linux**) with full 
 ## 3. Known challenges
 * **.smt2** files usually contain a **set-logic** line, which helps the solver to apply the correct tactic.
 When setting the logic to quantifier-free non-linear real arithmetic (QF NRA),
-using existential quantifiers for the constraints produces an error on reading the file,
+using existential quantifiers for the formula produces an error on reading the file,
 although existential quantification is defined for the quantifier-free non-linear real arithmetic (QF NRA) logic.
 This seems like a general problem with the `z3 theorem prover` and its function to read **.smt2** files.
 * In general, the Python interface of the `z3 theorem prover` sometimes has difficulties automatically select the correct theory solver needed for the specific problem.
-This often results in a timeout even on relatively easy constraints.
-As a solution multiple theory solvers are used in parallel in case the default one fails to process the given constraints.
+This often results in a timeout even on relatively easy formulas.
+As a solution multiple theory solvers are used in parallel in case the default one fails to process the given formula.
 This does not have any effect on the performance or time needed to solve the problem.
 * The performance of Python in comparison to hardware-related programming languages (f.e. C and C++) is very weak.
 One approach to benefit from the simplicity of Python and not dispense with high performance, is to integrate `Cython` an optimizing static compiler.

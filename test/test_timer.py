@@ -3,7 +3,7 @@
 import unittest
 import time
 
-# from pasypy import constraints_parser, variables
+# from pasypy import formula_parser, variables
 from pasypy.timer import Timer
 
 

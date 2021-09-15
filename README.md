@@ -1,5 +1,5 @@
 # PaSyPy <img align="right" width="25%" height="25%" src="Documentation/images/PaSyPy_logo.png" />
-A python-based tool using parameter synthesis to find safe and unsafe regions of the parameter space
+A python-based tool using parameter synthesis to find safe and unsafe regions of the parameter space.
 
 <br/>
 
@@ -29,7 +29,7 @@ To start this tool, simply execute `__main__.py`.
 <img align="right" width="50%" height="50%" src="Documentation/images/full_gui.png" />
 
 **Functionality:**
-* **SMT-LIB Support:** Read *.smt2* files or define your own constraints in the text field.
+* **SMT-LIB Support:** Read *.smt2* files or define your own formula in the text field.
 * **Find safe and unsafe regions:** Separate the whole region of the parameter space into *safe (green)* and *unsafe (red)* regions. Select from different *splitting heuristics* to obtain optimal results.
 * **Visualization:** Get a visualization for found <span style="color:green">safe (green)</span> and <span style="color:red">unsafe (red)</span> regions. Choose which parameters you want to see. 
 * **Information:** Lots of different information about your computation.
