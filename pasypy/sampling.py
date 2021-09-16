@@ -68,6 +68,16 @@ class PreSampling:
                 else:
                     last = value
 
+    def _filter_wrong_queue_elements(self):
+        """Filters all wrong queue elements with intervals like [0.0, 0.0]."""
+        removed_indices = 0
+        for index, value in enumerate(variables.queue[:]):
+            for parameter in range(len(variables.parameters)):
+                if value[parameter][0] == value[parameter][1]:
+                    variables.queue.pop(index-removed_indices)
+                    removed_indices += 1
+                    break
+
     def _set_depth(self):
         """Sets the depth based on the separated regions."""
         for index, value in enumerate(variables.queue):
@@ -102,6 +112,7 @@ class PreSampling:
         self.pre_sampling_length = len(variables.queue)
         variables.queue = variables.queue + temp_list
         self._set_depth()
+        self._filter_wrong_queue_elements()
 
 
 class Sampling:

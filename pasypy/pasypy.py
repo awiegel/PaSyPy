@@ -1,6 +1,7 @@
 """Tries to find safe and unsafe regions of the parameter space."""
 
 import z3
+import decimal
 
 from pasypy import variables
 from pasypy.splitting_heuristic import SplittingHeuristic
@@ -9,6 +10,8 @@ from pasypy.logger import Logger
 
 class PaSyPy:
     """Tries to find safe and unsafe regions of the parameter space."""
+
+    FACTOR = -4
 
     def __init__(self):
         """Initializes the solvers used by this class."""
@@ -79,10 +82,23 @@ class PaSyPy:
         else:
             print('TIMEOUT', variables.solver.reason_unknown()) # pragma: no cover
 
+    def check_factor(self):
+        """Checks if the queue contains scientific notation (<0.0001) because solver crashes on this.
+
+        :return: If the factor is acceptable by the solver.
+        """
+        correct_factor = True
+        for parameter in range(len(variables.parameters)):
+            if (decimal.Decimal(str(variables.queue[0][parameter][0])).as_tuple().exponent < self.FACTOR) or \
+               (decimal.Decimal(str(variables.queue[0][parameter][1])).as_tuple().exponent < self.FACTOR):
+                correct_factor = False
+                break
+        return correct_factor
+
     def main(self, application):
         """The main function of this tool which tries to find safe and unsafe regions of the parameter space."""
         while variables.queue and application.running:
-            if self.check_zoom() and (variables.queue[0][len(variables.parameters)] <= (2**variables.depth_limit)):
+            if self.check_zoom() and (variables.queue[0][len(variables.parameters)] <= (2**variables.depth_limit)) and self.check_factor():
                 self.solveit(variables.queue[0])
             else:
                 variables.sub_queue.append(variables.queue[0])
