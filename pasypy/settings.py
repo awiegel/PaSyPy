@@ -3,7 +3,7 @@
 import tkinter as tk
 import webbrowser
 
-from pasypy import color
+from pasypy import color, splitting_heuristic
 from pasypy.color import Color
 
 pre_sampling = True # pylint: disable=C0103 # is not a constant
@@ -24,6 +24,8 @@ class Settings(tk.Frame):
         self.parent = parent
         self.window = None
         self.settings_frame = None
+        self.current_splitting_heuristic = None
+        self.splitting_option = None
         self.pre_sampling = None
         self.pre_sampling_option = None
         self.sampling = None
@@ -57,17 +59,25 @@ class Settings(tk.Frame):
             self.settings_frame = tk.Frame(master=self.window, background='black')
             self.settings_frame.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
 
+            self.current_splitting_heuristic = tk.StringVar(self)
+            self.current_splitting_heuristic.set(splitting_heuristic.current_splitting_heuristic)
+
+            self.splitting_option = tk.OptionMenu(self.settings_frame, self.current_splitting_heuristic,*splitting_heuristic.SPLITTING_HEURISTIC,
+                                                  command=self.set_splitting_heuristic)
+            self.splitting_option.configure(state='normal', font=('',10), width=8, relief='solid')
+            self.splitting_option.grid(row=0, column=0, sticky=tk.NW, padx=5, pady=5)
+
             self.pre_sampling = tk.BooleanVar()
             self.pre_sampling_option = tk.Checkbutton(self.settings_frame, text='Pre-Sampling',variable=self.pre_sampling, onvalue=True, offvalue=False,
                                                       command=self.set_pre_sampling_option, font=('',10), bg='white', fg='black', anchor=tk.W)
-            self.pre_sampling_option.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+            self.pre_sampling_option.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             if pre_sampling:
                 self.pre_sampling_option.select()
 
             self.sampling = tk.BooleanVar()
             self.sampling_option = tk.Checkbutton(self.settings_frame, text='Sampling',variable=self.sampling, onvalue=True, offvalue=False,
                                                   command=self.set_sampling_option, font=('',10), bg='white', fg='black', anchor=tk.W, state='disabled')
-            self.sampling_option.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+            # self.sampling_option.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             if sampling:
                 self.sampling_option.select()
 
@@ -88,7 +98,7 @@ class Settings(tk.Frame):
             self.hatch_pattern = tk.BooleanVar()
             self.hatch_pattern_option = tk.Checkbutton(self.settings_frame, text='Hatch Pattern',variable=self.hatch_pattern, onvalue=True, offvalue=False,
                                                        command=self.set_hatch_pattern_option, font=('',10), bg='white', fg='black', anchor=tk.W)
-            self.hatch_pattern_option.grid(row=0, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+            self.hatch_pattern_option.grid(row=1, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             if hatch_pattern:
                 self.hatch_pattern_option.select()
 
@@ -96,20 +106,20 @@ class Settings(tk.Frame):
             self.colorblind_mode = tk.BooleanVar()
             self.colorblind_option = tk.Checkbutton(self.settings_frame, text='Colorblind',variable=self.colorblind_mode, onvalue=True, offvalue=False,
                                                     command=self.set_colorblind_option, font=('',10), bg='white', fg='black', anchor=tk.W)
-            self.colorblind_option.grid(row=1, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+            self.colorblind_option.grid(row=2, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             if colorblind_mode:
                 self.colorblind_option.select()
 
             self.skip_visualization = tk.BooleanVar()
             self.skip_visualization_option = tk.Checkbutton(self.settings_frame, text='Skip Visual',variable=self.skip_visualization, onvalue=True, offvalue=False,
                                                             command=self.set_skip_visualization_option, font=('',10), bg='white', fg='black', anchor=tk.W)
-            self.skip_visualization_option.grid(row=2, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+            self.skip_visualization_option.grid(row=3, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
             if skip_visualization:
                 self.skip_visualization_option.select()
 
             self.github = tk.PhotoImage(file='images/GitHub-Emblem.png')
             self.github_label = tk.Label(self.settings_frame, image=self.github, bg='black')
-            self.github_label.grid(row=3, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
+            self.github_label.grid(row=0, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=0)
             self.github_label.bind('<Button-1>', self.get_help)
 
             tk.Grid.rowconfigure(self.settings_frame, index=0, weight=1)
@@ -129,6 +139,14 @@ class Settings(tk.Frame):
         """
         self.window.destroy()
         self.window = None
+
+    def set_splitting_heuristic(self, args=None): # pylint: disable=W0613 # argument is required
+        """Sets the 'current splitting heuristic' option from the option menu.
+
+        :param args: Event listener, defaults to None
+        """
+        splitting_heuristic.current_splitting_heuristic = self.current_splitting_heuristic.get()
+        self.parent.restore_default()
 
     def set_pre_sampling_option(self):
         """Sets the 'Pre-Sampling' option from the checkbox."""

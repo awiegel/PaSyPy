@@ -24,8 +24,10 @@ depth_limit = 8 # pylint: disable=C0103 # is not a constant
 x_axe_position = 0 # pylint: disable=C0103 # is not a constant
 y_axe_position = 0 # pylint: disable=C0103 # is not a constant
 
-x_axe_limit = [0.0, 1.0]
-y_axe_limit = [0.0, 1.0]
+DEFAULT_LIMIT = [0.0, 1.0]
+x_axe_limit = DEFAULT_LIMIT.copy()
+y_axe_limit = DEFAULT_LIMIT.copy()
+interval_limit = []
 
 x_axe_limit_temp = x_axe_limit
 y_axe_limit_temp = y_axe_limit

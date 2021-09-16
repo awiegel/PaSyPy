@@ -16,6 +16,7 @@ class TestSplittingHeuristic(unittest.TestCase):
         x = z3.Real('x') # pylint: disable=C0103 # parameter name is conform
         y = z3.Real('y') # pylint: disable=C0103 # parameter name is conform
         variables.parameters = [x,y]
+        variables.interval_limit = [variables.DEFAULT_LIMIT.copy(), variables.DEFAULT_LIMIT.copy()]
         cls.splitting_heuristic = SplittingHeuristic()
 
     def test_default_heuristic(self):

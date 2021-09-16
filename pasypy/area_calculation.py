@@ -21,6 +21,6 @@ class AreaCalculation:
         for i in area:
             mult = 1
             for j in range(len(variables.parameters)):
-                mult *= (i[j][1]-i[j][0]) / (variables.x_axe_limit[1] - variables.x_axe_limit[0])
+                mult *= (i[j][1]-i[j][0]) / (variables.interval_limit[j][1] - variables.interval_limit[j][0])
             total_area += mult
         return total_area

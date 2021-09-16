@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
-from pasypy import variables, settings, color, splitting_heuristic
+from pasypy import variables, settings, color
 from pasypy.pasypy import PaSyPy
 from pasypy.visualize import Visualize
 from pasypy.logger import Logger
@@ -126,14 +126,16 @@ class MainApplication(tk.Frame):
         #### START - FRAME 1.1.2.3 #
         self.frame1123 = tk.Frame(master=self.frame112, background='white')
         self.frame1123.grid(row=2, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
-        self.interval = tk.Label(self.frame1123, text='Interval:', bg='white', fg='black', anchor=tk.W, font=('',10))
-        self.interval.grid(row=0, column=0, columnspan=2, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5)
+        self.interval = tk.Label(self.frame1123, text='Interval:', bg='white', fg='black', anchor=tk.W, font=('',12))
+        self.interval.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=(5,0))
         self.minimum = tk.Entry(self.frame1123, width=5, relief='solid')
         self.minimum.grid(row=1, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=(5,0))
         self.maximum = tk.Entry(self.frame1123, width=5, relief='solid')
         self.maximum.grid(row=1, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=(5,0))
-        self.border_button = tk.Button(self.frame1123, text='SAVE', command=self.border, bg='gray', fg='white')
-        self.border_button.grid(row=0, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5)
+        self.interval_param = tk.StringVar(self)
+        self.opt_interval_param = tk.OptionMenu(self.frame1123, self.interval_param, *[''])
+        self.opt_interval_param.configure(state='disabled', font=('',10), width=1, relief='solid')
+        self.opt_interval_param.grid(row=0, column=1, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5)
 
         tk.Grid.rowconfigure(self.frame1123, index=0, weight=1)
         tk.Grid.rowconfigure(self.frame1123, index=1, weight=1)
@@ -143,33 +145,18 @@ class MainApplication(tk.Frame):
 
         #### START - FRAME 1.1.2.4 #
         self.frame1124 = tk.Frame(master=self.frame112, background='white')
-        self.frame1124.grid(row=3, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1)
-        self.hyphen = tk.Label(self.frame1124, text='------------------', bg='white', fg='black', font=('',13))
-        self.hyphen.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W))
+        self.frame1124.grid(row=3, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
+        self.border_button = tk.Button(self.frame1124, text='SAVE', command=self.border, bg='gray', fg='white')
+        self.border_button.grid(row=0, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=5, pady=5)
 
         tk.Grid.rowconfigure(self.frame1124, index=0, weight=1)
         tk.Grid.columnconfigure(self.frame1124, index=0, weight=1)
         #### END - FRAME 1.1.2.4 #
 
-        #### START - FRAME 1.1.2.5 #
-        self.frame1125 = tk.Frame(master=self.frame112, background='white')
-        self.frame1125.grid(row=4, column=0, sticky=(tk.N+tk.E+tk.S+tk.W), padx=1, pady=(0,1))
-        self.current_splitting_heuristic = tk.StringVar(self)
-        self.current_splitting_heuristic.set(splitting_heuristic.current_splitting_heuristic)
-
-        self.splitting_option = tk.OptionMenu(self.frame1125, self.current_splitting_heuristic, *splitting_heuristic.SPLITTING_HEURISTIC, command=self.set_splitting_heuristic)
-        self.splitting_option.configure(state='normal', font=('',10), width=8, relief='solid')
-        self.splitting_option.grid(row=0, column=0, sticky=tk.NW, padx=5, pady=(0,1))
-
-        tk.Grid.rowconfigure(self.frame1125, index=0, weight=1)
-        tk.Grid.columnconfigure(self.frame1125, index=0, weight=1)
-        #### END - FRAME 1.1.2.5 #
-
         tk.Grid.rowconfigure(self.frame112, index=0, weight=1)
         tk.Grid.rowconfigure(self.frame112, index=1, weight=1)
         tk.Grid.rowconfigure(self.frame112, index=2, weight=1)
         tk.Grid.rowconfigure(self.frame112, index=3, weight=1)
-        tk.Grid.rowconfigure(self.frame112, index=4, weight=1)
         tk.Grid.columnconfigure(self.frame112, index=0, weight=1)
         ### END - FRAME 1.1.2 #
 
@@ -303,22 +290,39 @@ class MainApplication(tk.Frame):
         plt.close('all')
         self.add_plot(plt.figure())
         plt.xlim(variables.x_axe_limit)
-        plt.ylim(variables.y_axe_limit)
+        if len(variables.parameters) > 1:
+            plt.ylim(variables.y_axe_limit)
+        else:
+            plt.ylim([0, 1])
+            plt.yticks([])
 
     def add_empty_axes(self):
         """Adds the empty fields for the parameters on the graph and the settings wheel."""
         self.variable_x_axe = tk.StringVar(self)
         self.opt_x_axe = tk.OptionMenu(self.frame12, self.variable_x_axe, *[''])
         self.opt_x_axe.configure(state='disabled', font=('',10), width=1, relief='solid')
-        self.opt_x_axe.grid(row=0, column=0, sticky=tk.S, pady=1)
         self.variable_y_axe = tk.StringVar(self)
         self.opt_y_axe = tk.OptionMenu(self.frame12, self.variable_y_axe, *[''])
         self.opt_y_axe.configure(state='disabled', font=('',10), width=1, relief='solid')
-        self.opt_y_axe.grid(row=0, column=0, sticky=tk.W, padx=1)
         self.settings_image = tk.PhotoImage(file='images/gear.png')
         self.settings_label = tk.Label(self.frame12, image=self.settings_image, bg='white', fg='black')
         self.settings_label.grid(row=0, column=0, sticky=tk.NE, padx=(0,1), pady=(1,0))
         self.settings_label.bind('<Button-1>', settings.Settings(self).on_click)
+
+    def _insert_interval(self, parameter):
+        """Inserts the current interval border for this parameter.
+
+        :param parameter: The selected parameter
+        """
+        self.interval_param.set(parameter)
+        parameter_index = 0
+        for index, value in enumerate(variables.parameters):
+            if parameter == value:
+                parameter_index = index
+        self.minimum.delete(0, tk.END)
+        self.minimum.insert(0, variables.interval_limit[parameter_index][0])
+        self.maximum.delete(0, tk.END)
+        self.maximum.insert(0, variables.interval_limit[parameter_index][1])
 
     def add_axes_field(self, update=False):
         """Adds the axes fields with actual parameters.
@@ -327,13 +331,22 @@ class MainApplication(tk.Frame):
         """
         self.opt_x_axe.children['menu'].delete(0, 'end')
         self.opt_y_axe.children['menu'].delete(0, 'end')
+        self.opt_interval_param.children['menu'].delete(0, 'end')
 
         if len(variables.parameters) == 1:
             self.opt_x_axe.children['menu'].add_command(label=variables.parameters[0], command=self.variable_x_axe.set(variables.parameters[0]))
+            self.opt_interval_param.children['menu'].add_command(label=variables.parameters[0], command=self.interval_param.set(variables.parameters[0]))
+            self.opt_x_axe.grid(row=0, column=0, sticky=tk.S, pady=1)
+            self.opt_y_axe.grid_forget()
+            self.opt_x_axe.configure(state='disabled')
+            self.opt_interval_param.configure(state='disabled')
         elif len(variables.parameters) > 1:
+            self.opt_x_axe.grid(row=0, column=0, sticky=tk.S, pady=1)
+            self.opt_y_axe.grid(row=0, column=0, sticky=tk.W, padx=1)
             for parameter in variables.parameters:
                 self.opt_x_axe.children['menu'].add_command(label=parameter, command=lambda x=parameter: self.variable_x_axe.set(x))
                 self.opt_y_axe.children['menu'].add_command(label=parameter, command=lambda x=parameter: self.variable_y_axe.set(x))
+                self.opt_interval_param.children['menu'].add_command(label=parameter, command=lambda x=parameter: self._insert_interval(x))
             if update:
                 self.variable_x_axe.set(self.variable_x_axe.get())
                 if self.variable_y_axe.get() != self.variable_x_axe.get():
@@ -345,10 +358,16 @@ class MainApplication(tk.Frame):
             else:
                 self.variable_x_axe.set(variables.parameters[0])
                 self.variable_y_axe.set(variables.parameters[1])
+            if not self.interval_param.get():
+                self.interval_param.set(variables.parameters[0])
+            else:
+                self.interval_param.set(self.interval_param.get())
+                self.opt_interval_param.configure(state='disabled')
             self.opt_x_axe.configure(state='normal')
             self.opt_y_axe.configure(state='normal')
+            self.opt_interval_param.configure(state='normal')
         else:
-            pass
+            self.opt_y_axe.grid_forget()
         self.opt_x_axe.lift()
         self.opt_y_axe.lift()
         self.settings_label.lift()
@@ -361,43 +380,60 @@ class MainApplication(tk.Frame):
             for index, value in enumerate(variables.parameters):
                 if self.variable_x_axe.get() == str(value):
                     variables.x_axe_position = index
+                    variables.x_axe_limit = variables.interval_limit[index]
                     break
             if self.variable_y_axe.get() != self.variable_x_axe.get():
                 for index, value in enumerate(variables.parameters):
                     if self.variable_y_axe.get() == str(value):
                         variables.y_axe_position = index
+                        variables.y_axe_limit = variables.interval_limit[index]
                         break
             else:
                 for index, value in enumerate(variables.parameters):
                     if self.variable_x_axe.get() != str(value):
                         variables.y_axe_position = index
+                        variables.y_axe_limit = variables.interval_limit[index]
 
     def border(self):
         """Sets the complete considered interval."""
+        if not variables.interval_limit:
+            return
+        interval_param = self.interval_param.get()
+        parameter_index = 0
+        for index, value in enumerate(variables.parameters):
+            if interval_param == str(value):
+                parameter_index = index
+        update = False
         lim_inf = self.minimum.get()
         if lim_inf:
             try:
                 lim_inf = float(lim_inf.replace(',','.'))
+                update = True
             except ValueError as error:
                 print(error)
                 return
         else:
-            lim_inf = variables.x_axe_limit[0]
+            lim_inf = variables.interval_limit[parameter_index][0]
         lim_sup = self.maximum.get()
         if lim_sup:
             try:
                 lim_sup = float(lim_sup.replace(',','.'))
+                update = True
             except ValueError as error:
                 print(error)
                 return
         else:
-            lim_sup = variables.x_axe_limit[1]
-        variables.x_axe_limit = [lim_inf, lim_sup]
-        variables.x_axe_limit_temp = variables.x_axe_limit
-        if len(variables.parameters) > 1:
-            variables.y_axe_limit = [lim_inf, lim_sup]
-        variables.y_axe_limit_temp = variables.y_axe_limit
-        self.restore_default()
+            lim_sup = variables.interval_limit[parameter_index][1]
+
+        if update:
+            variables.interval_limit[parameter_index] = [lim_inf, lim_sup]
+            variables.x_axe_limit = variables.interval_limit[variables.x_axe_position]
+            variables.x_axe_limit_temp = variables.x_axe_limit
+
+            if len(variables.parameters) > 1:
+                variables.y_axe_limit = variables.interval_limit[variables.y_axe_position]
+            variables.y_axe_limit_temp = variables.y_axe_limit
+            self.restore_default()
 
     def _check_correct_parsing(self, formula_parser, insert=False):
         if variables.formula is not None:
@@ -405,8 +441,20 @@ class MainApplication(tk.Frame):
                 self.text.insert('1.0', variables.formula)
             if settings.pre_sampling:
                 formula_parser.pre_sampling.pre_sampling()
+            self.get_graph_axes()
+            self.minimum.delete(0, tk.END)
+            self.minimum.insert(0, 0.0)
+            self.maximum.delete(0, tk.END)
+            self.maximum.insert(0, 1.0)
         else:
             self.ready_label.configure(text='ERROR')
+
+    def _reset_interval_limit(self):
+        """Resets the interval limit for every parameter."""
+        variables.interval_limit = []
+        for _ in range(len(variables.parameters)):
+            variables.interval_limit.append(variables.DEFAULT_LIMIT)
+        self.interval_param.set(variables.parameters[0])
 
     def read_file(self):
         """Reads the formula from the selected file and tries to parse them."""
@@ -414,6 +462,7 @@ class MainApplication(tk.Frame):
             self.file_path_label.configure(text=os.path.basename(self.file_path), anchor=tk.W)
             formula_parser = FormulaParser()
             formula_parser.parse_from_file(self.file_path)
+            self._reset_interval_limit()
             self.restore_default()
             self.text.delete('1.0', 'end-1c')
             self._check_correct_parsing(formula_parser, True)
@@ -435,6 +484,8 @@ class MainApplication(tk.Frame):
             formula_parser.parse_from_textfield(text)
             self.restore_default()
             self._check_correct_parsing(formula_parser)
+        if self.text.compare('1.0', '!=', 'end-1c') and text != str(variables.formula):
+            self._reset_interval_limit()
 
     @staticmethod
     def save():
@@ -458,14 +509,6 @@ class MainApplication(tk.Frame):
         if variables.depth_limit > 1:
             variables.depth_limit -= 1
             self.splits.config(text='Max Splits: 2^{}'.format(variables.depth_limit))
-
-    def set_splitting_heuristic(self, args=None): # pylint: disable=W0613 # argument is required
-        """Sets the 'current splitting heuristic' option from the option menu.
-
-        :param args: Event listener, defaults to None
-        """
-        splitting_heuristic.current_splitting_heuristic = self.current_splitting_heuristic.get()
-        self.restore_default()
 
     def add_plot(self, figure):
         """Adds the navigation toolbar to the plot.
@@ -543,8 +586,12 @@ class MainApplication(tk.Frame):
     def restore_default(self):
         """Restores all relevant variables to default as they were at the beginning of the program."""
         boundaries = ()
-        for _ in range(len(variables.parameters)):
-            boundaries += (variables.x_axe_limit,)
+        if variables.interval_limit:
+            for interval in variables.interval_limit:
+                boundaries += (interval,)
+        else:
+            for _ in range(len(variables.parameters)):
+                boundaries += (variables.DEFAULT_LIMIT,)
         boundaries += (1,)
         variables.queue = [boundaries]
         variables.sub_queue = []

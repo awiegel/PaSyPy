@@ -13,6 +13,7 @@ class TestAreaCalculation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         variables.parameters = [z3.Real('x'), z3.Real('y')]
+        variables.interval_limit = [variables.DEFAULT_LIMIT.copy(), variables.DEFAULT_LIMIT.copy()]
 
     def test_calculate_area(self):
         """Checks if calculation of given area is correct."""
