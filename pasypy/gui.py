@@ -38,6 +38,7 @@ class MainApplication(tk.Frame):
         self.running = False
         self.line = 0
         self.file_path = None
+        self.formula_parser = FormulaParser()
         self.computation_timer = Timer()
         self.area_calculation = AreaCalculation()
 
@@ -45,6 +46,7 @@ class MainApplication(tk.Frame):
         self.parent.bind('<Control-minus>', lambda _: self.decrease_splits())
         self.parent.bind('<Control-o>', lambda _: self.open_file())
         self.parent.bind('<Control-r>', lambda _: self.reload_file())
+        self.parent.bind('<Control-s>', lambda _: self.save())
 
         self.changed = True
         self.current_depth_limit = 0
@@ -434,38 +436,48 @@ class MainApplication(tk.Frame):
                 variables.y_axe_limit = variables.interval_limit[variables.y_axe_position]
             variables.y_axe_limit_temp = variables.y_axe_limit
             self.restore_default()
+            if settings.pre_sampling:
+                self.formula_parser.pre_sampling.pre_sampling()
 
-    def _check_correct_parsing(self, formula_parser, insert=False):
+    def _check_correct_parsing(self, insert=False):
+        """Checks if formula was parsed correctly.
+
+        :param insert: If text field needs an insert of the formula, defaults to False
+        """
         if variables.formula is not None:
             if insert:
                 self.text.insert('1.0', variables.formula)
             if settings.pre_sampling:
-                formula_parser.pre_sampling.pre_sampling()
+                self.formula_parser.pre_sampling.pre_sampling()
             self.get_graph_axes()
-            self.minimum.delete(0, tk.END)
-            self.minimum.insert(0, 0.0)
-            self.maximum.delete(0, tk.END)
-            self.maximum.insert(0, 1.0)
         else:
             self.ready_label.configure(text='ERROR')
 
-    def _reset_interval_limit(self):
-        """Resets the interval limit for every parameter."""
+    def _reset_interval_limit(self, same=False):
+        """Resets the interval limit for every parameter.
+
+        :param same: If its the same formula, defaults to False
+        """
         variables.interval_limit = []
         for _ in range(len(variables.parameters)):
             variables.interval_limit.append(variables.DEFAULT_LIMIT)
         self.interval_param.set(variables.parameters[0])
+        if not same:
+            self.minimum.delete(0, tk.END)
+            self.minimum.insert(0, 0.0)
+            self.maximum.delete(0, tk.END)
+            self.maximum.insert(0, 1.0)
 
     def read_file(self):
         """Reads the formula from the selected file and tries to parse them."""
         if self.file_path:
             self.file_path_label.configure(text=os.path.basename(self.file_path), anchor=tk.W)
-            formula_parser = FormulaParser()
-            formula_parser.parse_from_file(self.file_path)
+            self.formula_parser = FormulaParser()
+            self.formula_parser.parse_from_file(self.file_path)
             self._reset_interval_limit()
             self.restore_default()
             self.text.delete('1.0', 'end-1c')
-            self._check_correct_parsing(formula_parser, True)
+            self._check_correct_parsing(True)
 
     def open_file(self):
         """Opens a SMT-LIB file (.smt2)."""
@@ -480,12 +492,18 @@ class MainApplication(tk.Frame):
         """Sets the formula from the text field as the new formula."""
         text = self.text.get('1.0', 'end-1c')
         if self.text.compare('1.0', '!=', 'end-1c'):
-            formula_parser = FormulaParser()
-            formula_parser.parse_from_textfield(text)
+            formula = str(variables.formula)
+            self.formula_parser = FormulaParser()
+            self.formula_parser.parse_from_textfield(text)
+            if formula == text:
+                self._reset_interval_limit(True)
+            else:
+                if not self.minimum.get():
+                    self.minimum.insert(0, 0.0)
+                if not self.maximum.get():
+                    self.maximum.insert(0, 1.0)
             self.restore_default()
-            self._check_correct_parsing(formula_parser)
-        if self.text.compare('1.0', '!=', 'end-1c') and text != str(variables.formula):
-            self._reset_interval_limit()
+            self._check_correct_parsing()
 
     @staticmethod
     def save():
@@ -592,6 +610,7 @@ class MainApplication(tk.Frame):
         else:
             for _ in range(len(variables.parameters)):
                 boundaries += (variables.DEFAULT_LIMIT,)
+                variables.interval_limit.append(variables.DEFAULT_LIMIT)
         boundaries += (1,)
         variables.queue = [boundaries]
         variables.sub_queue = []
