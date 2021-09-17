@@ -1,7 +1,6 @@
 """Tries to find safe and unsafe regions of the parameter space."""
 
 import z3
-import decimal
 
 from pasypy import variables
 from pasypy.splitting_heuristic import SplittingHeuristic
@@ -11,11 +10,12 @@ from pasypy.logger import Logger
 class PaSyPy:
     """Tries to find safe and unsafe regions of the parameter space."""
 
-    FACTOR = -4
+    FACTOR = 0.0001
 
     def __init__(self):
         """Initializes the solvers used by this class."""
         self.init_solvers()
+        self.splitting_heuristic = SplittingHeuristic()
 
     @staticmethod
     def init_solvers():
@@ -49,6 +49,24 @@ class PaSyPy:
                            (variables.queue[0][variables.y_axe_position][1] <= variables.y_axe_limit_temp[1]))
         return inside_zoom
 
+    def check_factor(self):
+        """Checks if the queue contains scientific notation (<0.0001) because solver crashes on this.
+
+        :return: If the factor is acceptable by the solver.
+        """
+        correct_factor = True
+        for parameter in range(len(variables.parameters)):
+            left_number = variables.queue[0][parameter][0]
+            right_number = variables.queue[0][parameter][1]
+            if left_number < 0:
+                left_number = -left_number
+            if right_number < 0:
+                right_number = -right_number
+            if ((left_number < self.FACTOR) and (left_number != 0)) or ((right_number < self.FACTOR)  and (right_number != 0)):
+                correct_factor = False
+                break
+        return correct_factor
+
     def solveit(self, area):
         """Checks if the given area is safe, unsafe or unknown and requires splitting.
         For this the solver first checks if the original formula on given area are satisfiable (sat).
@@ -69,7 +87,7 @@ class PaSyPy:
             self.add_boundary(variables.solver_neg, area)
             status = variables.solver_neg.check()
             if status == z3.sat:
-                SplittingHeuristic().apply_heuristic(area)
+                self.splitting_heuristic.apply_heuristic(area)
             elif status == z3.unsat:
                 variables.safe_area.append(area)
             else:
@@ -81,19 +99,6 @@ class PaSyPy:
             variables.unsafe_area.append(area)
         else:
             print('TIMEOUT', variables.solver.reason_unknown()) # pragma: no cover
-
-    def check_factor(self):
-        """Checks if the queue contains scientific notation (<0.0001) because solver crashes on this.
-
-        :return: If the factor is acceptable by the solver.
-        """
-        correct_factor = True
-        for parameter in range(len(variables.parameters)):
-            if (decimal.Decimal(str(variables.queue[0][parameter][0])).as_tuple().exponent < self.FACTOR) or \
-               (decimal.Decimal(str(variables.queue[0][parameter][1])).as_tuple().exponent < self.FACTOR):
-                correct_factor = False
-                break
-        return correct_factor
 
     def main(self, application):
         """The main function of this tool which tries to find safe and unsafe regions of the parameter space."""

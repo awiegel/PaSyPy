@@ -41,6 +41,7 @@ class MainApplication(tk.Frame):
         self.formula_parser = FormulaParser()
         self.computation_timer = Timer()
         self.area_calculation = AreaCalculation()
+        self.visual = Visualize()
 
         self.parent.bind('<Control-plus>', lambda _: self.increase_splits())
         self.parent.bind('<Control-minus>', lambda _: self.decrease_splits())
@@ -291,12 +292,7 @@ class MainApplication(tk.Frame):
         """Adds the empty graph on initialization or resetting to default."""
         plt.close('all')
         self.add_plot(plt.figure())
-        plt.xlim(variables.x_axe_limit)
-        if len(variables.parameters) > 1:
-            plt.ylim(variables.y_axe_limit)
-        else:
-            plt.ylim([0, 1])
-            plt.yticks([])
+        self.visual.init_graph()
 
     def add_empty_axes(self):
         """Adds the empty fields for the parameters on the graph and the settings wheel."""
@@ -349,6 +345,7 @@ class MainApplication(tk.Frame):
                 self.opt_x_axe.children['menu'].add_command(label=parameter, command=lambda x=parameter: self.variable_x_axe.set(x))
                 self.opt_y_axe.children['menu'].add_command(label=parameter, command=lambda x=parameter: self.variable_y_axe.set(x))
                 self.opt_interval_param.children['menu'].add_command(label=parameter, command=lambda x=parameter: self._insert_interval(x))
+            self.opt_interval_param.children['menu'].add_command(label='all', command=lambda x='all': self.interval_param.set(x))
             if update:
                 self.variable_x_axe.set(self.variable_x_axe.get())
                 if self.variable_y_axe.get() != self.variable_x_axe.get():
@@ -374,10 +371,17 @@ class MainApplication(tk.Frame):
         self.opt_y_axe.lift()
         self.settings_label.lift()
 
+    def set_zoom(self):
+        """Sets the current viewed area as zoom limit."""
+        variables.x_axe_limit_temp = variables.x_axe_limit
+        if len(variables.parameters) > 1:
+            variables.y_axe_limit_temp = variables.y_axe_limit
+
     def get_graph_axes(self):
         """Sets the position of the currently active parameters inside the array to know which axes have to be visualized."""
         if len(variables.parameters) == 1:
             variables.x_axe_position = 0
+            variables.x_axe_limit = variables.interval_limit[0]
         else:
             for index, value in enumerate(variables.parameters):
                 if self.variable_x_axe.get() == str(value):
@@ -395,6 +399,7 @@ class MainApplication(tk.Frame):
                     if self.variable_x_axe.get() != str(value):
                         variables.y_axe_position = index
                         variables.y_axe_limit = variables.interval_limit[index]
+        self.set_zoom()
 
     def border(self):
         """Sets the complete considered interval."""
@@ -402,9 +407,10 @@ class MainApplication(tk.Frame):
             return
         interval_param = self.interval_param.get()
         parameter_index = 0
-        for index, value in enumerate(variables.parameters):
-            if interval_param == str(value):
-                parameter_index = index
+        if interval_param != 'all':
+            for index, value in enumerate(variables.parameters):
+                if interval_param == str(value):
+                    parameter_index = index
         update = False
         lim_inf = self.minimum.get()
         if lim_inf:
@@ -428,13 +434,17 @@ class MainApplication(tk.Frame):
             lim_sup = variables.interval_limit[parameter_index][1]
 
         if update:
-            variables.interval_limit[parameter_index] = [lim_inf, lim_sup]
+            if interval_param != 'all':
+                variables.interval_limit[parameter_index] = [lim_inf, lim_sup]
+            else:
+                for index in range(len(variables.interval_limit)):
+                    variables.interval_limit[index] = [lim_inf, lim_sup]
             variables.x_axe_limit = variables.interval_limit[variables.x_axe_position]
             variables.x_axe_limit_temp = variables.x_axe_limit
 
             if len(variables.parameters) > 1:
                 variables.y_axe_limit = variables.interval_limit[variables.y_axe_position]
-            variables.y_axe_limit_temp = variables.y_axe_limit
+                variables.y_axe_limit_temp = variables.y_axe_limit
             self.restore_default()
             if settings.pre_sampling:
                 self.formula_parser.pre_sampling.pre_sampling()
@@ -464,9 +474,9 @@ class MainApplication(tk.Frame):
         self.interval_param.set(variables.parameters[0])
         if not same:
             self.minimum.delete(0, tk.END)
-            self.minimum.insert(0, 0.0)
+            self.minimum.insert(0, variables.DEFAULT_LIMIT[0])
             self.maximum.delete(0, tk.END)
-            self.maximum.insert(0, 1.0)
+            self.maximum.insert(0, variables.DEFAULT_LIMIT[1])
 
     def read_file(self):
         """Reads the formula from the selected file and tries to parse them."""
@@ -499,11 +509,12 @@ class MainApplication(tk.Frame):
                 self._reset_interval_limit(True)
             else:
                 if not self.minimum.get():
-                    self.minimum.insert(0, 0.0)
+                    self.minimum.insert(0, variables.DEFAULT_LIMIT[0])
                 if not self.maximum.get():
-                    self.maximum.insert(0, 1.0)
+                    self.maximum.insert(0, variables.DEFAULT_LIMIT[1])
             self.restore_default()
             self._check_correct_parsing()
+        self.changed = True
 
     @staticmethod
     def save():
@@ -560,7 +571,8 @@ class MainApplication(tk.Frame):
             self.ready_label.configure(text='VISUALIZING...')
             self.ready_label.update()
             self.computation_timer.create_timestamp('Visualization')
-            figure = Visualize().generate_graph()
+            self.visual = Visualize()
+            figure = self.visual.generate_graph()
             self.add_plot(figure)
             self.computation_timer.calculate_time('Visualization')
             self.visualization_time.config(text='Visualization Time         : {} sec.'.format(round(self.computation_timer.get_time('Visualization'), 3)))
@@ -604,7 +616,7 @@ class MainApplication(tk.Frame):
     def restore_default(self):
         """Restores all relevant variables to default as they were at the beginning of the program."""
         boundaries = ()
-        if variables.interval_limit:
+        if variables.interval_limit and (len(variables.interval_limit) == len(variables.parameters)):
             for interval in variables.interval_limit:
                 boundaries += (interval,)
         else:

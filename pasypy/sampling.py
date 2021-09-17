@@ -34,9 +34,18 @@ class PreSampling:
     def _add_candidates(self):
         """Adds candidates to the instruction list."""
         for candidate in self.candidates:
-            temp = [candidate.decl().name(), (candidate.children()[1].numerator_as_long()/candidate.children()[1].denominator_as_long())]
+            param_index = 0
+            number_index = 0
+            for index, sub_formula in enumerate(candidate.children()):
+                if isinstance(sub_formula, z3.z3.RatNumRef):
+                    number_index = index
+            temp = [candidate.decl().name(), (candidate.children()[number_index].numerator_as_long()/candidate.children()[number_index].denominator_as_long())]
+            if number_index == 0:
+                param_index = 1
+            else:
+                param_index = 0
             for index, value in enumerate(variables.parameters):
-                if candidate.children()[0] == value:
+                if candidate.children()[param_index] == value:
                     self.instructions[index][1].append(temp)
 
     def _sort_values(self):
@@ -68,7 +77,8 @@ class PreSampling:
                 else:
                     last = value
 
-    def _filter_wrong_queue_elements(self):
+    @staticmethod
+    def _filter_wrong_queue_elements():
         """Filters all wrong queue elements with intervals like [0.0, 0.0]."""
         removed_indices = 0
         for index, value in enumerate(variables.queue[:]):
@@ -139,8 +149,8 @@ class Sampling:
                     test_point_status = self.check_point(new_mid, index)
                     if test_point_status != first_point_status:
                         found = True
-                        break
-                    new_mid = (area[index][0] + new_mid) / 2
+                    else:
+                        new_mid = (area[index][0] + new_mid) / 2
 
             if not found:
                 if self.check_bounds(first_point, area[index][1], value, first_point_status):
@@ -149,11 +159,8 @@ class Sampling:
                         test_point_status = self.check_point(new_mid, index)
                         if test_point_status != first_point_status:
                             found = True
-                            break
-                        new_mid = (area[index][1] + new_mid) / 2
-                        if test_point_status != first_point_status:
-                            found = True
-                            break
+                        else:
+                            new_mid = (area[index][1] + new_mid) / 2
             if found:
                 borders.append([[area[index][0], new_mid], [new_mid, area[index][1]]])
             else:
@@ -180,8 +187,8 @@ class Sampling:
                 test_point_status = self.check_point(new_mid, index)
                 if test_point_status != first_point_status:
                     found = True
-                    break
-                new_mid = (area[index][0] + new_mid) / 2
+                else:
+                    new_mid = (area[index][0] + new_mid) / 2
 
         if not found:
             if self.check_bounds(first_point, area[index][1], variables.parameters[index], first_point_status):
@@ -190,11 +197,8 @@ class Sampling:
                     test_point_status = self.check_point(new_mid, index)
                     if test_point_status != first_point_status:
                         found = True
-                        break
-                    new_mid = (area[index][1] + new_mid) / 2
-                    if test_point_status != first_point_status:
-                        found = True
-                        break
+                    else:
+                        new_mid = (area[index][1] + new_mid) / 2
 
         self.remove_mid_points()
         if found:
@@ -256,8 +260,9 @@ class Sampling:
         variables.solver.push()
         for index, value in enumerate(variables.parameters):
             if index != current_index:
-                variables.solver.add(value == (area[current_index][0] + area[current_index][1])/2)
-                variables.solver_neg.add(value == (area[current_index][0] + area[current_index][1])/2)
+                mid_point = (area[current_index][0] + area[current_index][1])/2
+                variables.solver.add(value == mid_point)
+                variables.solver_neg.add(value == mid_point)
 
     @staticmethod
     def remove_mid_points():
