@@ -58,6 +58,7 @@ Calculates safe, unsafe and unknown areas in percentage.
 
 **settings.py** \
 Contains adjustable settings:
+* **Splitting Heuristic:** The used splitting heuristic. Choose between Default, Simple, Extended and Random.
 * **Pre-Sampling:** Optimizes performance prior to computation by generating better candidates.
 * **Sampling:** Optimizes performance prior to each splitting step by generating better candidates.
 * **Regression:** Approximation curve (regression) with safe and unsafe regions as training sets.
@@ -84,6 +85,9 @@ Contains all icons used by this tool.
 **Documentation** \
 Contains documentation.
 
+**benchmarks** \
+Contains own created **.smt2** files but also Benchmarks from `SMT-LIB`.
+
 **requirements.txt** \
 Includes all dependencies needed by this tool.
 Can be invoked with `pip install -r requirements.txt`.
@@ -103,12 +107,10 @@ The file used by GitHub to facilitate citing this repository.
 **LICENSE** \
 A license file.
 
-<br/> <br/> <br/>
 
 ## 2. Platform Support
 This tool works on every platform (**Windows**, **MacOS**, **Linux**) with full functionality.
 
-<br/> <br/> <br/>
 
 ## 3. Known challenges
 * **.smt2** files usually contain a **set-logic** line, which helps the solver to apply the correct tactic.
