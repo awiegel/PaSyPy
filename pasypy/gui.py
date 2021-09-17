@@ -341,11 +341,11 @@ class MainApplication(tk.Frame):
         elif len(variables.parameters) > 1:
             self.opt_x_axe.grid(row=0, column=0, sticky=tk.S, pady=1)
             self.opt_y_axe.grid(row=0, column=0, sticky=tk.W, padx=1)
+            self.opt_interval_param.children['menu'].add_command(label='all', command=lambda x='all': self.interval_param.set(x))
             for parameter in variables.parameters:
                 self.opt_x_axe.children['menu'].add_command(label=parameter, command=lambda x=parameter: self.variable_x_axe.set(x))
                 self.opt_y_axe.children['menu'].add_command(label=parameter, command=lambda x=parameter: self.variable_y_axe.set(x))
                 self.opt_interval_param.children['menu'].add_command(label=parameter, command=lambda x=parameter: self._insert_interval(x))
-            self.opt_interval_param.children['menu'].add_command(label='all', command=lambda x='all': self.interval_param.set(x))
             if update:
                 self.variable_x_axe.set(self.variable_x_axe.get())
                 if self.variable_y_axe.get() != self.variable_x_axe.get():
