@@ -1,5 +1,5 @@
 # PaSyPy Documentation <img align="right" width="25%" height="25%" src="images/PaSyPy_logo.png" />
-This python-based tool uses parameter synthesis to find safe and unsafe regions of the parameter space.
+This python-based tool uses parameter synthesis to find safe and unsafe regions of the parameter space on nonlinear real arithmetic.
 
 <br/>
 
