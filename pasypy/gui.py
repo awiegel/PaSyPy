@@ -620,6 +620,7 @@ class MainApplication(tk.Frame):
             for interval in variables.interval_limit:
                 boundaries += (interval,)
         else:
+            variables.interval_limit = []
             for _ in range(len(variables.parameters)):
                 boundaries += (variables.DEFAULT_LIMIT,)
                 variables.interval_limit.append(variables.DEFAULT_LIMIT)
