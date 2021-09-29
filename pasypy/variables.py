@@ -17,6 +17,9 @@ sub_queue = []
 safe_area = []
 unsafe_area = []
 
+models = []
+models_neg = []
+
 # stops at the limit (1/(2**depth_limit)). Can also be stopped before by pressing Ctrl+C.
 # Amount of splits where 1 is initial box and 2 is the initial box split into 2**dimensions boxes.
 depth_limit = 8 # pylint: disable=C0103 # is not a constant

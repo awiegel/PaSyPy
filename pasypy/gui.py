@@ -626,6 +626,8 @@ class MainApplication(tk.Frame):
                 variables.interval_limit.append(variables.DEFAULT_LIMIT)
         boundaries += (1,)
         variables.queue = [boundaries]
+        variables.models = []
+        variables.models_neg = []
         variables.sub_queue = []
         variables.safe_area = []
         variables.unsafe_area = []
