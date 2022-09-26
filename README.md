@@ -1,6 +1,8 @@
 # PaSyPy <img align="right" width="25%" height="25%" src="Documentation/images/PaSyPy_logo.png" />
 A python-based tool using parameter synthesis to find safe and unsafe regions of the parameter space on nonlinear real arithmetic.
 
+For a detailed description of this project, read the [publication](https://ths.rwth-aachen.de/wp-content/uploads/sites/4/wiegel_bachelor.pdf).
+
 <br/>
 
 ## Table of contents
